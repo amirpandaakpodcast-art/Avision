@@ -318,6 +318,17 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
 
   /* ── 12. FOOTER ─────────────────────────────────────────────────────────── */
   footer                     { padding: 1.5rem 1.2rem; flex-direction: column; gap: .8rem; text-align: center; }
+
+  /* ── 13. CLIENT LOGOS: mobile-specific logo fixes ──────────────────────── */
+
+  /* Samsung logo is 180px on desktop — too wide for a 2-col mobile grid cell */
+  #logo-samsung              { width: 100px !important; }
+
+  /* Sony & Logitech logos are black (filter: brightness(0) invert(1) makes them
+     white on desktop). On mobile the dark bg still causes them to vanish if the
+     filter chain resets or renders differently — force full white + boost. */
+  #logo-sony,
+  #logo-logitech             { filter: invert(1) brightness(2) !important; }
 }
 
 /* ══ SMALL MOBILE  (≤ 400px) ════════════════════════════════════════════════ */
@@ -845,7 +856,7 @@ function playVideoA3() {
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="logos/SAM.png" alt="Sony" style="width: 180px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
+          <img id="logo-samsung" src="logos/SAM.png" alt="Samsung" style="width: 180px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="22" y="8" width="10" height="10" rx="2"/><rect x="8" y="22" width="10" height="10" rx="2"/><rect x="22" y="22" width="10" height="10" rx="2"/></svg>
         </div>
         <div class="client-placeholder">SAMSUNG</div>
@@ -863,7 +874,7 @@ function playVideoA3() {
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="logos/sony-logo.png" alt="Sony" style="width: 130px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
+          <img id="logo-sony" src="logos/sony-logo.png" alt="Sony" style="width: 130px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><polygon points="20,6 34,32 6,32"/></svg>
         </div>
         <div class="client-placeholder">SONY</div>
@@ -890,7 +901,7 @@ function playVideoA3() {
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="logos/logitech-logo.png" alt="Sony" style="width: 130px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
+          <img id="logo-logitech" src="logos/logitech-logo.png" alt="Logitech" style="width: 130px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="20" r="8"/><circle cx="26" cy="20" r="8"/></svg>
         </div>
         <div class="client-placeholder">logitech</div>
