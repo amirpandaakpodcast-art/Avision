@@ -1,48 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<style>
-  /* تعديل للجوال فقط - شاشات أصغر من 600px */
-  @media only screen and (max-width: 600px) {
-    
-    /* 1. تصغير الخطوط الكبيرة اللي تطلع برا الشاشة */
-    h1, h2, .big-text, h3 { 
-      font-size: 28px !important; 
-      line-height: 1.2 !important;
-      word-wrap: break-word !important;
-    }
-
-    /* 2. ضبط الفيديوهات والصور عشان ما "تنفجر" برا الجوال */
-    iframe, img, video {
-      width: 100% !important;
-      max-width: 100% !important;
-      height: auto !important;
-      position: relative !important;
-      left: 0 !important;
-      margin-bottom: 10px !important;
-    }
-
-    /* 3. ترتيب القائمة (Nav) عشان ما تتداخل */
-    nav, header {
-      flex-direction: column !important;
-      text-align: center !important;
-      height: auto !important;
-    }
-
-    /* 4. إلغاء أي عرض ثابت يسبب سكرول يمين ويسار */
-    .container, div, section {
-      width: 100% !important;
-      padding: 10px !important;
-      margin: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-    }
-  }
-</style>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<!-- ✅ Single correct viewport meta tag -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Avision — Cinematic Editor</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -72,10 +33,13 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .clbl{font-size:.62rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;font-family:'Space Mono',monospace;margin-top:.15rem}
 .hero-tag{font-size:.72rem;font-weight:700;letter-spacing:.22em;color:var(--gl);text-transform:uppercase;margin-bottom:1.4rem;display:flex;align-items:center;gap:.7rem}
 .hero-tag::before{content:'';width:2.2rem;height:1px;background:var(--gl)}
-.hero-headline{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2.8rem,7.5vw,8rem);line-height:1.05;font-weight:900;color:var(--white);position:relative;z-index:1;text-align:left;max-width:800px}
+/* hero-headline: font-size handled by .hero-hl-line spans for fluid scaling */
+.hero-headline{font-family:'Barlow Condensed',sans-serif;line-height:1.05;font-weight:900;color:var(--white);position:relative;z-index:1;text-align:left;max-width:800px}
 .hero-headline span{display:inline-block;padding-bottom:15px;}
 .hero-headline .accent{color:var(--yellow)}
 .hero-headline .outline{-webkit-text-stroke:1.5px rgba(248,225,111,.4);color:transparent}
+/* Fluid headline lines — desktop default */
+.hero-hl-line{display:block;font-size:clamp(2rem,7.5vw,4.8rem);font-weight:900;line-height:1.15}
 .hero-sub{margin-top:1.6rem;max-width:480px;font-size:.95rem;font-weight:300;color:var(--muted);line-height:2;text-align:left}
 .hero-actions{margin-top:2.2rem;display:flex;align-items:center;gap:1.8rem;flex-direction:row-reverse}
 .btn-p{font-family:'Barlow Condensed',sans-serif;font-size:.88rem;background:var(--yellow);color:var(--black);padding:.8rem 1.8rem;text-decoration:none;font-weight:700;transition:all .3s;display:inline-flex;align-items:center;gap:.4rem}
@@ -211,17 +175,142 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
 .reveal.visible{opacity:1;transform:none}
 .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
 
-@media(max-width:900px){
-.hero{padding:0 1.5rem 4rem}
-nav{padding:1rem 1.5rem}
-.hero-counter{display:none}
-.hero-wm{display:none}
-.section{padding:4.5rem 1.5rem}
-.ads-grid,.reels-grid{grid-template-columns:1fr}
-.yt-card{grid-template-columns:1fr}
-.clients-grid{grid-template-columns:repeat(3,1fr)}
-.nav-links{display:none}
-footer{flex-direction:column;gap:1rem;text-align:center}
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE STYLES — desktop rules untouched above this line
+   Breakpoints: 900px (tablet), 768px (mobile), 400px (small mobile)
+   Strategy: targeted class / id selectors only — no universal blasts
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ══ TABLET  (≤ 900px) ══════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  nav                        { padding: 1rem 1.5rem; }
+  .nav-links                 { display: none; }
+  .hero                      { padding: 0 1.5rem 4rem; }
+  .hero-counter              { display: none; }
+  .hero-wm                   { display: none; }
+  .section                   { padding: 4.5rem 1.5rem; }
+  .clients-section           { padding: 4rem 1.5rem; }
+  .ads-grid                  { grid-template-columns: 1fr; }
+  .reels-grid                { grid-template-columns: 1fr; }
+  .yt-card                   { grid-template-columns: 1fr; }
+  .yt-thumb                  { aspect-ratio: 16 / 9; }
+  .clients-grid              { grid-template-columns: repeat(3, 1fr); }
+  footer                     { flex-direction: column; gap: 1rem; text-align: center; }
+}
+
+/* ══ MOBILE  (≤ 768px) ══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── 1. NAV: wrap tightly, prevent overflow ─────────────────────────────── */
+  nav {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: space-between;
+  }
+  .nav-logo-text             { font-size: 1.05rem; }
+  .nav-cta                   { font-size: .72rem; padding: .35rem .85rem; }
+
+  /* ── 2. HERO: add top padding for fixed nav, fluid bottom padding ───────── */
+  .hero {
+    padding: 5rem 1.2rem 3.5rem;
+    min-height: 100svh;
+  }
+  .hero-tag                  { font-size: .65rem; margin-bottom: 1rem; }
+
+  /* Hero headline: mobile-safe clamp — lines never bleed the viewport */
+  .hero-hl-line              { font-size: clamp(1.75rem, 9vw, 3rem); }
+
+  .hero-sub {
+    font-size: .88rem;
+    max-width: 100%;
+    margin-top: 1.2rem;
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-top: 1.8rem;
+  }
+  .btn-p                     { font-size: .82rem; padding: .72rem 1.4rem; }
+  .btn-g                     { font-size: .78rem; }
+  .scroll-wrap               { display: none; }
+
+  /* ── 3. SECTIONS: tighter padding ──────────────────────────────────────── */
+  .section                   { padding: 3.5rem 1.2rem; }
+  .clients-section           { padding: 3rem 1.2rem; }
+  .contact-section           { padding: 4rem 1.2rem; }
+
+  /* ── 4. TYPOGRAPHY: scale section titles ───────────────────────────────── */
+  .stitle                    { font-size: clamp(1.6rem, 6vw, 2.5rem); }
+
+  /* ── 5. WORK TABS: wrap and shrink ─────────────────────────────────────── */
+  .work-tabs {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: .4rem;
+    margin-bottom: 2rem;
+  }
+  .wtab                      { font-size: .74rem; padding: .6rem 1rem; }
+
+  /* ── 6. AD CARDS: single column, 9:16 thumbnails fill correctly ─────────── */
+  .ads-grid                  { grid-template-columns: 1fr; gap: 1.2rem; }
+  .ad-vthumb                 { width: 100%; }
+
+  /* ── 7. YT CARDS: stack body below thumb ───────────────────────────────── */
+  .yt-card                   { grid-template-columns: 1fr; direction: ltr; }
+  .yt-thumb                  { aspect-ratio: 16 / 9; width: 100%; }
+  .yt-body {
+    padding: 1.2rem;
+    border-right: none;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── 8. REELS: single column, phone-frame cards centred ────────────────── */
+  .reels-grid                { grid-template-columns: 1fr; gap: 1.2rem; }
+  .reel-card                 { max-width: 360px; margin: 0 auto; }
+
+  /* ── 9. IFRAME WRAPPERS: never exceed viewport ──────────────────────────── */
+  /* iframes live inside position:absolute divs that are children of
+     aspect-ratio containers — they fill via 100% width/height already.
+     These rules prevent their parent wrappers from bleeding. */
+  .ad-vthumb > div,
+  .yt-thumb > div,
+  .reel-thumb > div          { max-width: 100%; }
+
+  /* ── 10. CLIENTS: 2 columns on mobile ───────────────────────────────────── */
+  .clients-grid              { grid-template-columns: repeat(2, 1fr); }
+  .client-cell               { padding: 1.4rem 1rem; }
+  .client-logo-mark          { width: 36px; height: 36px; }
+
+  /* ── 11. CONTACT ─────────────────────────────────────────────────────────── */
+  .contact-inner             { padding: 0 0.5rem; }
+  .cemail                    { font-size: clamp(.9rem, 3.5vw, 1.4rem); word-break: break-all; }
+  .ctag                      { font-size: .88rem; }
+  .social-links              { gap: .75rem; }
+  .slink                     { font-size: .72rem; padding: .4rem .7rem; }
+
+  /* ── 12. FOOTER ─────────────────────────────────────────────────────────── */
+  footer                     { padding: 1.5rem 1.2rem; flex-direction: column; gap: .8rem; text-align: center; }
+
+  /* ── 13. CLIENT LOGO FIXES (mobile-only) ────────────────────────────────── */
+
+  /* Samsung: 180px inline width is too large for a 2-col mobile cell */
+  #logo-samsung              { width: 100px !important; }
+
+  /* Sony & Logitech: their inline filter(brightness(0) invert(1)) can render
+     as near-invisible on dark mobile backgrounds — force full white + boost */
+  #logo-sony,
+  #logo-logitech             { filter: invert(1) brightness(2) !important; }
+}
+
+/* ══ SMALL MOBILE  (≤ 400px) ════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+  .hero-hl-line              { font-size: clamp(1.5rem, 10vw, 2.2rem); }
+  .stitle                    { font-size: clamp(1.4rem, 7vw, 2rem); }
+  .clients-grid              { grid-template-columns: repeat(2, 1fr); }
+  .work-tabs                 { gap: .25rem; }
+  .wtab                      { font-size: .68rem; padding: .5rem .75rem; }
 }
 </style>
 </head>
@@ -229,7 +318,7 @@ footer{flex-direction:column;gap:1rem;text-align:center}
 
 <!-- LOGO SVG inline (dragon-A mark, white) -->
 <svg id="logosvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="display:none">
-  <image href="/mnt/user-data/uploads/White.png" width="100" height="100"/>
+  <image href="../logos/White.png" width="100" height="100"/>
 </svg>
 
 <!-- NAV -->
@@ -244,7 +333,7 @@ footer{flex-direction:column;gap:1rem;text-align:center}
     <li><a href="#clients">Clients</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
-  <a href="index.html" style="color: #fff; text-decoration: none; font-size: 14px; margin-right: 20px; vertical-align: middle;">العربية</a>
+  <a href="../index.html" style="color: #fff; text-decoration: none; font-size: 14px; margin-right: 20px; vertical-align: middle;">العربية</a>
   <a href="#contact" class="nav-cta">Let's Talk</a>
 </nav>
 
@@ -252,21 +341,23 @@ footer{flex-direction:column;gap:1rem;text-align:center}
 <section class="hero" id="home">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
-  <img src="/mnt/user-data/uploads/White.png" alt="" class="hero-wm" aria-hidden="true" onerror="this.style.display='none'">
+  <img src="../logos/White.png" alt="" class="hero-wm" aria-hidden="true" onerror="this.style.display='none'">
 
-  <div class="hero-counter" style="position: absolute; right: 20px; display: flex; flex-direction: column; align-items: flex-end; text-align: right !important;">
+  <!-- hero-counter: right-aligned on desktop, hidden on mobile via CSS -->
+  <div class="hero-counter" style="position: absolute; right: 20px; display: flex; flex-direction: column; align-items: flex-end; text-align: right;">
     <div><div class="cnum" style="text-align: right;">+250</div><div class="clbl" style="text-align: right;">Projects</div></div>
     <div><div class="cnum" style="text-align: right;">+6</div><div class="clbl" style="text-align: right;">Years</div></div>
     <div><div class="cnum" style="text-align: right;">+40</div><div class="clbl" style="text-align: right;">Clients</div></div>
-</div>
+  </div>
 
   <div class="hero-tag">Cinematic Editor — Avision</div>
 
- <h1 class="hero-headline" style="position: relative; top: -250px; line-height: 1.15 !important; text-align: left; direction: ltr;">
-    <span style="font-size: 4.8rem; font-weight: 900; color: #f5f5f5; display: block;">EDITING</span>
-    <span class="accent" style="font-size: 4.8rem; font-weight: 900; display: block;">IS NOT JUST A TOOL,</span>
-    <span style="font-size: 4.8rem; font-weight: 900; color: #f5f5f5; display: block;">EDITING IS VISION</span>
-</h1>
+  <!-- hero-headline: top:-250px offset removed; fluid font via .hero-hl-line -->
+  <h1 class="hero-headline" style="line-height: 1.15; text-align: left; direction: ltr;">
+    <span class="hero-hl-line" style="color: #f5f5f5;">EDITING</span>
+    <span class="hero-hl-line accent">IS NOT JUST A TOOL,</span>
+    <span class="hero-hl-line" style="color: #f5f5f5;">EDITING IS VISION</span>
+  </h1>
 
   <p class="hero-sub">I craft visual experiences that go beyond the screen — every cut is intentional, every moment told with purpose.</p>
 
@@ -321,22 +412,20 @@ footer{flex-direction:column;gap:1rem;text-align:center}
       <div class="ad-card">
         <div class="ad-vthumb">
           <div style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="../image/PC1.png" 
-         id="cover-C1" 
-         onclick="playVideoC1()" 
-         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
+    <img src="../image/PC1.png"
+         id="cover-C1"
+         onclick="playVideoC1()"
+         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;"
          alt="Video Cover">
-
-    <iframe 
-        id="video-C1" 
-        src="https://www.youtube.com/embed/RD8bM5kMij0?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
+    <iframe
+        id="video-C1"
+        src="https://www.youtube.com/embed/RD8bM5kMij0?enablejsapi=1&rel=0&modestbranding=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
         style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
     </iframe>
 </div>
-
 <script>
 function playVideoC1() {
     document.getElementById('cover-C1').style.display = 'none';
@@ -363,22 +452,20 @@ function playVideoC1() {
       <div class="ad-card">
         <div class="ad-vthumb">
           <div style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="../image/PC2.png" 
-         id="cover-C2" 
-         onclick="playVideoC2()" 
-         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
+    <img src="../image/PC2.png"
+         id="cover-C2"
+         onclick="playVideoC2()"
+         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;"
          alt="Video Cover">
-
-    <iframe 
-        id="video-C2" 
-        src="https://www.youtube.com/embed/MhriLwbwE-g?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
+    <iframe
+        id="video-C2"
+        src="https://www.youtube.com/embed/MhriLwbwE-g?enablejsapi=1&rel=0&modestbranding=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
         style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
     </iframe>
 </div>
-
 <script>
 function playVideoC2() {
     document.getElementById('cover-C2').style.display = 'none';
@@ -396,8 +483,7 @@ function playVideoC2() {
         <div class="ad-body">
           <div class="ccat">Commercial Ad ✦ 2026</div>
           <div class="ctitle">Sony Ad — INZONE Products</div>
-          <div class="cdesc">A Sony ad for INZONE products, focused on showcasing performance power and response speed to help professional gamers deliver their best performance in tournaments.
-</div>
+          <div class="cdesc">A Sony ad for INZONE products, focused on showcasing performance power and response speed to help professional gamers deliver their best performance in tournaments.</div>
           <span class="cdir">Direction: Calm pacing and clean editing to highlight the performance and responsiveness of INZONE products.</span>
           <div class="cmeta">Hero Ad · Vertical</div>
         </div>
@@ -406,22 +492,20 @@ function playVideoC2() {
       <div class="ad-card">
         <div class="ad-vthumb">
           <div style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="../image/PC3.png" 
-         id="cover-C3" 
-         onclick="playVideoC3()" 
-         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
+    <img src="../image/PC3.png"
+         id="cover-C3"
+         onclick="playVideoC3()"
+         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;"
          alt="Video Cover">
-
-    <iframe 
-        id="video-C3" 
-        src="https://www.youtube.com/embed/RlC5j9GDuY8?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
+    <iframe
+        id="video-C3"
+        src="https://www.youtube.com/embed/RlC5j9GDuY8?enablejsapi=1&rel=0&modestbranding=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
         style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
     </iframe>
 </div>
-
 <script>
 function playVideoC3() {
     document.getElementById('cover-C3').style.display = 'none';
@@ -439,8 +523,7 @@ function playVideoC3() {
         <div class="ad-body">
           <div class="ccat">Commercial Ad ✦ 2026</div>
           <div class="ctitle">Logitech Ad — G Pro X2 Super Strike Mouse</div>
-          <div class="cdesc">A Logitech ad for the G Pro X2 Super Strike, focused on highlighting the response speed and precision that help professional gamers perform at their best in tournaments.
-</div>
+          <div class="cdesc">A Logitech ad for the G Pro X2 Super Strike, focused on highlighting the response speed and precision that help professional gamers perform at their best in tournaments.</div>
           <span class="cdir">Direction: Calm pacing and clean editing to highlight the performance and responsiveness of the G Pro X2 Super Strike mouse.</span>
           <div class="cmeta">Hero Ad · Vertical</div>
         </div>
@@ -458,29 +541,26 @@ function playVideoC3() {
           <div class="ccat">Ad · Falcons</div>
           <div class="ctitle">Promotional Ad — Falcons Content 2026</div>
           <div class="cdesc">A project for @teamfalconsgg titled: What's Coming?
-We focused on showcasing all of Falcons' upcoming series in an engaging style, with a powerful rhythm that keeps the excitement and holds the viewer's attention.
-</div>
+We focused on showcasing all of Falcons' upcoming series in an engaging style, with a powerful rhythm that keeps the excitement and holds the viewer's attention.</div>
           <span class="cdir">Editing Style: Narrative storytelling + Motion Graphics</span>
           <div class="cmeta">2026 · Social Media</div>
         </div>
         <div class="yt-thumb ytt1" style="position:relative; overflow:visible;">
           <div style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="../image/PB1.png" 
-         id="cover-B1" 
-         onclick="playVideoB1()" 
-         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
+    <img src="../image/PB1.png"
+         id="cover-B1"
+         onclick="playVideoB1()"
+         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;"
          alt="Video Cover">
-
-    <iframe 
-        id="video-B1" 
-        src="https://www.youtube.com/embed/5sCeAPXd63A?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
+    <iframe
+        id="video-B1"
+        src="https://www.youtube.com/embed/5sCeAPXd63A?enablejsapi=1&rel=0&modestbranding=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
         style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
     </iframe>
 </div>
-
 <script>
 function playVideoB1() {
     document.getElementById('cover-B1').style.display = 'none';
@@ -504,22 +584,20 @@ function playVideoB1() {
         </div>
         <div class="yt-thumb ytt2" style="position:relative; overflow:visible;">
           <div style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="../image/PB2.png" 
-         id="cover-B22" 
-         onclick="playVideoB22()" 
-         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
+    <img src="../image/PB2.png"
+         id="cover-B22"
+         onclick="playVideoB22()"
+         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;"
          alt="Video Cover">
-
-    <iframe 
-        id="video-B22" 
-        src="https://www.youtube.com/embed/XBjj1pJ92CE?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
+    <iframe
+        id="video-B22"
+        src="https://www.youtube.com/embed/XBjj1pJ92CE?enablejsapi=1&rel=0&modestbranding=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
         style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
     </iframe>
 </div>
-
 <script>
 function playVideoB22() {
     document.getElementById('cover-B22').style.display = 'none';
@@ -543,22 +621,20 @@ function playVideoB22() {
         </div>
         <div class="yt-thumb ytt3" style="position:relative; overflow:visible;">
           <div style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="../image/PB3.png" 
-         id="cover-B3" 
-         onclick="playVideoB3()" 
-         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
+    <img src="../image/PB3.png"
+         id="cover-B3"
+         onclick="playVideoB3()"
+         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;"
          alt="Video Cover">
-
-    <iframe 
-        id="video-B3" 
-        src="https://www.youtube.com/embed/4dtDE6SEHWw?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
+    <iframe
+        id="video-B3"
+        src="https://www.youtube.com/embed/4dtDE6SEHWw?enablejsapi=1&rel=0&modestbranding=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
         style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
     </iframe>
 </div>
-
 <script>
 function playVideoB3() {
     document.getElementById('cover-B3').style.display = 'none';
@@ -582,22 +658,20 @@ function playVideoB3() {
       <div class="reel-card">
         <div class="reel-thumb rt1" style="position:relative; overflow:visible;">
           <div style="width:100%; height:92%; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="../image/PA1.png" 
-         id="cover-A2" 
-         onclick="playVideoA2()" 
-         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
+    <img src="../image/PA1.png"
+         id="cover-A2"
+         onclick="playVideoA2()"
+         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;"
          alt="Video Cover">
-
-    <iframe 
-        id="video-A2" 
-        src="https://www.youtube.com/embed/DibDmd18p9s?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
+    <iframe
+        id="video-A2"
+        src="https://www.youtube.com/embed/DibDmd18p9s?enablejsapi=1&rel=0&modestbranding=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
         style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
     </iframe>
 </div>
-
 <script>
 function playVideoA2() {
     document.getElementById('cover-A2').style.display = 'none';
@@ -610,7 +684,7 @@ function playVideoA2() {
           <div class="reel-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
           <div class="reel-ov">
             <div class="reel-cat">social media ✦</div>
-            <div class="reel-title">  MLZLZ Ad + OKAMI Brand</div>
+            <div class="reel-title">MLZLZ Ad + OKAMI Brand</div>
             <div class="reel-desc">A promotional video for YouTuber MLZLZ's collaboration with OKAMI brand to produce his own clothing line.</div>
           </div>
         </div>
@@ -623,22 +697,20 @@ function playVideoA2() {
       <div class="reel-card">
         <div class="reel-thumb rt2">
           <div style="width:100%; height:92%; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="../image/PA2.png" 
-         id="cover-A1" 
-         onclick="playVideoA1()" 
-         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
+    <img src="../image/PA2.png"
+         id="cover-A1"
+         onclick="playVideoA1()"
+         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;"
          alt="Video Cover">
-
-    <iframe 
-        id="video-A1" 
-        src="https://www.youtube.com/embed/WAIhv2D0huU?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
+    <iframe
+        id="video-A1"
+        src="https://www.youtube.com/embed/WAIhv2D0huU?enablejsapi=1&rel=0&modestbranding=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
         style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
     </iframe>
 </div>
-
 <script>
 function playVideoA1() {
     document.getElementById('cover-A1').style.display = 'none';
@@ -651,8 +723,7 @@ function playVideoA1() {
           <div class="reel-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
           <div class="reel-ov">
             <div class="reel-cat">social media ✦</div>
-            <div class="reel-title">Ad for Mohamed Adnan | Call of Duty Mobile
-</div>
+            <div class="reel-title">Ad for Mohamed Adnan | Call of Duty Mobile</div>
             <div class="reel-desc">Editing an ad for YouTuber Mohamed Adnan in collaboration with Call of Duty Mobile.</div>
           </div>
         </div>
@@ -665,22 +736,20 @@ function playVideoA1() {
       <div class="reel-card">
         <div class="reel-thumb rt3">
           <div style="width:100%; height:92%; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="../image/PA3.png" 
-         id="cover-A3" 
-         onclick="playVideoA3()" 
-         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
+    <img src="../image/PA3.png"
+         id="cover-A3"
+         onclick="playVideoA3()"
+         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;"
          alt="Video Cover">
-
-    <iframe 
-        id="video-A3" 
-        src="https://www.youtube.com/embed/Vqgxm7FOd0w?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
+    <iframe
+        id="video-A3"
+        src="https://www.youtube.com/embed/Vqgxm7FOd0w?enablejsapi=1&rel=0&modestbranding=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
         style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
     </iframe>
 </div>
-
 <script>
 function playVideoA3() {
     document.getElementById('cover-A3').style.display = 'none';
@@ -713,9 +782,10 @@ In collaboration with content creator mad v.</div>
 <!-- ABOUT -->
 <section class="section" id="about">
   <div class="stag">About</div>
-  <h2 class="stitle" style="margin-bottom:2.5rem; line-height: 1.25; font-size: 3rem; font-weight: 900; position: relative; top: -25px !important;">
+  <!-- Removed inline top:-25px !important that caused overlap on mobile -->
+  <h2 class="stitle" style="margin-bottom:2.5rem; line-height: 1.25; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900;">
     Advertising is a <span class="y" style="color: var(--yellow);">growth strategy</span>.. <br> turning attention into impact
-</h2>
+  </h2>
 
   <div class="about-wrap reveal">
     <div class="about-name">Amir | Video Editor & Creative Content Creator</div>
@@ -736,7 +806,8 @@ In collaboration with content creator mad v.</div>
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="../logos/SAM.png" alt="Sony" style="width: 180px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
+          <!-- id="logo-samsung" → targeted in mobile media query to reduce width to 100px -->
+          <img id="logo-samsung" src="../logos/SAM.png" alt="Samsung" style="width: 180px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="22" y="8" width="10" height="10" rx="2"/><rect x="8" y="22" width="10" height="10" rx="2"/><rect x="22" y="22" width="10" height="10" rx="2"/></svg>
         </div>
         <div class="client-placeholder">SAMSUNG</div>
@@ -754,7 +825,8 @@ In collaboration with content creator mad v.</div>
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="../logos/sony-logo.png" alt="Sony" style="width: 130px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
+          <!-- id="logo-sony" → filter override in mobile media query for visibility -->
+          <img id="logo-sony" src="../logos/sony-logo.png" alt="Sony" style="width: 130px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><polygon points="20,6 34,32 6,32"/></svg>
         </div>
         <div class="client-placeholder">SONY</div>
@@ -763,7 +835,7 @@ In collaboration with content creator mad v.</div>
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="../logos/TS.jpg" alt="Logo" style="width: 50px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
+          <img src="../logos/TS.jpg" alt="Team Saudi" style="width: 50px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="14" width="28" height="4" rx="2"/><rect x="6" y="22" width="20" height="4" rx="2"/></svg>
         </div>
         <div class="client-placeholder">Team Saudi</div>
@@ -772,7 +844,7 @@ In collaboration with content creator mad v.</div>
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="../logos/falcons logo.png" alt="Falcons" style="width: 45px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
+          <img src="../logos/falcons logo.png" alt="Team Falcons" style="width: 45px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><path d="M20 6 L34 14 L34 26 L20 34 L6 26 L6 14 Z"/></svg>
         </div>
         <div class="client-placeholder">Team Falcons</div>
@@ -781,7 +853,8 @@ In collaboration with content creator mad v.</div>
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="../logos/logitech-logo.png" alt="Logitech" style="width: 130px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
+          <!-- id="logo-logitech" → filter override in mobile media query for visibility -->
+          <img id="logo-logitech" src="../logos/logitech-logo.png" alt="Logitech" style="width: 130px; height: auto; object-fit: contain; filter: brightness(0) invert(1);">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="20" r="8"/><circle cx="26" cy="20" r="8"/></svg>
         </div>
         <div class="client-placeholder">logitech</div>
@@ -790,11 +863,10 @@ In collaboration with content creator mad v.</div>
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="../logos/MA logo.jpg" alt="MA Logo" style="width: 50px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
+          <img src="../logos/MA logo.jpg" alt="Mohamad Adnan" style="width: 50px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="24" height="24" rx="4"/><rect x="14" y="14" width="12" height="12" rx="2" fill="rgba(13,13,13,0.8)"/></svg>
         </div>
-        <div class="client-placeholder">Mohamad Adnan
-</div>
+        <div class="client-placeholder">Mohamad Adnan</div>
       </div>
     </div>
     <div class="client-cell">
@@ -809,7 +881,7 @@ In collaboration with content creator mad v.</div>
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="../logos/KSU logo.png" alt="KSU" style="width: 100px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
+          <img src="../logos/KSU logo.png" alt="King Saud University" style="width: 100px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="20" x2="30" y2="20" stroke="rgba(248,225,111,0.6)" stroke-width="2"/><line x1="20" y1="10" x2="20" y2="30" stroke="rgba(248,225,111,0.6)" stroke-width="2"/><circle cx="20" cy="20" r="10" fill="none" stroke="rgba(248,225,111,0.6)" stroke-width="1.5"/></svg>
         </div>
         <div class="client-placeholder">King Saud University</div>
@@ -818,17 +890,16 @@ In collaboration with content creator mad v.</div>
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="../logos/mlazlaz logo.png" alt="Mlazlaz" style="width: 170px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
+          <img src="../logos/mlazlaz logo.png" alt="MLZLZ" style="width: 170px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><polygon points="20,8 24,16 34,16 26,22 29,32 20,26 11,32 14,22 6,16 16,16"/></svg>
         </div>
-        <div class="client-placeholder">MLZLZ
-</div>
+        <div class="client-placeholder">MLZLZ</div>
       </div>
     </div>
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="../logos/PL logo.jpg" alt="PL Logo" style="width: 50px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
+          <img src="../logos/PL logo.jpg" alt="PRIME eLeague" style="width: 50px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="24" height="4" rx="2"/><rect x="14" y="10" width="12" height="4" rx="2"/><rect x="14" y="26" width="12" height="4" rx="2"/></svg>
         </div>
         <div class="client-placeholder">PRIME eLeague</div>
@@ -837,7 +908,7 @@ In collaboration with content creator mad v.</div>
     <div class="client-cell">
       <div>
         <div class="client-logo-mark">
-          <img src="../logos/COD M logo.png" alt="COD M" style="width: 85px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
+          <img src="../logos/COD M logo.png" alt="Call of Duty Mobile" style="width: 85px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
           <svg viewBox="0 0 40 40" fill="rgba(248,225,111,0.6)" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="14" r="6"/><path d="M8 32 Q8 22 20 22 Q32 22 32 32"/></svg>
         </div>
         <div class="client-placeholder">Call of Duty Mobile</div>
@@ -845,9 +916,7 @@ In collaboration with content creator mad v.</div>
     </div>
   </div>
 
-  <p style="text-align:center;color:rgba(136,128,120,.4);font-size:.68rem;font-family:'Space Mono',monospace;margin-top:2rem;letter-spacing:.15em;text-transform:uppercase">Brands · Content Creators · Companies Across All Industries
-
-</p>
+  <p style="text-align:center;color:rgba(136,128,120,.4);font-size:.68rem;font-family:'Space Mono',monospace;margin-top:2rem;letter-spacing:.15em;text-transform:uppercase">Brands · Content Creators · Companies Across All Industries</p>
 </div>
 
 <!-- CONTACT -->
@@ -858,9 +927,9 @@ In collaboration with content creator mad v.</div>
     <h2 class="stitle" style="font-size:clamp(2.4rem,6vw,5rem);line-height:1.05;margin-bottom:0">Let's Make Something<br><span class="y">Unforgettable.</span></h2>
     <p class="ctag">Turn your vision into a stunning advertising reality. Reach out to me.</p>
     <a href="mailto:amirouaddah.for.business@gmail.com" class="cemail">amirouaddah.for.business@gmail.com</a>
-    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=amirouaddah.for.business@gmail.com" 
-   target="_blank" 
-   class="btn-p" 
+    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=amirouaddah.for.business@gmail.com"
+   target="_blank"
+   class="btn-p"
    style="position: relative; z-index: 999; display: inline-flex; cursor: pointer; transition: transform 0.3s ease;">
    Start Your Project ←
 </a>
@@ -904,7 +973,7 @@ In collaboration with content creator mad v.</div>
   <a href="#home" class="nav-logo">
     <img src="../logos/White.png" alt="logo" style="width: 35px; height: 35px; object-fit: contain; display: inline-block; vertical-align: middle;">
     <span class="nav-logo-text">Avision</span>
-</a>
+  </a>
   <div class="f-copy">© 2026 · Made with Vision</div>
 </footer>
 
