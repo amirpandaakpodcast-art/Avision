@@ -72,10 +72,10 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .wpanel{display:none}.wpanel.active{display:block}
 
 /* ── ADS — proper vertical cards ── */
-.ads-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem}
+.ads-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;max-width:960px;margin:0 auto}
 .ad-card{background:var(--charcoal);overflow:hidden;cursor:pointer;transition:transform .4s}
 .ad-card:hover{transform:translateY(-8px)}
-.ad-vthumb{position:relative;aspect-ratio:9/16;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.ad-vthumb{position:relative;aspect-ratio:9/16;max-height:420px;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .ad-vthumb-inner{position:absolute;inset:0}
 .avt1{background:linear-gradient(175deg,#0d1a08 0%,#1a2a10 40%,#111 100%)}
 .avt2{background:linear-gradient(175deg,#0a1420 0%,#101e30 40%,#0a0a0a 100%)}
@@ -112,10 +112,10 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .yt-body{padding:2rem;display:flex;flex-direction:column;justify-content:center;text-align:right;border-right:1px solid var(--border)}
 
 /* ── REELS ── */
-.reels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem}
+.reels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;max-width:900px;margin:0 auto}
 .reel-card{position:relative;background:var(--charcoal);overflow:hidden;cursor:pointer;border-radius:18px;transition:all .4s}
 .reel-card:hover{transform:scale(1.025)}
-.reel-thumb{aspect-ratio:9/19.5;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.reel-thumb{aspect-ratio:9/16;max-height:400px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .rt1{background:linear-gradient(180deg,#0d1a08,#1a2810 50%,#050a02)}
 .rt2{background:linear-gradient(180deg,#0a1420,#101e28 50%,#020508)}
 .rt3{background:linear-gradient(180deg,#1e1500,#2a1a00 50%,#0a0700)}
@@ -173,6 +173,14 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
 .reveal.visible{opacity:1;transform:none}
 .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+
+/* ── STATS BAR (replaces hidden hero-counter on mobile) ── */
+.stats-bar{background:var(--charcoal2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.8rem 3rem}
+.stats-bar-inner{display:flex;align-items:center;justify-content:center;gap:3rem;flex-wrap:wrap}
+.stat-item{display:flex;flex-direction:column;align-items:center;gap:.25rem}
+.stat-num{font-family:'Cairo',sans-serif;font-size:2rem;font-weight:900;color:var(--yellow);line-height:1}
+.stat-lbl{font-size:.62rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;font-family:'Space Mono',monospace}
+.stat-divider{width:1px;height:2.5rem;background:var(--border)}
 
 /* ─────────────────────────────────────────────────────────────────────────────
    RESPONSIVE STYLES — DO NOT MODIFY ABOVE THIS LINE (desktop-safe)
@@ -274,9 +282,9 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
   .wtab                      { font-size: .74rem; padding: .6rem 1rem; }
 
   /* ── 6. AD CARDS: single column, keep 9:16 aspect ratio ────────────────── */
-  .ads-grid                  { grid-template-columns: 1fr; gap: 1.2rem; }
-  /* The ad-vthumb already uses aspect-ratio:9/16 — just ensure full width */
-  .ad-vthumb                 { width: 100%; }
+  .ads-grid                  { grid-template-columns: 1fr; gap: 1.2rem; max-width: 100%; }
+  /* The ad-vthumb already uses aspect-ratio:9/16 — remove max-height cap on mobile */
+  .ad-vthumb                 { width: 100%; max-height: none; }
 
   /* ── 7. YT CARDS: stack body below thumb, constrain thumb ──────────────── */
   .yt-card {
@@ -292,9 +300,16 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
   }
 
   /* ── 8. REELS: single column, preserve phone frame aspect ratio ─────────── */
-  .reels-grid                { grid-template-columns: 1fr; gap: 1.2rem; }
-  /* reel-thumb uses aspect-ratio:9/19.5 — keep it, just cap the width */
+  .reels-grid                { grid-template-columns: 1fr; gap: 1.2rem; max-width:100%; }
+  /* reel-thumb uses aspect-ratio:9/16 — keep it, just cap the width */
+  .reel-thumb                { max-height: none; aspect-ratio: 9/16; }
   .reel-card                 { max-width: 360px; margin: 0 auto; }
+
+  /* ── stats bar: tighten on mobile ──────────────────────────────────────── */
+  .stats-bar                 { padding: 1.4rem 1.2rem; }
+  .stats-bar-inner           { gap: 1.4rem; }
+  .stat-num                  { font-size: 1.6rem; }
+  .stat-divider              { height: 1.8rem; }
 
   /* ── 9. IFRAMES inside absolute containers: ensure no bleed ────────────── */
   /* These iframes live inside position:absolute wrappers that are children of
@@ -397,6 +412,26 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
     <div class="scroll-line"></div>
   </div>
 </section>
+
+<!-- STATS BAR — visible on all screen sizes (mobile stats fix) -->
+<div class="stats-bar">
+  <div class="stats-bar-inner">
+    <div class="stat-item">
+      <div class="stat-num">+250</div>
+      <div class="stat-lbl">مشروع</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-num">+6</div>
+      <div class="stat-lbl">سنوات خبرة</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-num">+40</div>
+      <div class="stat-lbl">عميل</div>
+    </div>
+  </div>
+</div>
 
 <!-- MARQUEE -->
 <div class="mq-section">
