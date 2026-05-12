@@ -1,48 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<style>
-  /* تعديل للجوال فقط - شاشات أصغر من 600px */
-  @media only screen and (max-width: 600px) {
-    
-    /* 1. تصغير الخطوط الكبيرة اللي تطلع برا الشاشة */
-    h1, h2, .big-text, h3 { 
-      font-size: 28px !important; 
-      line-height: 1.2 !important;
-      word-wrap: break-word !important;
-    }
-
-    /* 2. ضبط الفيديوهات والصور عشان ما "تنفجر" برا الجوال */
-    iframe, img, video {
-      width: 100% !important;
-      max-width: 100% !important;
-      height: auto !important;
-      position: relative !important;
-      left: 0 !important;
-      margin-bottom: 10px !important;
-    }
-
-    /* 3. ترتيب القائمة (Nav) عشان ما تتداخل */
-    nav, header {
-      flex-direction: column !important;
-      text-align: center !important;
-      height: auto !important;
-    }
-
-    /* 4. إلغاء أي عرض ثابت يسبب سكرول يمين ويسار */
-    .container, div, section {
-      width: 100% !important;
-      padding: 10px !important;
-      margin: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-    }
-  }
-</style>
+<!-- REMOVED: broken first <style> block that used universal div/section !important overrides.
+     All responsive styles are now consolidated in the single media query block below. -->
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<!-- ✅ SINGLE correct viewport meta tag — allows user zoom, prevents layout overflow -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Avision — مونتاج سينمائي</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -72,7 +35,7 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .clbl{font-size:.62rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;font-family:'Space Mono',monospace;margin-top:.15rem}
 .hero-tag{font-size:.72rem;font-weight:700;letter-spacing:.22em;color:var(--gl);text-transform:uppercase;margin-bottom:1.4rem;display:flex;align-items:center;gap:.7rem}
 .hero-tag::before{content:'';width:2.2rem;height:1px;background:var(--gl)}
-.hero-headline{font-family:'Cairo',sans-serif;font-size:clamp(2.8rem,7.5vw,8rem);line-height:1.05;font-weight:900;color:var(--white);position:relative;z-index:1;text-align:right;max-width:800px}
+.hero-headline{font-family:'Cairo',sans-serif;line-height:1.05;font-weight:900;color:var(--white);position:relative;z-index:1;text-align:right;max-width:800px}
 .hero-headline span{display:inline-block;padding-bottom:15px;}
 .hero-headline .accent{color:var(--yellow)}
 .hero-headline .outline{-webkit-text-stroke:1.5px rgba(248,225,111,.4);color:transparent}
@@ -211,17 +174,159 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
 .reveal.visible{opacity:1;transform:none}
 .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
 
-@media(max-width:900px){
-.hero{padding:0 1.5rem 4rem}
-nav{padding:1rem 1.5rem}
-.hero-counter{display:none}
-.hero-wm{display:none}
-.section{padding:4.5rem 1.5rem}
-.ads-grid,.reels-grid{grid-template-columns:1fr}
-.yt-card{grid-template-columns:1fr}
-.clients-grid{grid-template-columns:repeat(3,1fr)}
-.nav-links{display:none}
-footer{flex-direction:column;gap:1rem;text-align:center}
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE STYLES — DO NOT MODIFY ABOVE THIS LINE (desktop-safe)
+   Breakpoints: 900px (tablet), 768px (mobile)
+   Strategy: targeted class selectors only — no universal * or div/section blasts
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Hero headline lines: fluid font size on all screens ── */
+.hero-hl-line {
+  display: block;
+  font-size: clamp(2rem, 7.5vw, 4.8rem);
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+/* ══ TABLET  (≤ 900px) ══════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* NAV: tighten padding, hide desktop nav links */
+  nav                        { padding: 1rem 1.5rem; }
+  .nav-links                 { display: none; }
+
+  /* HERO: reduce padding, hide decorative side elements */
+  .hero                      { padding: 0 1.5rem 4rem; }
+  .hero-counter              { display: none; }
+  .hero-wm                   { display: none; }
+
+  /* SECTIONS */
+  .section                   { padding: 4.5rem 1.5rem; }
+  .clients-section           { padding: 4rem 1.5rem; }
+
+  /* WORK GRIDS: single column for ads and reels */
+  .ads-grid                  { grid-template-columns: 1fr; }
+  .reels-grid                { grid-template-columns: 1fr; }
+
+  /* YT CARDS: stack to single column, give thumb a fixed height */
+  .yt-card                   { grid-template-columns: 1fr; }
+  .yt-thumb                  { aspect-ratio: 16 / 9; }
+
+  /* CLIENTS: 3 columns instead of 6 */
+  .clients-grid              { grid-template-columns: repeat(3, 1fr); }
+
+  /* FOOTER */
+  footer                     { flex-direction: column; gap: 1rem; text-align: center; }
+}
+
+/* ══ MOBILE  (≤ 768px) ══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── 1. NAV: stack logo + CTA, prevent overflow ─────────────────────────── */
+  nav {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: space-between;
+  }
+  .nav-logo-text             { font-size: 1.05rem; }
+  .nav-cta                   { font-size: .72rem; padding: .35rem .85rem; }
+
+  /* ── 2. HERO: full-width, comfortable padding ───────────────────────────── */
+  .hero {
+    padding: 5rem 1.2rem 3.5rem;
+    min-height: 100svh; /* use svh on mobile to avoid address-bar issues */
+  }
+  .hero-tag                  { font-size: .65rem; margin-bottom: 1rem; }
+
+  /* hero headline: mobile-safe clamp so lines never bleed the viewport */
+  .hero-hl-line              { font-size: clamp(1.75rem, 9vw, 3rem); }
+
+  .hero-sub {
+    font-size: .88rem;
+    max-width: 100%;
+    margin-top: 1.2rem;
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-top: 1.8rem;
+  }
+  .btn-p                     { font-size: .82rem; padding: .72rem 1.4rem; }
+  .btn-g                     { font-size: .78rem; }
+  .scroll-wrap               { display: none; } /* hide scroll indicator on mobile */
+
+  /* ── 3. SECTIONS: tighter padding ──────────────────────────────────────── */
+  .section                   { padding: 3.5rem 1.2rem; }
+  .clients-section           { padding: 3rem 1.2rem; }
+  .contact-section           { padding: 4rem 1.2rem; }
+
+  /* ── 4. TYPOGRAPHY: scale down section titles ───────────────────────────── */
+  .stitle                    { font-size: clamp(1.6rem, 6vw, 2.5rem); }
+
+  /* ── 5. WORK TABS: wrap and shrink ─────────────────────────────────────── */
+  .work-tabs {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: .4rem;
+    margin-bottom: 2rem;
+  }
+  .wtab                      { font-size: .74rem; padding: .6rem 1rem; }
+
+  /* ── 6. AD CARDS: single column, keep 9:16 aspect ratio ────────────────── */
+  .ads-grid                  { grid-template-columns: 1fr; gap: 1.2rem; }
+  /* The ad-vthumb already uses aspect-ratio:9/16 — just ensure full width */
+  .ad-vthumb                 { width: 100%; }
+
+  /* ── 7. YT CARDS: stack body below thumb, constrain thumb ──────────────── */
+  .yt-card {
+    grid-template-columns: 1fr;
+    direction: rtl;
+  }
+  .yt-thumb                  { aspect-ratio: 16 / 9; width: 100%; }
+  /* iframe/cover inside yt-thumb are positioned absolute — they fill naturally */
+  .yt-body {
+    padding: 1.2rem;
+    border-right: none;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── 8. REELS: single column, preserve phone frame aspect ratio ─────────── */
+  .reels-grid                { grid-template-columns: 1fr; gap: 1.2rem; }
+  /* reel-thumb uses aspect-ratio:9/19.5 — keep it, just cap the width */
+  .reel-card                 { max-width: 360px; margin: 0 auto; }
+
+  /* ── 9. IFRAMES inside absolute containers: ensure no bleed ────────────── */
+  /* These iframes live inside position:absolute wrappers that are children of
+     aspect-ratio containers — they fill via width/height:100% already.
+     We only need to ensure their PARENT wrapper never exceeds viewport width. */
+  .ad-vthumb > div,
+  .yt-thumb > div,
+  .reel-thumb > div          { max-width: 100%; }
+
+  /* ── 10. CLIENTS: 2 columns on small mobile ─────────────────────────────── */
+  .clients-grid              { grid-template-columns: repeat(2, 1fr); }
+  .client-cell               { padding: 1.4rem 1rem; }
+  .client-logo-mark          { width: 36px; height: 36px; }
+
+  /* ── 11. CONTACT ─────────────────────────────────────────────────────────── */
+  .contact-inner             { padding: 0 0.5rem; }
+  .cemail                    { font-size: clamp(.9rem, 3.5vw, 1.4rem); word-break: break-all; }
+  .ctag                      { font-size: .88rem; }
+  .social-links              { gap: .75rem; }
+  .slink                     { font-size: .72rem; padding: .4rem .7rem; }
+
+  /* ── 12. FOOTER ─────────────────────────────────────────────────────────── */
+  footer                     { padding: 1.5rem 1.2rem; flex-direction: column; gap: .8rem; text-align: center; }
+}
+
+/* ══ SMALL MOBILE  (≤ 400px) ════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+  .hero-hl-line              { font-size: clamp(1.5rem, 10vw, 2.2rem); }
+  .stitle                    { font-size: clamp(1.4rem, 7vw, 2rem); }
+  .clients-grid              { grid-template-columns: repeat(2, 1fr); }
+  .work-tabs                 { gap: .25rem; }
+  .wtab                      { font-size: .68rem; padding: .5rem .75rem; }
 }
 </style>
 </head>
@@ -262,10 +367,11 @@ footer{flex-direction:column;gap:1rem;text-align:center}
 
   <div class="hero-tag">مونتير سينمائي — Avision</div>
 
- <h1 class="hero-headline" style="position: relative; top: -250px; line-height: 1.15 !important; text-align: right; direction: rtl;">
-    <span style="font-size: 4.8rem; font-weight: 900; color: #f5f5f5; display: block;">المونتاج</span>
-    <span class="accent" style="font-size: 4.8rem; font-weight: 900; display: block;">ليس مجرد أداة،</span>
-    <span style="font-size: 4.8rem; font-weight: 900; color: #f5f5f5; display: block;">المونتاج رؤية</span>
+ <!-- hero-headline: removed top:-250px inline offset; now handled responsively via CSS -->
+ <h1 class="hero-headline" style="line-height: 1.15; text-align: right; direction: rtl;">
+    <span class="hero-hl-line" style="color: #f5f5f5;">المونتاج</span>
+    <span class="hero-hl-line accent">ليس مجرد أداة،</span>
+    <span class="hero-hl-line" style="color: #f5f5f5;">المونتاج رؤية</span>
 </h1>
 
   <p class="hero-sub">أصنع تجارب بصرية تتجاوز الشاشة — كل قطعة مقصودة، كل لحظة مروية بنية.</p>
@@ -716,7 +822,7 @@ function playVideoA3() {
 <!-- ABOUT -->
 <section class="section" id="about">
   <div class="stag">عني</div>
-  <h2 class="stitle" style="margin-bottom:2.5rem; line-height: 1.25; font-size: 3rem; font-weight: 900; position: relative; top: -25px !important;">
+  <h2 class="stitle" style="margin-bottom:2.5rem; line-height: 1.25; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900;">
     الإعلان <span class="y" style="color: var(--yellow);">استراتيجية</span> نمو.. <br> يحول الانتباه إلى تأثير
 </h2>
 
