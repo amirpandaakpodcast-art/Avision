@@ -73,9 +73,16 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 
 /* ── ADS — proper vertical cards ── */
 .ads-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;max-width:960px;margin:0 auto}
-.ad-card{background:var(--charcoal);overflow:hidden;cursor:pointer;transition:transform .4s}
+.ad-card{background:var(--charcoal);overflow:hidden;cursor:pointer;transition:transform .4s;display:flex;flex-direction:column}
 .ad-card:hover{transform:translateY(-8px)}
-.ad-vthumb{position:relative;aspect-ratio:9/16;max-height:420px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+/* True 9:16 container — no black bars, iframe fills every pixel */
+.ad-vthumb{position:relative;width:100%;aspect-ratio:9/16;overflow:hidden;background:#000;flex-shrink:0}
+/* The iframe wrapper fills the vthumb exactly */
+.ad-vthumb .yt-wrap{position:absolute;inset:0;width:100%;height:100%;z-index:20}
+.ad-vthumb .yt-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.ad-vthumb .yt-wrap img.cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:22;cursor:pointer}
+/* Body text always separated from the video — never overlapping */
+.ad-body{padding:1.3rem 1.4rem 1.6rem;text-align:right;border-top:1px solid var(--border);flex:1}
 .ad-vthumb-inner{position:absolute;inset:0}
 .avt1{background:linear-gradient(175deg,#0d1a08 0%,#1a2a10 40%,#111 100%)}
 .avt2{background:linear-gradient(175deg,#0a1420 0%,#101e30 40%,#0a0a0a 100%)}
@@ -113,9 +120,16 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 
 /* ── REELS ── */
 .reels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;max-width:900px;margin:0 auto}
-.reel-card{position:relative;background:var(--charcoal);overflow:hidden;cursor:pointer;border-radius:18px;transition:all .4s}
+.reel-card{position:relative;background:var(--charcoal);overflow:hidden;cursor:pointer;border-radius:18px;transition:all .4s;display:flex;flex-direction:column}
 .reel-card:hover{transform:scale(1.025)}
-.reel-thumb{aspect-ratio:9/16;max-height:400px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+/* True 9:16, no black bars */
+.reel-thumb{position:relative;width:100%;aspect-ratio:9/16;overflow:hidden;flex-shrink:0}
+/* iframe wrapper inside reel-thumb */
+.reel-thumb .yt-wrap{position:absolute;inset:0;width:100%;height:100%;z-index:20}
+.reel-thumb .yt-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.reel-thumb .yt-wrap img.cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:22;cursor:pointer}
+/* reel-body always below the thumb, never overlapping */
+.reel-body{padding:.85rem 1.1rem 1.1rem;text-align:right;border-top:1px solid var(--border);flex:1}
 .rt1{background:linear-gradient(180deg,#0d1a08,#1a2810 50%,#050a02)}
 .rt2{background:linear-gradient(180deg,#0a1420,#101e28 50%,#020508)}
 .rt3{background:linear-gradient(180deg,#1e1500,#2a1a00 50%,#0a0700)}
@@ -173,14 +187,6 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
 .reveal.visible{opacity:1;transform:none}
 .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
-
-/* ── STATS BAR (replaces hidden hero-counter on mobile) ── */
-.stats-bar{background:var(--charcoal2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.8rem 3rem}
-.stats-bar-inner{display:flex;align-items:center;justify-content:center;gap:3rem;flex-wrap:wrap}
-.stat-item{display:flex;flex-direction:column;align-items:center;gap:.25rem}
-.stat-num{font-family:'Cairo',sans-serif;font-size:2rem;font-weight:900;color:var(--yellow);line-height:1}
-.stat-lbl{font-size:.62rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;font-family:'Space Mono',monospace}
-.stat-divider{width:1px;height:2.5rem;background:var(--border)}
 
 /* ─────────────────────────────────────────────────────────────────────────────
    RESPONSIVE STYLES — DO NOT MODIFY ABOVE THIS LINE (desktop-safe)
@@ -282,9 +288,9 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
   .wtab                      { font-size: .74rem; padding: .6rem 1rem; }
 
   /* ── 6. AD CARDS: single column, keep 9:16 aspect ratio ────────────────── */
-  .ads-grid                  { grid-template-columns: 1fr; gap: 1.2rem; max-width: 100%; }
-  /* The ad-vthumb already uses aspect-ratio:9/16 — remove max-height cap on mobile */
-  .ad-vthumb                 { width: 100%; max-height: none; }
+  .ads-grid                  { grid-template-columns: 1fr; gap: 1.2rem; }
+  /* The ad-vthumb already uses aspect-ratio:9/16 — just ensure full width */
+  .ad-vthumb                 { width: 100%; }
 
   /* ── 7. YT CARDS: stack body below thumb, constrain thumb ──────────────── */
   .yt-card {
@@ -299,25 +305,14 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
     border-top: 1px solid var(--border);
   }
 
-  /* ── 8. REELS: single column, preserve phone frame aspect ratio ─────────── */
-  .reels-grid                { grid-template-columns: 1fr; gap: 1.2rem; max-width:100%; }
-  /* reel-thumb uses aspect-ratio:9/16 — keep it, just cap the width */
-  .reel-thumb                { max-height: none; aspect-ratio: 9/16; }
-  .reel-card                 { max-width: 360px; margin: 0 auto; }
+  /* ── 8. REELS: single column, no max-width cap — fills viewport ─────────── */
+  .reels-grid                { grid-template-columns: 1fr; gap: 1.2rem; max-width: 100%; }
+  .reel-card                 { max-width: 420px; margin: 0 auto; }
+  /* reel-thumb keeps its 9/16 ratio; yt-wrap fills it fully — no black bars */
 
-  /* ── stats bar: tighten on mobile ──────────────────────────────────────── */
-  .stats-bar                 { padding: 1.4rem 1.2rem; }
-  .stats-bar-inner           { gap: 1.4rem; }
-  .stat-num                  { font-size: 1.6rem; }
-  .stat-divider              { height: 1.8rem; }
-
-  /* ── 9. IFRAMES inside absolute containers: ensure no bleed ────────────── */
-  /* These iframes live inside position:absolute wrappers that are children of
-     aspect-ratio containers — they fill via width/height:100% already.
-     We only need to ensure their PARENT wrapper never exceeds viewport width. */
-  .ad-vthumb > div,
-  .yt-thumb > div,
-  .reel-thumb > div          { max-width: 100%; }
+  /* ── 9. IFRAMES inside yt-wrap: already inset:0, no extra rules needed ───── */
+  .ad-vthumb .yt-wrap,
+  .reel-thumb .yt-wrap       { max-width: 100%; }
 
   /* ── 10. CLIENTS: 2 columns on small mobile ─────────────────────────────── */
   .clients-grid              { grid-template-columns: repeat(2, 1fr); }
@@ -413,26 +408,6 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
   </div>
 </section>
 
-<!-- STATS BAR — visible on all screen sizes (mobile stats fix) -->
-<div class="stats-bar">
-  <div class="stats-bar-inner">
-    <div class="stat-item">
-      <div class="stat-num">+250</div>
-      <div class="stat-lbl">مشروع</div>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat-item">
-      <div class="stat-num">+6</div>
-      <div class="stat-lbl">سنوات خبرة</div>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat-item">
-      <div class="stat-num">+40</div>
-      <div class="stat-lbl">عميل</div>
-    </div>
-  </div>
-</div>
-
 <!-- MARQUEE -->
 <div class="mq-section">
   <div class="mq-track" id="mqt">
@@ -472,30 +447,27 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
 
       <div class="ad-card">
         <div class="ad-vthumb">
-          <div style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:20;">
-    <img src="image/PC1.png" 
-         id="cover-PC1"
-         onclick="playVideoPC1()" 
-         style="width:100%; height:100%; aspect-ratio:9/16; object-fit:contain; background:black; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
-         alt="Video Cover">
-
-    <iframe 
-        id="video-PC1"
-        src="https://www.youtube.com/embed/RD8bM5kMij0?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
-        style="width:100%; height:100%; aspect-ratio:9/16; object-fit:contain; background:black; position:absolute; top:0; left:0; z-index:21;">
-    </iframe>
-</div>
-
-<script>
-function playVideoPC1() {
-    document.getElementById('cover-PC1').style.display = 'none';
-    var iframe = document.getElementById('video-PC1');
-    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-}
-</script>
+          <div class="yt-wrap">
+            <img src="image/PC1.png"
+                 id="cover-PC1"
+                 onclick="playVideoPC1()"
+                 class="cover"
+                 alt="Video Cover">
+            <iframe
+                id="video-PC1"
+                src="https://www.youtube.com/embed/RD8bM5kMij0?enablejsapi=1&rel=0&modestbranding=1&controls=1"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+            </iframe>
+          </div>
+          <script>
+          function playVideoPC1() {
+              document.getElementById('cover-PC1').style.display = 'none';
+              var iframe = document.getElementById('video-PC1');
+              iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+          }
+          </script>
           <div class="ad-vthumb-inner avt1"></div>
           <div class="ad-grid-ov"></div>
           <div class="ad-grad"></div>
@@ -514,30 +486,27 @@ function playVideoPC1() {
 
       <div class="ad-card">
         <div class="ad-vthumb">
-          <div style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:20;">
-    <img src="image/PC2.png" 
-         id="cover-PC2"
-         onclick="playVideoPC2()" 
-         style="width:100%; height:100%; aspect-ratio:9/16; object-fit:contain; background:black; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
-         alt="Video Cover">
-
-    <iframe 
-        id="video-PC2"
-        src="https://www.youtube.com/embed/MhriLwbwE-g?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
-        style="width:100%; height:100%; aspect-ratio:9/16; object-fit:contain; background:black; position:absolute; top:0; left:0; z-index:21;">
-    </iframe>
-</div>
-
-<script>
-function playVideoPC2() {
-    document.getElementById('cover-PC2').style.display = 'none';
-    var iframe = document.getElementById('video-PC2');
-    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-}
-</script>
+          <div class="yt-wrap">
+            <img src="image/PC2.png"
+                 id="cover-PC2"
+                 onclick="playVideoPC2()"
+                 class="cover"
+                 alt="Video Cover">
+            <iframe
+                id="video-PC2"
+                src="https://www.youtube.com/embed/MhriLwbwE-g?enablejsapi=1&rel=0&modestbranding=1&controls=1"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+            </iframe>
+          </div>
+          <script>
+          function playVideoPC2() {
+              document.getElementById('cover-PC2').style.display = 'none';
+              var iframe = document.getElementById('video-PC2');
+              iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+          }
+          </script>
           <div class="ad-vthumb-inner avt2"></div>
           <div class="ad-grid-ov"></div>
           <div class="ad-grad"></div>
@@ -548,8 +517,7 @@ function playVideoPC2() {
         <div class="ad-body">
           <div class="ccat">إعلان تجاري ✦ 2026</div>
           <div class="ctitle">إعلان لشركة Sony — لمنتجات INZONE</div>
-          <div class="cdesc">إعلان لشركة Sony لمنتجات INZONE، يركز على إبراز قوة الأداء وسرعة الاستجابة لمساعدة اللاعبين المحترفين على تقديم أفضل أداء في البطولات.
-</div>
+          <div class="cdesc">إعلان لشركة Sony لمنتجات INZONE، يركز على إبراز قوة الأداء وسرعة الاستجابة لمساعدة اللاعبين المحترفين على تقديم أفضل أداء في البطولات.</div>
           <span class="cdir">التوجه: إيقاع هادئ ومونتاج بسيط يبرز قوة الأداء وسرعة الاستجابة لمنتجات INZONE.</span>
           <div class="cmeta">إعلان رئيسي · عمودي</div>
         </div>
@@ -557,30 +525,27 @@ function playVideoPC2() {
 
       <div class="ad-card">
         <div class="ad-vthumb">
-          <div style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:20;">
-    <img src="image/PC3.png" 
-         id="cover-PC3"
-         onclick="playVideoPC3()" 
-         style="width:100%; height:100%; aspect-ratio:9/16; object-fit:contain; background:black; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
-         alt="Video Cover">
-
-    <iframe 
-        id="video-PC3"
-        src="https://www.youtube.com/embed/RlC5j9GDuY8?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
-        style="width:100%; height:100%; aspect-ratio:9/16; object-fit:contain; background:black; position:absolute; top:0; left:0; z-index:21;">
-    </iframe>
-</div>
-
-<script>
-function playVideoPC3() {
-    document.getElementById('cover-PC3').style.display = 'none';
-    var iframe = document.getElementById('video-PC3');
-    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-}
-</script>
+          <div class="yt-wrap">
+            <img src="image/PC3.png"
+                 id="cover-PC3"
+                 onclick="playVideoPC3()"
+                 class="cover"
+                 alt="Video Cover">
+            <iframe
+                id="video-PC3"
+                src="https://www.youtube.com/embed/RlC5j9GDuY8?enablejsapi=1&rel=0&modestbranding=1&controls=1"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+            </iframe>
+          </div>
+          <script>
+          function playVideoPC3() {
+              document.getElementById('cover-PC3').style.display = 'none';
+              var iframe = document.getElementById('video-PC3');
+              iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+          }
+          </script>
           <div class="ad-vthumb-inner avt3"></div>
           <div class="ad-grid-ov"></div>
           <div class="ad-grad"></div>
@@ -591,9 +556,8 @@ function playVideoPC3() {
         <div class="ad-body">
           <div class="ccat">إعلان تجاري ✦ 2026</div>
           <div class="ctitle">إعلان لشركة Logitech — لمنتجهم mouse G Pro X2 super strike</div>
-          <div class="cdesc">إعلان لشركة Logitech لمنتج G Pro X2 Super strike، يركز على إبراز سرعة الاستجابة والدقة العالية التي تساعد اللاعبين المحترفين على تقديم أفضل أداء داخل البطولات.
-</div>
-          <span class="cdir">التوجه:  إيقاع هادئ ومونتاج بسيط يبرز قوة الأداء وسرعة الاستجابة لماوس G Pro X2 super strike.</span>
+          <div class="cdesc">إعلان لشركة Logitech لمنتج G Pro X2 Super strike، يركز على إبراز سرعة الاستجابة والدقة العالية التي تساعد اللاعبين المحترفين على تقديم أفضل أداء داخل البطولات.</div>
+          <span class="cdir">التوجه: إيقاع هادئ ومونتاج بسيط يبرز قوة الأداء وسرعة الاستجابة لماوس G Pro X2 super strike.</span>
           <div class="cmeta">إعلان رئيسي · عمودي</div>
         </div>
       </div>
@@ -735,37 +699,34 @@ function playVideoB3() {
     <div class="reels-grid reveal">
 
       <div class="reel-card">
-        <div class="reel-thumb rt1" style="position:relative; overflow:visible;">
-          <div style="width:100%; height:92%; aspect-ratio:9/16; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="image/PA1.png" 
-         id="cover-A2" 
-         onclick="playVideoA2()" 
-         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
-         alt="Cover">
-
-    <iframe 
-        id="video-A2" 
-        src="https://www.youtube.com/embed/DibDmd18p9s?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
-        style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
-    </iframe>
-</div>
-
-<script>
-function playVideoA2() {
-    document.getElementById('cover-A2').style.display = 'none';
-    var iframe = document.getElementById('video-A2');
-    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-}
-</script>
+        <div class="reel-thumb rt1">
+          <div class="yt-wrap">
+            <img src="image/PA1.png"
+                 id="cover-A2"
+                 onclick="playVideoA2()"
+                 class="cover"
+                 alt="Cover">
+            <iframe
+                id="video-A2"
+                src="https://www.youtube.com/embed/DibDmd18p9s?enablejsapi=1&rel=0&modestbranding=1&controls=1"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+            </iframe>
+          </div>
+          <script>
+          function playVideoA2() {
+              document.getElementById('cover-A2').style.display = 'none';
+              var iframe = document.getElementById('video-A2');
+              iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+          }
+          </script>
           <div class="reel-notch"></div>
           <div class="reel-grid-ov"></div>
           <div class="reel-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
           <div class="reel-ov">
             <div class="reel-cat">social media ✦</div>
-            <div class="reel-title">  اعلان ملزلز + براند اوكامي</div>
+            <div class="reel-title">اعلان ملزلز + براند اوكامي</div>
             <div class="reel-desc">فيديو ترويجي لتعاون اليوتيوبر ملزلز مع براند أوكامي لإنتاج براند ملابس خاص به.</div>
           </div>
         </div>
@@ -777,37 +738,33 @@ function playVideoA2() {
 
       <div class="reel-card">
         <div class="reel-thumb rt2">
-          <div style="width:100%; height:92%; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="image/PA2.png" 
-         id="cover-A1" 
-         onclick="playVideoA1()" 
-         style="width:101%; height:101%; object-fit:cover; position:absolute; top:-0.5%; left:-0.5%; z-index:22; cursor:pointer; outline: 2px solid #1a1a1a; outline-offset: -2px;" 
-         alt="Cover">
-
-    <iframe 
-        id="video-A1" 
-        src="https://www.youtube.com/embed/WAIhv2D0huU?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
-        style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
-    </iframe>
-</div>
-
-<script>
-function playVideoA1() {
-    document.getElementById('cover-A1').style.display = 'none';
-    var iframe = document.getElementById('video-A1');
-    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-}
-</script>
+          <div class="yt-wrap">
+            <img src="image/PA2.png"
+                 id="cover-A1"
+                 onclick="playVideoA1()"
+                 class="cover"
+                 alt="Cover">
+            <iframe
+                id="video-A1"
+                src="https://www.youtube.com/embed/WAIhv2D0huU?enablejsapi=1&rel=0&modestbranding=1&controls=1"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+            </iframe>
+          </div>
+          <script>
+          function playVideoA1() {
+              document.getElementById('cover-A1').style.display = 'none';
+              var iframe = document.getElementById('video-A1');
+              iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+          }
+          </script>
           <div class="reel-notch"></div>
           <div class="reel-grid-ov"></div>
           <div class="reel-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
           <div class="reel-ov">
             <div class="reel-cat">social media ✦</div>
-            <div class="reel-title">إعلان لمحمد عدنان | Call of Duty Mobile
-</div>
+            <div class="reel-title">إعلان لمحمد عدنان | Call of Duty Mobile</div>
             <div class="reel-desc">مونتاج إعلان لليوتيوبر محمد عدنان بالتعاون مع لعبة Call of Duty Mobile.</div>
           </div>
         </div>
@@ -819,38 +776,34 @@ function playVideoA1() {
 
       <div class="reel-card">
         <div class="reel-thumb rt3">
-          <div style="width:100%; height:92%; aspect-ratio:9/16; position:absolute; top:0; left:0; z-index:20; overflow:hidden; background:black;">
-    <img src="image/PA3.png" 
-         id="cover-A3" 
-         onclick="playVideoA3()" 
-         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:22; cursor:pointer;" 
-         alt="Cover">
-
-    <iframe 
-        id="video-A3" 
-        src="https://www.youtube.com/embed/Vqgxm7FOd0w?enablejsapi=1&rel=0&modestbranding=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen 
-        style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:21; border:none;">
-    </iframe>
-</div>
-
-<script>
-function playVideoA3() {
-    document.getElementById('cover-A3').style.display = 'none';
-    var iframe = document.getElementById('video-A3');
-    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-}
-</script>
+          <div class="yt-wrap">
+            <img src="image/PA3.png"
+                 id="cover-A3"
+                 onclick="playVideoA3()"
+                 class="cover"
+                 alt="Cover">
+            <iframe
+                id="video-A3"
+                src="https://www.youtube.com/embed/Vqgxm7FOd0w?enablejsapi=1&rel=0&modestbranding=1&controls=1"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+            </iframe>
+          </div>
+          <script>
+          function playVideoA3() {
+              document.getElementById('cover-A3').style.display = 'none';
+              var iframe = document.getElementById('video-A3');
+              iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+          }
+          </script>
           <div class="reel-notch"></div>
           <div class="reel-grid-ov"></div>
           <div class="reel-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
           <div class="reel-ov">
             <div class="reel-cat">social media ✦</div>
             <div class="reel-title">اعلان لبراند | O MATCHA</div>
-            <div class="reel-desc">اعلان لبراند | O MATCHA
-بالتعاون مع صناعة المحتوى mad v.</div>
+            <div class="reel-desc">اعلان لبراند | O MATCHA بالتعاون مع صناعة المحتوى mad v.</div>
           </div>
         </div>
         <div class="reel-body">
