@@ -73,22 +73,22 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .wpanel{display:none}.wpanel.active{display:block}
 
 /* ── ADS — proper vertical cards ── */
-.ads-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem}
+.ads-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;max-width:960px;margin:0 auto}
 .ad-card{background:var(--charcoal);overflow:hidden;cursor:pointer;transition:transform .4s}
 .ad-card:hover{transform:translateY(-8px)}
 .ad-vthumb{position:relative;aspect-ratio:9/16;overflow:hidden;display:flex;align-items:center;justify-content:center;max-height:420px}
-.ad-vthumb-inner{position:absolute;inset:0}
+.ad-vthumb-inner{position:absolute;inset:0;pointer-events:none}
 .avt1{background:linear-gradient(175deg,#0d1a08 0%,#1a2a10 40%,#111 100%)}
 .avt2{background:linear-gradient(175deg,#0a1420 0%,#101e30 40%,#0a0a0a 100%)}
 .avt3{background:linear-gradient(175deg,#1e1500 0%,#2a1e08 40%,#100a00 100%)}
-.ad-grid-ov{position:absolute;inset:0;background-image:linear-gradient(rgba(248,225,111,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(248,225,111,.03) 1px,transparent 1px);background-size:40px 40px}
-.ad-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 50%)}
-.ad-corner-line{position:absolute;top:0;right:0;width:3px;height:100%;background:var(--green);transform:scaleY(0);transform-origin:top;transition:transform .45s}
+.ad-grid-ov{position:absolute;inset:0;background-image:linear-gradient(rgba(248,225,111,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(248,225,111,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.ad-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 50%);pointer-events:none}
+.ad-corner-line{position:absolute;top:0;right:0;width:3px;height:100%;background:var(--green);transform:scaleY(0);transform-origin:top;transition:transform .45s;pointer-events:none}
 .ad-card:hover .ad-corner-line{transform:scaleY(1)}
-.ad-play{width:50px;height:50px;border:1px solid rgba(248,225,111,.55);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.55);transition:all .4s;position:relative;z-index:2}
+.ad-play{width:50px;height:50px;border:1px solid rgba(248,225,111,.55);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.55);transition:all .4s;position:relative;z-index:2;pointer-events:none}
 .ad-play svg{fill:var(--yellow);width:16px;margin-right:-2px}
 .ad-card:hover .ad-play{opacity:1;transform:scale(1)}
-.ad-tag-badge{position:absolute;bottom:1rem;right:1rem;z-index:3;background:rgba(13,13,13,.75);border:1px solid var(--border);padding:.25rem .65rem;font-size:.6rem;font-family:'Space Mono',monospace;color:var(--gl);letter-spacing:.15em;text-transform:uppercase}
+.ad-tag-badge{position:absolute;bottom:1rem;right:1rem;z-index:3;background:rgba(13,13,13,.75);border:1px solid var(--border);padding:.25rem .65rem;font-size:.6rem;font-family:'Space Mono',monospace;color:var(--gl);letter-spacing:.15em;text-transform:uppercase;pointer-events:none}
 .ad-body{padding:1.4rem 1.4rem 1.8rem;text-align:left;border-top:1px solid var(--border);margin-top:0}
 .ccat{font-size:.62rem;font-weight:700;letter-spacing:.18em;color:var(--gl);text-transform:uppercase;margin-bottom:.5rem;font-family:'Space Mono',monospace}
 .ctitle{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.45rem;line-height:1.35}
@@ -104,16 +104,16 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .ytt1{background:linear-gradient(135deg,#1a2810,#0d1a08)}
 .ytt2{background:linear-gradient(135deg,#101e28,#0a1420)}
 .ytt3{background:linear-gradient(135deg,#1e1500,#2a1a00)}
-.yt-grid-ov{position:absolute;inset:0;background-image:linear-gradient(rgba(248,225,111,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(248,225,111,.03) 1px,transparent 1px);background-size:40px 40px}
-.yt-play{width:52px;height:52px;border:1px solid rgba(248,225,111,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.5);transition:all .35s;position:relative;z-index:2}
+.yt-grid-ov{position:absolute;inset:0;background-image:linear-gradient(rgba(248,225,111,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(248,225,111,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.yt-play{width:52px;height:52px;border:1px solid rgba(248,225,111,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.5);transition:all .35s;position:relative;z-index:2;pointer-events:none}
 .yt-play svg{fill:var(--yellow);width:18px;margin-right:-2px}
 .yt-card:hover .yt-play{opacity:1;transform:scale(1)}
-.yt-bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--green);transform:scaleX(0);transform-origin:right;transition:transform .4s}
+.yt-bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--green);transform:scaleX(0);transform-origin:right;transition:transform .4s;pointer-events:none}
 .yt-card:hover .yt-bar{transform:scaleX(1)}
 .yt-body{padding:2rem;display:flex;flex-direction:column;justify-content:center;text-align:left;border-right:1px solid var(--border)}
 
 /* ── REELS — now identical card design to ADS (Brands section) ── */
-.reels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem}
+.reels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;max-width:960px;margin:0 auto}
 .reel-card{background:var(--charcoal);overflow:hidden;cursor:pointer;transition:transform .4s;border-radius:0}
 .reel-card:hover{transform:translateY(-8px)}
 .reel-thumb{position:relative;aspect-ratio:9/16;overflow:hidden;display:flex;align-items:center;justify-content:center;max-height:420px}
@@ -121,16 +121,16 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .rt2{background:linear-gradient(180deg,#0a1420,#101e28 50%,#020508)}
 .rt3{background:linear-gradient(180deg,#1e1500,#2a1a00 50%,#0a0700)}
 .reel-notch{display:none}
-.reel-grid-ov{position:absolute;inset:0;background-image:linear-gradient(rgba(248,225,111,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(248,225,111,.03) 1px,transparent 1px);background-size:40px 40px}
-.reel-play{width:50px;height:50px;border:1px solid rgba(248,225,111,.55);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.55);transition:all .4s;position:relative;z-index:2}
+.reel-grid-ov{position:absolute;inset:0;background-image:linear-gradient(rgba(248,225,111,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(248,225,111,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.reel-play{width:50px;height:50px;border:1px solid rgba(248,225,111,.55);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.55);transition:all .4s;position:relative;z-index:2;pointer-events:none}
 .reel-play svg{fill:var(--yellow);width:16px;margin-right:-2px}
 .reel-card:hover .reel-play{opacity:1;transform:scale(1)}
 .reel-ov{display:none}
 .reel-body{padding:1.3rem 1.4rem 1.6rem;text-align:left;border-top:1px solid var(--border)}
-.reel-corner-line{position:absolute;top:0;right:0;width:3px;height:100%;background:var(--green);transform:scaleY(0);transform-origin:top;transition:transform .45s}
+.reel-corner-line{position:absolute;top:0;right:0;width:3px;height:100%;background:var(--green);transform:scaleY(0);transform-origin:top;transition:transform .45s;pointer-events:none}
 .reel-card:hover .reel-corner-line{transform:scaleY(1)}
-.reel-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 50%)}
-.reel-tag-badge{position:absolute;bottom:1rem;right:1rem;z-index:3;background:rgba(13,13,13,.75);border:1px solid var(--border);padding:.25rem .65rem;font-size:.6rem;font-family:'Space Mono',monospace;color:var(--gl);letter-spacing:.15em;text-transform:uppercase}
+.reel-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 50%);pointer-events:none}
+.reel-tag-badge{position:absolute;bottom:1rem;right:1rem;z-index:3;background:rgba(13,13,13,.75);border:1px solid var(--border);padding:.25rem .65rem;font-size:.6rem;font-family:'Space Mono',monospace;color:var(--gl);letter-spacing:.15em;text-transform:uppercase;pointer-events:none}
 
 /* ── ABOUT ── */
 .about-wrap{max-width:820px;margin:0 auto;text-align:left}
@@ -191,8 +191,8 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
   .hero-wm                   { display: none; }
   .section                   { padding: 4.5rem 1.5rem; }
   .clients-section           { padding: 4rem 1.5rem; }
-  .ads-grid                  { grid-template-columns: 1fr; }
-  .reels-grid                { grid-template-columns: 1fr; }
+  .ads-grid                  { grid-template-columns: 1fr; max-width: 100%; }
+  .reels-grid                { grid-template-columns: 1fr; max-width: 100%; }
   .yt-card                   { grid-template-columns: 1fr; }
   .yt-thumb                  { aspect-ratio: 16 / 9; }
   .clients-grid              { grid-template-columns: repeat(3, 1fr); }
@@ -255,7 +255,7 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
   .wtab                      { font-size: .74rem; padding: .6rem 1rem; }
 
   /* ── 6. AD CARDS: single column, 9:16 thumbnails fill correctly ─────────── */
-  .ads-grid                  { grid-template-columns: 1fr; gap: 1.2rem; }
+  .ads-grid                  { grid-template-columns: 1fr; gap: 1.2rem; max-width: 100%; }
   .ad-vthumb                 { width: 100%; }
 
   /* ── 7. YT CARDS: stack body below thumb ───────────────────────────────── */
@@ -268,7 +268,7 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
   }
 
   /* ── 8. REELS (Brands): single column, full width like ads-grid ───────────── */
-  .reels-grid                { grid-template-columns: 1fr; gap: 1.2rem; }
+  .reels-grid                { grid-template-columns: 1fr; gap: 1.2rem; max-width: 100%; }
   .reel-card                 { width: 100%; max-width: 100%; margin: 0; }
   .reel-thumb                { aspect-ratio: 9 / 16; width: 100%; max-height: none; }
 
@@ -433,8 +433,11 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
 </div>
 <script>
 function playVideoC1() {
-    document.getElementById('cover-C1').style.display = 'none';
+    var cover = document.getElementById('cover-C1');
+    cover.style.display = 'none';
+    cover.parentNode.style.pointerEvents = 'none';
     var iframe = document.getElementById('video-C1');
+    iframe.style.pointerEvents = 'auto';
     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
 }
 </script>
@@ -473,8 +476,11 @@ function playVideoC1() {
 </div>
 <script>
 function playVideoC2() {
-    document.getElementById('cover-C2').style.display = 'none';
+    var cover = document.getElementById('cover-C2');
+    cover.style.display = 'none';
+    cover.parentNode.style.pointerEvents = 'none';
     var iframe = document.getElementById('video-C2');
+    iframe.style.pointerEvents = 'auto';
     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
 }
 </script>
@@ -513,8 +519,11 @@ function playVideoC2() {
 </div>
 <script>
 function playVideoC3() {
-    document.getElementById('cover-C3').style.display = 'none';
+    var cover = document.getElementById('cover-C3');
+    cover.style.display = 'none';
+    cover.parentNode.style.pointerEvents = 'none';
     var iframe = document.getElementById('video-C3');
+    iframe.style.pointerEvents = 'auto';
     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
 }
 </script>
@@ -559,7 +568,7 @@ We focused on showcasing all of Falcons' upcoming series in an engaging style, w
          alt="Video Cover">
     <iframe
         id="video-B1"
-        src="https://www.youtube.com/embed/5sCeAPXd63A?enablejsapi=1&rel=0&modestbranding=1"
+        src="https://www.youtube.com/embed/5sCeAPXd63A?enablejsapi=1&rel=0&modestbranding=1&controls=1"
         frameborder="0"
         allow="autoplay; encrypted-media"
         allowfullscreen
@@ -568,8 +577,11 @@ We focused on showcasing all of Falcons' upcoming series in an engaging style, w
 </div>
 <script>
 function playVideoB1() {
-    document.getElementById('cover-B1').style.display = 'none';
+    var cover = document.getElementById('cover-B1');
+    cover.style.display = 'none';
+    cover.parentNode.style.pointerEvents = 'none';
     var iframe = document.getElementById('video-B1');
+    iframe.style.pointerEvents = 'auto';
     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
 }
 </script>
@@ -596,7 +608,7 @@ function playVideoB1() {
          alt="Video Cover">
     <iframe
         id="video-B22"
-        src="https://www.youtube.com/embed/XBjj1pJ92CE?enablejsapi=1&rel=0&modestbranding=1"
+        src="https://www.youtube.com/embed/XBjj1pJ92CE?enablejsapi=1&rel=0&modestbranding=1&controls=1"
         frameborder="0"
         allow="autoplay; encrypted-media"
         allowfullscreen
@@ -605,8 +617,11 @@ function playVideoB1() {
 </div>
 <script>
 function playVideoB22() {
-    document.getElementById('cover-B22').style.display = 'none';
+    var cover = document.getElementById('cover-B22');
+    cover.style.display = 'none';
+    cover.parentNode.style.pointerEvents = 'none';
     var iframe = document.getElementById('video-B22');
+    iframe.style.pointerEvents = 'auto';
     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
 }
 </script>
@@ -633,7 +648,7 @@ function playVideoB22() {
          alt="Video Cover">
     <iframe
         id="video-B3"
-        src="https://www.youtube.com/embed/4dtDE6SEHWw?enablejsapi=1&rel=0&modestbranding=1"
+        src="https://www.youtube.com/embed/4dtDE6SEHWw?enablejsapi=1&rel=0&modestbranding=1&controls=1"
         frameborder="0"
         allow="autoplay; encrypted-media"
         allowfullscreen
@@ -642,8 +657,11 @@ function playVideoB22() {
 </div>
 <script>
 function playVideoB3() {
-    document.getElementById('cover-B3').style.display = 'none';
+    var cover = document.getElementById('cover-B3');
+    cover.style.display = 'none';
+    cover.parentNode.style.pointerEvents = 'none';
     var iframe = document.getElementById('video-B3');
+    iframe.style.pointerEvents = 'auto';
     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
 }
 </script>
@@ -679,8 +697,11 @@ function playVideoB3() {
 </div>
 <script>
 function playVideoA2() {
-    document.getElementById('cover-A2').style.display = 'none';
+    var cover = document.getElementById('cover-A2');
+    cover.style.display = 'none';
+    cover.parentNode.style.pointerEvents = 'none';
     var iframe = document.getElementById('video-A2');
+    iframe.style.pointerEvents = 'auto';
     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
 }
 </script>
@@ -718,8 +739,11 @@ function playVideoA2() {
 </div>
 <script>
 function playVideoA1() {
-    document.getElementById('cover-A1').style.display = 'none';
+    var cover = document.getElementById('cover-A1');
+    cover.style.display = 'none';
+    cover.parentNode.style.pointerEvents = 'none';
     var iframe = document.getElementById('video-A1');
+    iframe.style.pointerEvents = 'auto';
     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
 }
 </script>
@@ -757,8 +781,11 @@ function playVideoA1() {
 </div>
 <script>
 function playVideoA3() {
-    document.getElementById('cover-A3').style.display = 'none';
+    var cover = document.getElementById('cover-A3');
+    cover.style.display = 'none';
+    cover.parentNode.style.pointerEvents = 'none';
     var iframe = document.getElementById('video-A3');
+    iframe.style.pointerEvents = 'auto';
     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
 }
 </script>
