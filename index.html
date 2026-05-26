@@ -237,10 +237,15 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
 }
 
 /* ══ MOBILE  (≤ 768px) ══════════════════════════════════════════════════════ */
-@media (max-width: 768px) {.hero-counter{display:none}
-.hero-headline{font-size:clamp(2rem,9vw,3rem);max-width:100%}
-.hero-sub{max-width:100%;font-size:.88rem}
-.hero-actions{flex-direction:column;align-items:flex-end;gap:1rem}
+@media (max-width: 768px) {
+  .hero-counter{display:none}
+  .hero-headline{font-size:clamp(2rem,9vw,3rem);max-width:100%}
+  .hero-sub{max-width:100%;font-size:.88rem}
+  .hero-actions{flex-direction:column;align-items:flex-end;gap:1rem}
+  #how .stitle{font-size:clamp(1.4rem,7vw,2rem);max-width:100%}
+  #how > div{padding:0 1rem}
+  #how [style*="grid-template-columns"]{grid-template-columns:1fr !important}
+}
 
   /* ── 1. NAV: stack logo + CTA, prevent overflow ─────────────────────────── */
   nav {
