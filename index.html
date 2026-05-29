@@ -357,7 +357,16 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
 </style>
 </head>
 <body>
-
+<script>
+  // Auto-redirect: if user's language is NOT Arabic, send to English
+  const lang = navigator.language || navigator.userLanguage;
+  const isArabic = lang.startsWith('ar');
+  
+  if (!isArabic && !sessionStorage.getItem('lang-chosen')) {
+    sessionStorage.setItem('lang-chosen', 'en');
+    window.location.replace('/EN v/en.html');
+  }
+</script>
 <!-- LOGO SVG inline (dragon-A mark, white) -->
 <svg id="logosvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="display:none">
   <image href="/mnt/user-data/uploads/White.png" width="100" height="100"/>
