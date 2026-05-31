@@ -361,6 +361,8 @@ async function doSignup() {
   msg('sMsg','Creating account...','');
   const { error } = await sb.auth.signUp({ email:e, password:p, options:{ data:{ full_name:n } } });
   if (error) return msg('sMsg', error.message, 'error');
+  // Save to clients table
+  await sb.from('clients').upsert({ email:e, full_name:n }, { onConflict:'email' });
   msg('sMsg','✓ Check your email to confirm.','success');
 }
 
