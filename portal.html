@@ -581,7 +581,7 @@ async function loadInvoices() {
             : inv.status==='pending'
             ? 'background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid var(--border);'
             : 'background:rgba(200,80,80,0.1);color:#c66;border:1px solid rgba(200,80,80,0.2);';
-          const payBtn = !isPaid ? `<button onclick="payInvoice(${inv.id},${inv.amount},'${inv.currency||'USD'}','${inv.project_title}')" style="background:var(--gold);color:#0a0900;border:none;padding:7px 16px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" id="payBtn${inv.id}">Pay Now →</button>` : '<span style="color:#6ab46a;font-size:11px;">✓ Paid</span>';
+          const payBtn = !isPaid ? `<button onclick="payInvoice(${inv.id},${inv.amount},'${inv.currency||'USD'}','${inv.project_title.replace(/'/g,"\\'")}'" style="background:#c9a84c;color:#0a0900;border:none;padding:7px 16px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-weight:500;" id="payBtn${inv.id}">Pay Now →</button>` : '<span style="color:#6ab46a;font-size:11px;">✓ Paid</span>';
           return `<tr style="background:var(--bg2);">
             <td style="padding:12px 14px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(201,168,76,0.05);">${inv.project_title}${inv.notes?`<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">${inv.notes}</div>`:''}
             </td>
