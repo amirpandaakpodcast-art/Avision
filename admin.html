@@ -230,7 +230,7 @@ async function adminLogin() {
 }
 
 async function adminLogout() {
-  if (chatSub) chatSub.unsubscribe();
+  if (chatSub) { clearInterval(chatSub); chatSub=null; }
   await sb.auth.signOut();
   document.getElementById('adminDash').style.display='none';
   document.getElementById('loginPage').style.display='flex';
@@ -292,7 +292,7 @@ async function loadClients() {
 
 async function selectClient(email) {
   activeClient=email;
-  if (chatSub) chatSub.unsubscribe();
+  if (chatSub) { clearInterval(chatSub); chatSub=null; }
   document.querySelectorAll('.cl-btn').forEach(b=>b.classList.toggle('active',b.textContent===email));
   const area=document.getElementById('chatArea');
   area.innerHTML=`
@@ -304,15 +304,14 @@ async function selectClient(email) {
     </div>`;
   const { data } = await sb.from('messages').select('*').eq('client_email',email).order('created_at',{ascending:true});
   renderMsgs(data||[]);
-  chatSub=sb.channel('admin-ch').on('postgres_changes',{ event:'INSERT', schema:'public', table:'messages', filter:`client_email=eq.${email}` }, payload=>{
-    const c=document.getElementById('chatMsgs'); if(!c)return;
-    const m=payload.new, isAdm=m.sender==='admin';
-    const t=new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    const e=c.querySelector('.chat-empty'); if(e)e.remove();
-    const d=document.createElement('div'); d.className=`mrow ${isAdm?'adm':'cli'}`;
-    d.innerHTML=`${!isAdm?'<div class="msender">Client</div>':''}<div class="mbubble">${m.message}</div><div class="mtime">${t}</div>`;
-    c.appendChild(d); c.scrollTop=c.scrollHeight;
-  }).subscribe();
+  let lastId = data&&data.length ? data[data.length-1].id : 0;
+  chatSub = setInterval(async () => {
+    if (!activeClient) return;
+    const { data: fresh } = await sb.from('messages').select('*').eq('client_email', activeClient).order('created_at', { ascending: true });
+    if (!fresh||!fresh.length) return;
+    const latest = fresh[fresh.length-1];
+    if (latest.id !== lastId) { lastId=latest.id; renderMsgs(fresh); }
+  }, 3000);
 }
 
 function renderMsgs(data) {
