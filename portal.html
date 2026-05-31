@@ -339,7 +339,6 @@ async function doSignup() {
 }
 
 async function doLogout() {
-  if (chatSub) chatSub.unsubscribe();
   await sb.auth.signOut();
   document.getElementById('dashboard').style.display='none';
   document.getElementById('authPage').style.display='flex';
@@ -409,16 +408,18 @@ function renderMsgs(data) {
   c.scrollTop=c.scrollHeight;
 }
 
+let lastMsgId = 0;
 function subscribeMsgs() {
-  chatSub=sb.channel('portal-chat').on('postgres_changes',{ event:'INSERT', schema:'public', table:'messages', filter:`client_email=eq.${me.email}` }, payload=>{
-    const c=document.getElementById('chatMsgs'); if(!c)return;
-    const m=payload.new, mine=m.sender==='client';
-    const t=new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    const e=c.querySelector('.chat-empty'); if(e)e.remove();
-    const d=document.createElement('div'); d.className=`mrow ${mine?'me':'them'}`;
-    d.innerHTML=`${!mine?'<div class="msender">Amir</div>':''}<div class="mbubble">${m.message}</div><div class="mtime">${t}</div>`;
-    c.appendChild(d); c.scrollTop=c.scrollHeight;
-  }).subscribe();
+  setInterval(async () => {
+    if (!me) return;
+    const { data } = await sb.from('messages').select('*').eq('client_email', me.email).order('created_at', { ascending: true });
+    if (!data || !data.length) return;
+    const latest = data[data.length - 1];
+    if (latest.id !== lastMsgId) {
+      lastMsgId = latest.id;
+      renderMsgs(data);
+    }
+  }, 3000);
 }
 
 async function loadFiles() {
