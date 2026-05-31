@@ -439,7 +439,12 @@ async function loadProjects(user) {
   document.getElementById('cActive').textContent=data.filter(p=>p.status==='inprogress').length;
   document.getElementById('cDone').textContent=data.filter(p=>p.status==='done').length;
   document.getElementById('cReview').textContent=data.filter(p=>p.status==='review').length;
-  list.innerHTML=data.map(p=>`<div class="proj"><div><div class="proj-title">${p.title}</div><div class="proj-sub">${p.description||''}${p.delivery_date?' · Delivery: '+p.delivery_date:''}</div></div>${statusBadge(p.status)}</div>`).join('');
+  list.innerHTML=data.map(p=>`<div class="proj"><div><div class="proj-title">${p.title}</div><div class="proj-sub">${p.description||''}${p.delivery_date?' · Delivery: '+p.delivery_date:''}</div></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      ${p.delivery_url?`<a href="${p.delivery_url}" target="_blank" style="background:var(--gold);color:#0a0900;text-decoration:none;padding:6px 14px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500;">↓ Download</a>`:''}
+      ${statusBadge(p.status)}
+    </div>
+  </div>`).join('');
 }
 
 async function loadInvoices() {
