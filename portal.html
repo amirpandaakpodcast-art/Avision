@@ -308,7 +308,17 @@ const sb = createClient(SB_URL, SB_KEY, {
   }
 });
 let me = null, chatSub = null;
-
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (session) {
+    me = session.user;
+    document.getElementById('authPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('userEmail').textContent = me.email;
+    const name = me.user_metadata?.full_name;
+    if (name) document.getElementById('welcomeName').textContent = `Welcome, ${name.split(' ')[0]}.`;
+    loadProjects(me); loadFiles(); loadMsgs(); subscribeMsgs();
+  }
+});
 async function notify(type, content) {
   try { await fetch(FN_URL, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${SB_KEY}`}, body:JSON.stringify({ client_email: me.email, type, content }) }); } catch(e) {}
 }
