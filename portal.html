@@ -300,8 +300,18 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
         <div class="fg"><label>Password</label>
           <div class="pw-wrap"><input type="password" id="lP" placeholder="Your password" autocomplete="current-password"><button type="button" class="pw-eye" onclick="togPw('lP',this)">👁</button></div>
         </div>
+        <div style="text-align:right;margin-bottom:.75rem;">
+  <span onclick="showReset()" style="font-size:12px;color:#888;cursor:pointer;">Forgot password?</span>
+</div>
         <button class="btn-primary" onclick="doLogin()">Sign in</button>
         <div class="amsg" id="lM"></div>
+        <div id="resetForm" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid #222;">
+  <p style="font-size:12px;color:#888;margin-bottom:.75rem;">Enter your email to receive a reset link.</p>
+  <div class="fg"><label>Email</label><input type="email" id="rE" placeholder="you@example.com"></div>
+  <button class="btn-p" onclick="doReset()">Send reset link</button>
+  <div class="amsg" id="rM"></div>
+  <div style="text-align:center;margin-top:.75rem;"><span onclick="hideReset()" style="font-size:12px;color:#444;cursor:pointer;">← Back to sign in</span></div>
+</div>
       </div>
       <div id="sForm" style="display:none;">
         <div class="fg"><label>Full Name</label><input type="text" id="sN" placeholder="Your name" autocomplete="name"></div>
@@ -714,6 +724,16 @@ sb.auth.onAuthStateChange(function(ev,session){
   if(session&&(ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED'||ev==='USER_UPDATED'))startDash(session.user);
   else if(!session){me=null;document.getElementById('dash').style.display='none';document.getElementById('authPage').style.display='flex';}
 });
+  function showReset(){document.getElementById('resetForm').style.display='block';}
+function hideReset(){document.getElementById('resetForm').style.display='none';}
+async function doReset(){
+  var e=document.getElementById('rE').value;
+  if(!e)return sm('rM','Please enter your email.','err');
+  sm('rM','Sending...','');
+  const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:'https://www.amiravision.com/portal.html'});
+  if(error)return sm('rM',error.message,'err');
+  sm('rM','✓ Reset link sent! Check your email.','ok');
+}
 </script>
 </body>
 </html>
