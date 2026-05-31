@@ -399,7 +399,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
         </div>
       </div>
       <div class="prof-wrap" id="profWrap" onclick="togProf()">
-        <span class="upill" id="uEmail">—</span>
+        <div style="width:38px;height:38px;border:1px solid var(--b2);border-radius:50%;background:var(--gd);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all .3s;" id="profIcon" title="Profile">👤</div>
         <div class="prof-pop" id="profPop">
           <div class="prof-head">
             <div class="prof-avatar" id="profAvatar">A</div>
@@ -413,7 +413,6 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
           </div>
         </div>
       </div>
-      <button class="btn-x" onclick="doLogout()">EXIT</button>
     </div>
   </div>
 
@@ -827,7 +826,7 @@ function startDash(user){
   me=user;
   document.getElementById('authPage').style.display='none';
   document.getElementById('dash').style.display='block';
-  document.getElementById('uEmail').textContent=user.email;
+  document.getElementById('uEmail') && (document.getElementById('uEmail').textContent=user.email);
   var name=user.user_metadata&&user.user_metadata.full_name;
   var firstName=name?name.split(' ')[0]:'';
   if(firstName)document.getElementById('wTitle').innerHTML='WELCOME, <em>'+firstName.toUpperCase()+'.</em>';
@@ -835,6 +834,9 @@ function startDash(user){
   document.getElementById('profEmailDisp').textContent=user.email;
   document.getElementById('profName').textContent=name||user.email;
   document.getElementById('profAvatar').textContent=(name?name.charAt(0):user.email.charAt(0)).toUpperCase();
+  // Update icon with first letter
+  var icon=document.getElementById('profIcon');
+  if(icon){icon.title=name||user.email;}
   loadProjects(user);loadFiles();loadMsgs();loadInvoices();
   sb.from('notifications').select('*').eq('client_email',user.email).order('created_at',{ascending:false}).then(function(r){
     notifs=r.data||[];
