@@ -15,26 +15,23 @@
     .form-group { margin-bottom: 1rem; }
     .form-group label { display: block; font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
     .form-group input, .form-group select, .form-group textarea { width: 100%; background: #111; border: 1px solid #1f1f1f; border-radius: 8px; padding: 11px 14px; color: #fff; font-size: 13px; outline: none; transition: border .2s; font-family: inherit; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #333; }
-    .form-group select option { background: #111; }
     .form-group textarea { resize: vertical; min-height: 80px; }
-    .btn { width: 100%; background: #fff; color: #000; border: none; border-radius: 8px; padding: 12px; font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity .2s; }
-    .btn:hover { opacity: 0.85; }
+    .btn { width: 100%; background: #fff; color: #000; border: none; border-radius: 8px; padding: 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
     .msg { font-size: 12px; margin-top: 0.75rem; min-height: 18px; }
     .msg.error { color: #ff5555; }
     .msg.success { color: #4caf50; }
     .admin { display: none; min-height: 100vh; }
     .topbar { background: #0d0d0d; border-bottom: 1px solid #1a1a1a; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
     .topbar h1 { font-size: 14px; font-weight: 500; color: #fff; }
-    .topbar-right { display: flex; gap: 10px; align-items: center; }
     .admin-badge { background: #2a1a1a; color: #ff8888; font-size: 11px; padding: 4px 10px; border-radius: 20px; }
     .btn-logout { background: none; border: 1px solid #222; border-radius: 8px; padding: 7px 14px; color: #555; font-size: 12px; cursor: pointer; }
     .btn-logout:hover { color: #fff; border-color: #444; }
-    .admin-body { display: grid; grid-template-columns: 340px 1fr; gap: 0; min-height: calc(100vh - 57px); }
+    .admin-body { display: grid; grid-template-columns: 320px 1fr 320px; gap: 0; min-height: calc(100vh - 57px); }
     .left-panel { border-right: 1px solid #1a1a1a; padding: 1.5rem; overflow-y: auto; }
+    .right-panel { padding: 1.5rem; overflow-y: auto; }
+    .chat-panel { border-left: 1px solid #1a1a1a; display: flex; flex-direction: column; }
     .panel-title { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1.25rem; }
     .add-form { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 12px; padding: 1.25rem; }
-    .right-panel { padding: 1.5rem; overflow-y: auto; }
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
     .stat-card { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 10px; padding: 1rem; }
     .stat-label { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
@@ -43,19 +40,39 @@
     .projects-table th { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 12px; text-align: left; border-bottom: 1px solid #1a1a1a; }
     .projects-table td { padding: 12px; font-size: 13px; border-bottom: 1px solid #111; vertical-align: middle; }
     .projects-table tr:hover td { background: #0f0f0f; }
-    .status-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; display: inline-block; }
-    .s-inprogress { background: #1a2a1a; color: #4caf50; }
-    .s-review { background: #2a2a1a; color: #ffc107; }
-    .s-done { background: #1a1a2a; color: #7c8cf8; }
-    .s-pending { background: #1a1a1a; color: #666; }
-    .empty-state { text-align: center; padding: 3rem; color: #333; font-size: 13px; }
-    .delete-btn { background: none; border: none; color: #333; cursor: pointer; font-size: 16px; padding: 4px 8px; border-radius: 6px; transition: all .2s; }
-    .delete-btn:hover { color: #ff4444; background: #1a0000; }
     .status-select { background: #111; border: 1px solid #222; border-radius: 6px; padding: 4px 8px; color: #ccc; font-size: 12px; cursor: pointer; }
-    @media (max-width: 900px) {
+    .empty-state { text-align: center; padding: 3rem; color: #333; font-size: 13px; }
+    .delete-btn { background: none; border: none; color: #333; cursor: pointer; font-size: 16px; padding: 4px 8px; border-radius: 6px; }
+    .delete-btn:hover { color: #ff4444; }
+
+    /* CHAT PANEL */
+    .chat-clients { padding: 1rem; border-bottom: 1px solid #1a1a1a; }
+    .chat-clients-title { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+    .client-btn { width: 100%; text-align: left; background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 8px; padding: 8px 12px; color: #888; font-size: 12px; cursor: pointer; margin-bottom: 6px; transition: all .2s; }
+    .client-btn.active { border-color: #333; color: #fff; background: #1a1a1a; }
+    .client-btn:hover { border-color: #333; color: #ccc; }
+    .chat-area { flex: 1; display: flex; flex-direction: column; }
+    .chat-header { padding: 1rem; border-bottom: 1px solid #1a1a1a; font-size: 12px; color: #555; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 10px; min-height: 200px; max-height: 400px; }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+    .msg-row { display: flex; flex-direction: column; }
+    .msg-row.admin { align-items: flex-end; }
+    .msg-row.client { align-items: flex-start; }
+    .msg-bubble { max-width: 80%; padding: 8px 12px; border-radius: 10px; font-size: 12px; line-height: 1.5; }
+    .msg-row.admin .msg-bubble { background: #fff; color: #000; border-radius: 10px 10px 2px 10px; }
+    .msg-row.client .msg-bubble { background: #1a1a1a; color: #ccc; border-radius: 10px 10px 10px 2px; }
+    .msg-time { font-size: 10px; color: #444; margin-top: 3px; }
+    .msg-sender-label { font-size: 10px; color: #555; margin-bottom: 2px; }
+    .chat-input-row { display: flex; gap: 8px; padding: 1rem; border-top: 1px solid #1a1a1a; }
+    .chat-input { flex: 1; background: #111; border: 1px solid #1f1f1f; border-radius: 8px; padding: 9px 12px; color: #fff; font-size: 12px; outline: none; font-family: inherit; }
+    .btn-send { background: #fff; color: #000; border: none; border-radius: 8px; padding: 9px 14px; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+    .chat-empty { text-align: center; padding: 2rem; color: #333; font-size: 12px; }
+    .no-client { display: flex; align-items: center; justify-content: center; flex: 1; color: #333; font-size: 12px; }
+
+    @media (max-width: 1100px) {
       .admin-body { grid-template-columns: 1fr; }
-      .left-panel { border-right: none; border-bottom: 1px solid #1a1a1a; }
-      .stats { grid-template-columns: repeat(2, 1fr); }
+      .left-panel, .chat-panel { border: none; border-top: 1px solid #1a1a1a; }
     }
   </style>
 </head>
@@ -65,14 +82,8 @@
   <div class="login-box">
     <h1>Admin Access</h1>
     <p>Avision — Project Management</p>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="adminEmail" placeholder="contact@amiravision.com">
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="adminPass" placeholder="••••••••">
-    </div>
+    <div class="form-group"><label>Email</label><input type="email" id="adminEmail" placeholder="contact@amiravision.com"></div>
+    <div class="form-group"><label>Password</label><input type="password" id="adminPass" placeholder="••••••••"></div>
     <button class="btn" onclick="adminLogin()">Sign In →</button>
     <div class="msg" id="loginMsg"></div>
   </div>
@@ -81,30 +92,21 @@
 <div class="admin" id="adminDash">
   <div class="topbar">
     <h1>⚡ Avision Admin</h1>
-    <div class="topbar-right">
+    <div style="display:flex;gap:10px;align-items:center;">
       <span class="admin-badge">Admin</span>
       <button class="btn-logout" onclick="adminLogout()">Sign Out</button>
     </div>
   </div>
 
   <div class="admin-body">
+    <!-- LEFT: ADD PROJECT -->
     <div class="left-panel">
       <div class="panel-title">Add New Project</div>
       <div class="add-form">
-        <div class="form-group">
-          <label>Client Email</label>
-          <input type="email" id="clientEmail" placeholder="client@email.com">
-        </div>
-        <div class="form-group">
-          <label>Project Title</label>
-          <input type="text" id="projTitle" placeholder="e.g. Samsung Ad Edit">
-        </div>
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="projDesc" placeholder="Brief description..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Status</label>
+        <div class="form-group"><label>Client Email</label><input type="email" id="clientEmail" placeholder="client@email.com"></div>
+        <div class="form-group"><label>Project Title</label><input type="text" id="projTitle" placeholder="e.g. Samsung Ad Edit"></div>
+        <div class="form-group"><label>Description</label><textarea id="projDesc" placeholder="Brief description..."></textarea></div>
+        <div class="form-group"><label>Status</label>
           <select id="projStatus">
             <option value="pending">Pending</option>
             <option value="inprogress">In Progress</option>
@@ -112,15 +114,13 @@
             <option value="done">Done ✓</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>Delivery Date</label>
-          <input type="text" id="projDate" placeholder="e.g. June 15, 2026">
-        </div>
+        <div class="form-group"><label>Delivery Date</label><input type="text" id="projDate" placeholder="e.g. June 15, 2026"></div>
         <button class="btn" onclick="addProject()">Add Project →</button>
         <div class="msg" id="addMsg"></div>
       </div>
     </div>
 
+    <!-- CENTER: PROJECTS -->
     <div class="right-panel">
       <div class="stats">
         <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" id="totalCount">0</div></div>
@@ -130,19 +130,20 @@
       </div>
       <div class="panel-title">All Projects</div>
       <table class="projects-table">
-        <thead>
-          <tr>
-            <th>Project</th>
-            <th>Client</th>
-            <th>Status</th>
-            <th>Delivery</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="projectsBody">
-          <tr><td colspan="5" class="empty-state">Loading...</td></tr>
-        </tbody>
+        <thead><tr><th>Project</th><th>Client</th><th>Status</th><th>Delivery</th><th></th></tr></thead>
+        <tbody id="projectsBody"><tr><td colspan="5" class="empty-state">Loading...</td></tr></tbody>
       </table>
+    </div>
+
+    <!-- RIGHT: CHAT -->
+    <div class="chat-panel">
+      <div class="chat-clients">
+        <div class="chat-clients-title">Client Conversations</div>
+        <div id="clientsList"><div style="color:#333;font-size:12px;">No clients yet</div></div>
+      </div>
+      <div class="chat-area" id="chatArea">
+        <div class="no-client">Select a client to chat</div>
+      </div>
     </div>
   </div>
 </div>
@@ -153,6 +154,8 @@ const SUPABASE_KEY = 'sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV';
 const ADMIN_EMAIL = 'contact@amiravision.com';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+let activeClient = null;
+let chatSub = null;
 
 function showMsg(id, text, type) {
   const el = document.getElementById(id);
@@ -163,14 +166,15 @@ function showMsg(id, text, type) {
 async function adminLogin() {
   const email = document.getElementById('adminEmail').value;
   const pass = document.getElementById('adminPass').value;
-  if (!email || !pass) return showMsg('loginMsg', 'Fill all fields.', 'error');
-  if (email !== ADMIN_EMAIL) return showMsg('loginMsg', 'Access denied.', 'error');
-  showMsg('loginMsg', 'Signing in...', '');
+  if (!email||!pass) return showMsg('loginMsg','Fill all fields.','error');
+  if (email !== ADMIN_EMAIL) return showMsg('loginMsg','Access denied.','error');
+  showMsg('loginMsg','Signing in...','');
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
   if (error) return showMsg('loginMsg', error.message, 'error');
 }
 
 async function adminLogout() {
+  if (chatSub) chatSub.unsubscribe();
   await sb.auth.signOut();
   document.getElementById('adminDash').style.display = 'none';
   document.getElementById('loginPage').style.display = 'flex';
@@ -182,21 +186,11 @@ async function addProject() {
   const desc = document.getElementById('projDesc').value.trim();
   const status = document.getElementById('projStatus').value;
   const date = document.getElementById('projDate').value.trim();
-
-  if (!clientEmail || !title) return showMsg('addMsg', 'Email and title are required.', 'error');
-  showMsg('addMsg', 'Adding...', '');
-
-  // Insert directly with client_email — no user_id needed
-  const { error } = await sb.from('projects').insert({
-    client_email: clientEmail,
-    title,
-    description: desc,
-    status,
-    delivery_date: date
-  });
-
+  if (!clientEmail||!title) return showMsg('addMsg','Email and title required.','error');
+  showMsg('addMsg','Adding...','');
+  const { error } = await sb.from('projects').insert({ client_email: clientEmail, title, description: desc, status, delivery_date: date });
   if (error) return showMsg('addMsg', error.message, 'error');
-  showMsg('addMsg', '✓ Project added!', 'success');
+  showMsg('addMsg','✓ Project added!','success');
   document.getElementById('projTitle').value = '';
   document.getElementById('projDesc').value = '';
   document.getElementById('projDate').value = '';
@@ -215,38 +209,86 @@ async function deleteProject(id) {
   loadProjects();
 }
 
-function statusBadge(id, current) {
-  const opts = ['pending','inprogress','review','done'];
-  const labels = { pending:'Pending', inprogress:'In Progress', review:'In Review', done:'Done ✓' };
-  return `<select class="status-select" onchange="updateStatus(${id}, this.value)">
-    ${opts.map(o => `<option value="${o}" ${o===current?'selected':''}>${labels[o]}</option>`).join('')}
-  </select>`;
-}
-
 async function loadProjects() {
-  const { data, error } = await sb.from('projects').select('*').order('created_at', { ascending: false });
+  const { data } = await sb.from('projects').select('*').order('created_at', { ascending: false });
   const tbody = document.getElementById('projectsBody');
-  if (error || !data || data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No projects yet. Add your first project!</td></tr>';
-    ['totalCount','activeCount','reviewCount','doneCount'].forEach(id => document.getElementById(id).textContent = '0');
+  if (!data||!data.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No projects yet.</td></tr>';
+    ['totalCount','activeCount','reviewCount','doneCount'].forEach(id=>document.getElementById(id).textContent='0');
     return;
   }
   document.getElementById('totalCount').textContent = data.length;
   document.getElementById('activeCount').textContent = data.filter(p=>p.status==='inprogress').length;
   document.getElementById('reviewCount').textContent = data.filter(p=>p.status==='review').length;
   document.getElementById('doneCount').textContent = data.filter(p=>p.status==='done').length;
+  const opts = ['pending','inprogress','review','done'];
+  const labels = {pending:'Pending',inprogress:'In Progress',review:'In Review',done:'Done ✓'};
+  tbody.innerHTML = data.map(p=>`<tr>
+    <td><div style="color:#fff;">${p.title}</div><div style="color:#444;font-size:11px;">${p.description||''}</div></td>
+    <td style="font-size:12px;color:#888;">${p.client_email||'—'}</td>
+    <td><select class="status-select" onchange="updateStatus(${p.id},this.value)">${opts.map(o=>`<option value="${o}" ${o===p.status?'selected':''}>${labels[o]}</option>`).join('')}</select></td>
+    <td style="font-size:12px;color:#666;">${p.delivery_date||'—'}</td>
+    <td><button class="delete-btn" onclick="deleteProject(${p.id})">✕</button></td>
+  </tr>`).join('');
+}
 
-  tbody.innerHTML = data.map(p => `
-    <tr>
-      <td>
-        <div style="color:#fff;">${p.title}</div>
-        <div style="color:#444;font-size:11px;margin-top:3px;">${p.description||''}</div>
-      </td>
-      <td style="font-size:12px;color:#888;">${p.client_email||'—'}</td>
-      <td>${statusBadge(p.id, p.status)}</td>
-      <td style="font-size:12px;color:#666;">${p.delivery_date||'—'}</td>
-      <td><button class="delete-btn" onclick="deleteProject(${p.id})">✕</button></td>
-    </tr>`).join('');
+async function loadClients() {
+  const { data } = await sb.from('messages').select('client_email').order('created_at', { ascending: false });
+  const unique = [...new Set((data||[]).map(m=>m.client_email))];
+  const list = document.getElementById('clientsList');
+  if (!unique.length) { list.innerHTML = '<div style="color:#333;font-size:12px;">No conversations yet</div>'; return; }
+  list.innerHTML = unique.map(email=>`<button class="client-btn ${activeClient===email?'active':''}" onclick="selectClient('${email}')">${email}</button>`).join('');
+}
+
+async function selectClient(email) {
+  activeClient = email;
+  if (chatSub) chatSub.unsubscribe();
+  document.querySelectorAll('.client-btn').forEach(b => b.classList.toggle('active', b.textContent===email));
+  const area = document.getElementById('chatArea');
+  area.innerHTML = `
+    <div class="chat-header">💬 ${email}</div>
+    <div class="chat-messages" id="chatMessages"><div class="chat-empty">Loading...</div></div>
+    <div class="chat-input-row">
+      <input type="text" class="chat-input" id="adminChatInput" placeholder="Reply to client..." onkeydown="if(event.key==='Enter')adminSendMessage()">
+      <button class="btn-send" onclick="adminSendMessage()">Send →</button>
+    </div>`;
+  const { data } = await sb.from('messages').select('*').eq('client_email', email).order('created_at', { ascending: true });
+  renderAdminMessages(data||[]);
+  chatSub = sb.channel('admin-chat').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `client_email=eq.${email}` }, payload => {
+    const container = document.getElementById('chatMessages');
+    if (!container) return;
+    const m = payload.new;
+    const isAdmin = m.sender === 'admin';
+    const time = new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const emptyEl = container.querySelector('.chat-empty');
+    if (emptyEl) emptyEl.remove();
+    const div = document.createElement('div');
+    div.className = `msg-row ${isAdmin?'admin':'client'}`;
+    div.innerHTML = `${!isAdmin?'<div class="msg-sender-label">Client</div>':''}<div class="msg-bubble">${m.message}</div><div class="msg-time">${time}</div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }).subscribe();
+}
+
+function renderAdminMessages(data) {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+  if (!data.length) { container.innerHTML = '<div class="chat-empty">No messages yet.</div>'; return; }
+  container.innerHTML = data.map(m=>{
+    const isAdmin = m.sender==='admin';
+    const time = new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    return `<div class="msg-row ${isAdmin?'admin':'client'}">${!isAdmin?'<div class="msg-sender-label">Client</div>':''}<div class="msg-bubble">${m.message}</div><div class="msg-time">${time}</div></div>`;
+  }).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+async function adminSendMessage() {
+  if (!activeClient) return;
+  const input = document.getElementById('adminChatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  await sb.from('messages').insert({ client_email: activeClient, sender: 'admin', message: msg });
 }
 
 sb.auth.onAuthStateChange((event, session) => {
@@ -254,6 +296,8 @@ sb.auth.onAuthStateChange((event, session) => {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('adminDash').style.display = 'block';
     loadProjects();
+    loadClients();
+    setInterval(loadClients, 10000);
   } else if (!session) {
     document.getElementById('adminDash').style.display = 'none';
     document.getElementById('loginPage').style.display = 'flex';
