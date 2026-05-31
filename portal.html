@@ -237,6 +237,19 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
     detectSessionInUrl: true
   }
 });
+  // Restore session on page load
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (session) {
+    currentUser = session.user;
+    document.getElementById('authPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('userEmail').textContent = session.user.email;
+    loadProjects(session.user);
+    loadFiles();
+    loadMessages();
+    subscribeToMessages();
+  }
+});
 let currentUser = null;
 let chatSub = null;
 
