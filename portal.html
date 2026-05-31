@@ -28,6 +28,45 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 .ti.show{transform:translateX(0);}
 .td{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 
+/* ── PROGRESS TIMELINE ── */
+.timeline{display:flex;align-items:center;padding:1.25rem 1.5rem;background:var(--s2);border-top:1px solid var(--b);position:relative;}
+.tl-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;z-index:2;}
+.tl-dot{width:12px;height:12px;border:2px solid var(--td);background:var(--bg);transition:all .4s;position:relative;}
+.tl-dot.done{background:var(--g);border-color:var(--g);box-shadow:0 0 12px rgba(201,168,76,.5);}
+.tl-dot.active{background:var(--g);border-color:var(--g);box-shadow:0 0 16px rgba(201,168,76,.7);animation:tlpulse 1.5s infinite;}
+@keyframes tlpulse{0%,100%{box-shadow:0 0 10px rgba(201,168,76,.5);}50%{box-shadow:0 0 24px rgba(201,168,76,.9);}}
+.tl-label{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:.15em;color:var(--td);margin-top:6px;text-align:center;white-space:nowrap;}
+.tl-label.done{color:var(--g);}
+.tl-label.active{color:var(--g2);}
+.tl-line{position:absolute;top:50%;left:calc(50% + 6px);right:calc(-50% + 6px);height:1px;background:var(--td);transform:translateY(-50%);z-index:1;transition:background .4s;}
+.tl-line.done{background:var(--g);}
+
+/* ── ENHANCED PROJECT CARDS ── */
+.pcard{background:var(--s1);border-left:2px solid transparent;transition:all .3s;position:relative;overflow:hidden;}
+.pcard:hover{background:var(--s2);border-left-color:var(--g);}
+.pcard-top{padding:1.25rem 1.5rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;}
+.pcard-info{flex:1;}
+.pcard-title{font-size:14px;color:var(--t);margin-bottom:4px;letter-spacing:.02em;}
+.pcard-meta{font-size:11px;color:var(--td);}
+.pcard-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.pcard-date{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:.15em;color:var(--g);opacity:.8;}
+.pcard-actions{display:flex;align-items:center;gap:8px;}
+
+/* PROGRESS BAR */
+.pbar-wrap{padding:0 1.5rem .75rem;}
+.pbar-info{display:flex;justify-content:space-between;margin-bottom:6px;}
+.pbar-lbl{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:.2em;color:var(--td);}
+.pbar-pct{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:.1em;color:var(--g);}
+.pbar-track{background:var(--s3);height:2px;position:relative;}
+.pbar-fill{height:2px;background:linear-gradient(90deg,var(--g),var(--g2));transition:width .8s cubic-bezier(.22,1,.36,1);box-shadow:0 0 8px rgba(201,168,76,.4);position:relative;}
+.pbar-fill::after{content:'';position:absolute;right:-3px;top:-2px;width:6px;height:6px;border-radius:50%;background:var(--g2);box-shadow:0 0 8px var(--g);}
+
+/* QUICK REPLIES */
+.qr-wrap{padding:0 1rem 12px;border-top:1px solid var(--b);display:flex;gap:6px;flex-wrap:wrap;}
+.qr-lbl{width:100%;font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:.2em;color:var(--td);padding-top:10px;padding-bottom:6px;}
+.qr-btn{background:var(--s3);border:1px solid var(--b);padding:6px 12px;font-size:11px;color:var(--tm);cursor:pointer;transition:all .25s;letter-spacing:.04em;white-space:nowrap;}
+.qr-btn:hover{background:var(--gd);border-color:var(--b2);color:var(--g);}
+
 /* AUTH PAGE */
 .ap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;position:relative;z-index:10;}
 .ab{width:100%;max-width:460px;}
@@ -361,6 +400,15 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       <div class="sec-h"><span class="sec-t">Message Amir</span><div class="sec-l"></div></div>
       <div class="cb">
         <div class="cm" id="cMsgs"><div class="ce">Start a conversation — Amir will reply shortly.</div></div>
+        <div class="qr-wrap">
+          <div class="qr-lbl">Quick Replies</div>
+          <button class="qr-btn" onclick="qr('When is the delivery date?')">📅 Delivery date?</button>
+          <button class="qr-btn" onclick="qr('I approve this version ✓')">✅ I approve this</button>
+          <button class="qr-btn" onclick="qr('I need a revision on this')">🔄 Need revision</button>
+          <button class="qr-btn" onclick="qr('Please send me the final file')">📁 Send final file</button>
+          <button class="qr-btn" onclick="qr('How is the project going?')">💬 Project update?</button>
+          <button class="qr-btn" onclick="qr('Invoice received, will pay shortly')">💳 Will pay soon</button>
+        </div>
         <div class="ci">
           <input type="text" class="cin" id="cIn" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sendMsg()">
           <button class="cs" onclick="sendMsg()">SEND</button>
@@ -467,6 +515,17 @@ function spill(s){
   var d=m[s]||['spd',s];return '<span class="sp '+d[0]+'">'+d[1]+'</span>';
 }
 
+function statusPct(s){return{pending:0,inprogress:55,review:85,done:100}[s]||0;}
+function tlSteps(s){
+  var steps=['Brief','Production','Review','Delivered'];
+  var idx={pending:0,inprogress:1,review:2,done:3}[s]||0;
+  return '<div class="timeline">'+steps.map(function(lbl,i){
+    var cls=i<idx?'done':i===idx?'active':'';
+    var line=i<steps.length-1?'<div class="tl-line '+(i<idx?'done':'')+'"></div>':'';
+    return '<div class="tl-step"><div class="tl-dot '+cls+'"></div>'+line+'<div class="tl-label '+cls+'">'+lbl+'</div></div>';
+  }).join('')+'</div>';
+}
+
 function loadProjects(user){
   sb.from('projects').select('*').eq('client_email',user.email).order('created_at',{ascending:false}).then(function(r){
     var data=r.data||[],el=document.getElementById('pList');
@@ -475,8 +534,26 @@ function loadProjects(user){
     document.getElementById('sR').textContent=data.filter(function(p){return p.status==='review';}).length;
     if(!data.length){el.innerHTML='<div class="empty">No projects yet — Amir will add them here soon.</div>';return;}
     el.innerHTML='<div class="plist">'+data.map(function(p){
+      var pct=statusPct(p.status);
       var dl=p.delivery_url?'<a href="'+p.delivery_url+'" target="_blank" class="dl">↓ Download</a>':'';
-      return '<div class="pitem"><div><div class="pn">'+p.title+'</div><div class="pm">'+(p.description||'')+(p.delivery_date?' · Delivery: '+p.delivery_date:'')+'</div></div><div class="pacts">'+dl+spill(p.status)+'</div></div>';
+      var dateTag=p.delivery_date?'<div class="pcard-date">Delivery: '+p.delivery_date+'</div>':'';
+      return '<div class="pcard">'+
+        '<div class="pcard-top">'+
+          '<div class="pcard-info">'+
+            '<div class="pcard-title">'+p.title+'</div>'+
+            '<div class="pcard-meta">'+(p.description||'No description')+'</div>'+
+          '</div>'+
+          '<div class="pcard-right">'+
+            dateTag+
+            '<div class="pcard-actions">'+dl+spill(p.status)+'</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="pbar-wrap">'+
+          '<div class="pbar-info"><span class="pbar-lbl">Progress</span><span class="pbar-pct">'+pct+'%</span></div>'+
+          '<div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%"></div></div>'+
+        '</div>'+
+        tlSteps(p.status)+
+      '</div>';
     }).join('')+'</div>';
   });
 }
@@ -557,6 +634,12 @@ function payNow(id,amount,cur,desc){
       if(d.url)window.location.href=d.url;
       else{if(btn){btn.textContent='PAY NOW →';btn.disabled=false;}toast('Payment error. Please try again.','err');}
     }).catch(function(){if(btn){btn.textContent='PAY NOW →';btn.disabled=false;}});
+}
+function qr(msg){
+  var inp=document.getElementById('cIn');
+  inp.value=msg;
+  inp.focus();
+  sendMsg();
 }
 function sendMsg(){
   var inp=document.getElementById('cIn'),m=inp.value.trim();
