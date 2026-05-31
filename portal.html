@@ -232,6 +232,10 @@
       <span class="topbar-sub">Client Portal</span>
     </div>
     <div class="topbar-right">
+      <div style="position:relative;cursor:pointer;" onclick="scrollToChat()" title="Messages">
+        <span style="font-size:18px;opacity:0.6;">🔔</span>
+        <span id="msgBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#c44;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:500;">0</span>
+      </div>
       <span class="user-pill" id="userEmail">—</span>
       <button class="btn-out" onclick="doLogout()">Exit</button>
     </div>
@@ -422,6 +426,27 @@ function renderMsgs(data) {
   c.scrollTop=c.scrollHeight;
 }
 
+let lastSeenMsgId = parseInt(localStorage.getItem('lastSeenMsgId') || '0');
+
+function scrollToChat() {
+  document.querySelector('.chat-wrap')?.scrollIntoView({ behavior: 'smooth' });
+  hideBadge();
+}
+
+function showBadge(count) {
+  const b = document.getElementById('msgBadge');
+  if (!b) return;
+  b.textContent = count > 9 ? '9+' : count;
+  b.style.display = 'flex';
+}
+
+function hideBadge() {
+  const b = document.getElementById('msgBadge');
+  if (!b) return;
+  b.style.display = 'none';
+  if (me) localStorage.setItem('lastSeenMsgId', lastSeenMsgId);
+}
+
 let lastMsgId = 0;
 function subscribeMsgs() {
   setInterval(async () => {
@@ -432,6 +457,12 @@ function subscribeMsgs() {
     if (latest.id !== lastMsgId) {
       lastMsgId = latest.id;
       renderMsgs(data);
+      // Show badge only for new admin messages
+      const unseenAdminMsgs = data.filter(m => m.sender === 'admin' && m.id > lastSeenMsgId);
+      if (unseenAdminMsgs.length > 0) {
+        lastSeenMsgId = latest.id;
+        showBadge(unseenAdminMsgs.length);
+      }
     }
   }, 3000);
 }
