@@ -85,18 +85,36 @@
     .step-num { background: #1a1a1a; border: 1px solid #222; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #666; flex-shrink: 0; margin-top: 1px; }
     .step-text { font-size: 13px; color: #888; line-height: 1.6; }
     .drive-input-row { display: flex; gap: 8px; }
-    .drive-input { flex: 1; background: #111; border: 1px solid #1f1f1f; border-radius: 8px; padding: 11px 14px; color: #fff; font-size: 13px; outline: none; transition: border .2s; }
-    .drive-input:focus { border-color: #333; }
-    .btn-send-link { background: #fff; color: #000; border: none; border-radius: 8px; padding: 11px 18px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: opacity .2s; }
-    .btn-send-link:hover { opacity: 0.85; }
+    .drive-input { flex: 1; background: #111; border: 1px solid #1f1f1f; border-radius: 8px; padding: 11px 14px; color: #fff; font-size: 13px; outline: none; }
+    .btn-send-link { background: #fff; color: #000; border: none; border-radius: 8px; padding: 11px 18px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
     .link-msg { font-size: 12px; margin-top: 10px; min-height: 18px; }
     .link-msg.success { color: #4caf50; }
     .link-msg.error { color: #ff5555; }
     .links-list { display: flex; flex-direction: column; gap: 8px; margin-top: 1rem; }
     .link-item { background: #111; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .link-item a { color: #7c8cf8; font-size: 12px; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-    .link-item a:hover { text-decoration: underline; }
     .link-date { font-size: 11px; color: #444; white-space: nowrap; }
+
+    /* CHAT */
+    .chat-section { margin-bottom: 2.5rem; }
+    .chat-box { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 12px; overflow: hidden; }
+    .chat-messages { height: 300px; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 10px; }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+    .msg-row { display: flex; flex-direction: column; }
+    .msg-row.mine { align-items: flex-end; }
+    .msg-row.theirs { align-items: flex-start; }
+    .msg-bubble { max-width: 70%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+    .msg-row.mine .msg-bubble { background: #fff; color: #000; border-radius: 12px 12px 2px 12px; }
+    .msg-row.theirs .msg-bubble { background: #1a1a1a; color: #ccc; border-radius: 12px 12px 12px 2px; }
+    .msg-time { font-size: 10px; color: #444; margin-top: 4px; }
+    .msg-sender { font-size: 10px; color: #555; margin-bottom: 3px; }
+    .chat-input-row { display: flex; gap: 8px; padding: 1rem; border-top: 1px solid #1a1a1a; }
+    .chat-input { flex: 1; background: #111; border: 1px solid #1f1f1f; border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13px; outline: none; font-family: inherit; }
+    .chat-input:focus { border-color: #333; }
+    .btn-send { background: #fff; color: #000; border: none; border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+    .btn-send:hover { opacity: 0.85; }
+    .chat-empty { text-align: center; padding: 2rem; color: #333; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -149,6 +167,7 @@
       <div class="card"><div class="card-label">Completed</div><div class="card-value" id="doneCount">0</div><div class="card-sub">Delivered</div></div>
       <div class="card"><div class="card-label">Pending Review</div><div class="card-value" id="reviewCount">0</div><div class="card-sub">Awaiting feedback</div></div>
     </div>
+
     <div class="section-title">Your Projects</div>
     <div class="project-list" id="projectList"><div class="empty">Loading your projects...</div></div>
 
@@ -158,7 +177,6 @@
         <div class="upload-tab active" onclick="switchUpload('direct')">📁 Direct Upload (max 50MB)</div>
         <div class="upload-tab" onclick="switchUpload('drive')">☁️ Google Drive Link</div>
       </div>
-
       <div id="directUpload">
         <div class="upload-box" onclick="document.getElementById('fileInput').click()" id="uploadBox">
           <div class="upload-icon">📁</div>
@@ -173,21 +191,34 @@
         </div>
         <div class="files-list" id="filesList"></div>
       </div>
-
       <div id="driveUpload" style="display:none;">
         <div class="drive-box">
-          <p>For large files (videos, raw footage), upload to Google Drive and share the link below. Amir will receive it instantly.</p>
+          <p>For large files, upload to Google Drive and share the link below.</p>
           <div class="drive-steps">
             <div class="drive-step"><div class="step-num">1</div><div class="step-text">Upload your file to <strong style="color:#ccc;">Google Drive</strong></div></div>
             <div class="drive-step"><div class="step-num">2</div><div class="step-text">Right-click → <strong style="color:#ccc;">"Share"</strong> → <strong style="color:#ccc;">"Anyone with the link"</strong></div></div>
-            <div class="drive-step"><div class="step-num">3</div><div class="step-text">Copy the link and paste it below</div></div>
+            <div class="drive-step"><div class="step-num">3</div><div class="step-text">Paste the link below</div></div>
           </div>
           <div class="drive-input-row">
             <input type="url" class="drive-input" id="driveLink" placeholder="https://drive.google.com/file/d/...">
-            <button class="btn-send-link" onclick="sendDriveLink()">Send Link →</button>
+            <button class="btn-send-link" onclick="sendDriveLink()">Send →</button>
           </div>
           <div class="link-msg" id="linkMsg"></div>
           <div class="links-list" id="linksList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="chat-section">
+      <div class="section-title">💬 Message Amir</div>
+      <div class="chat-box">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-empty">No messages yet — say hello! 👋</div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()">
+          <button class="btn-send" onclick="sendMessage()">Send →</button>
         </div>
       </div>
     </div>
@@ -201,6 +232,7 @@ const FUNCTION_URL = 'https://pwrukagppviyyxdlurxs.supabase.co/functions/v1/noti
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
+let chatSub = null;
 
 async function sendNotification(type, content) {
   try {
@@ -209,7 +241,7 @@ async function sendNotification(type, content) {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY}` },
       body: JSON.stringify({ client_email: currentUser.email, type, content })
     });
-  } catch(e) { console.log('Notification error:', e); }
+  } catch(e) {}
 }
 
 function switchTab(tab) {
@@ -244,14 +276,15 @@ async function handleSignup() {
   const email = document.getElementById('signupEmail').value;
   const pass = document.getElementById('signupPassword').value;
   if (!name||!email||!pass) return showMsg('signupMsg','Please fill all fields.','error');
-  if (pass.length < 6) return showMsg('signupMsg','Password must be at least 6 characters.','error');
+  if (pass.length < 6) return showMsg('signupMsg','Min. 6 characters.','error');
   showMsg('signupMsg','Creating account...','');
   const { error } = await sb.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
   if (error) return showMsg('signupMsg', error.message, 'error');
-  showMsg('signupMsg','✓ Check your email to confirm your account.','success');
+  showMsg('signupMsg','✓ Check your email to confirm.','success');
 }
 
 async function handleLogout() {
+  if (chatSub) chatSub.unsubscribe();
   await sb.auth.signOut();
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('authPage').style.display = 'flex';
@@ -262,14 +295,11 @@ function statusLabel(s) { return {inprogress:'In Progress',review:'In Review',do
 function fileIcon(name) {
   const ext = name.split('.').pop().toLowerCase();
   if (['mp4','mov','avi','mkv'].includes(ext)) return '🎬';
-  if (['jpg','jpeg','png','gif','webp'].includes(ext)) return '🖼️';
-  if (['pdf','doc','docx'].includes(ext)) return '📄';
-  if (['zip','rar'].includes(ext)) return '📦';
+  if (['jpg','jpeg','png','gif'].includes(ext)) return '🖼️';
   return '📎';
 }
 function formatSize(bytes) {
   if (!bytes) return '';
-  if (bytes < 1024) return bytes + ' B';
   if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
   return (bytes/(1024*1024)).toFixed(1) + ' MB';
 }
@@ -281,18 +311,15 @@ async function handleFileUpload(files) {
   const status = document.getElementById('uploadStatus');
   progress.style.display = 'block';
   for (let i = 0; i < files.length; i++) {
-    const file = files[i];
     bar.style.width = Math.round((i/files.length)*100) + '%';
-    status.textContent = `Uploading ${file.name}...`;
+    status.textContent = `Uploading ${files[i].name}...`;
     status.className = 'upload-status';
-    const path = `${currentUser.email}/${Date.now()}_${file.name}`;
-    const { error } = await sb.storage.from('project-files').upload(path, file);
+    const { error } = await sb.storage.from('project-files').upload(`${currentUser.email}/${Date.now()}_${files[i].name}`, files[i]);
     if (error) { status.textContent = `Error: ${error.message}`; status.className = 'upload-status error'; return; }
   }
   bar.style.width = '100%';
-  status.textContent = '✓ Files uploaded successfully!';
+  status.textContent = '✓ Uploaded!';
   status.className = 'upload-status success';
-  // Send notification
   await sendNotification('File Upload', Array.from(files).map(f=>f.name).join(', '));
   setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 3000);
   loadFiles();
@@ -304,7 +331,6 @@ async function sendDriveLink() {
   if (!link) { msgEl.textContent = 'Please paste a link.'; msgEl.className = 'link-msg error'; return; }
   msgEl.textContent = 'Sending...'; msgEl.className = 'link-msg';
   await sb.from('shared_links').insert({ client_email: currentUser.email, link });
-  // Send notification
   await sendNotification('Google Drive Link', link);
   msgEl.textContent = '✓ Link sent to Amir!'; msgEl.className = 'link-msg success';
   document.getElementById('driveLink').value = '';
@@ -315,46 +341,74 @@ async function sendDriveLink() {
   list.prepend(item);
 }
 
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg || !currentUser) return;
+  input.value = '';
+  await sb.from('messages').insert({ client_email: currentUser.email, sender: 'client', message: msg });
+  await sendNotification('New Message', msg);
+}
+
+async function loadMessages() {
+  const { data } = await sb.from('messages').select('*').eq('client_email', currentUser.email).order('created_at', { ascending: true });
+  renderMessages(data || []);
+}
+
+function renderMessages(data) {
+  const container = document.getElementById('chatMessages');
+  if (!data.length) { container.innerHTML = '<div class="chat-empty">No messages yet — say hello! 👋</div>'; return; }
+  container.innerHTML = data.map(m => {
+    const isMine = m.sender === 'client';
+    const time = new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    return `<div class="msg-row ${isMine?'mine':'theirs'}">
+      ${!isMine ? '<div class="msg-sender">Amir</div>' : ''}
+      <div class="msg-bubble">${m.message}</div>
+      <div class="msg-time">${time}</div>
+    </div>`;
+  }).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+function subscribeToMessages() {
+  chatSub = sb.channel('messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `client_email=eq.${currentUser.email}` },
+    payload => {
+      const container = document.getElementById('chatMessages');
+      const m = payload.new;
+      const isMine = m.sender === 'client';
+      const time = new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      const emptyEl = container.querySelector('.chat-empty');
+      if (emptyEl) emptyEl.remove();
+      const div = document.createElement('div');
+      div.className = `msg-row ${isMine?'mine':'theirs'}`;
+      div.innerHTML = `${!isMine?'<div class="msg-sender">Amir</div>':''}<div class="msg-bubble">${m.message}</div><div class="msg-time">${time}</div>`;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }).subscribe();
+}
+
 async function loadFiles() {
   if (!currentUser) return;
   const { data } = await sb.storage.from('project-files').list(currentUser.email, { sortBy: { column: 'created_at', order: 'desc' } });
   const list = document.getElementById('filesList');
-  if (!data || data.length === 0) { list.innerHTML = ''; return; }
-  list.innerHTML = data.map(f => `
-    <div class="file-item">
-      <div class="file-info">
-        <span class="file-icon">${fileIcon(f.name)}</span>
-        <div><div class="file-name">${f.name.replace(/^\d+_/,'')}</div><div class="file-size">${f.metadata?formatSize(f.metadata.size):''}</div></div>
-      </div>
-      <div class="file-date">${new Date(f.created_at).toLocaleDateString()}</div>
-    </div>`).join('');
+  if (!data || !data.length) { list.innerHTML = ''; return; }
+  list.innerHTML = data.map(f => `<div class="file-item"><div class="file-info"><span class="file-icon">${fileIcon(f.name)}</span><div><div class="file-name">${f.name.replace(/^\d+_/,'')}</div><div class="file-size">${f.metadata?formatSize(f.metadata.size):''}</div></div></div><div class="file-date">${new Date(f.created_at).toLocaleDateString()}</div></div>`).join('');
 }
 
 async function loadProjects(user) {
   const { data } = await sb.from('projects').select('*').eq('client_email', user.email).order('created_at', { ascending: false });
   const list = document.getElementById('projectList');
-  if (!data || data.length === 0) {
-    list.innerHTML = '<div class="empty">No projects yet — Amir will add your projects here soon.</div>';
-    ['activeCount','doneCount','reviewCount'].forEach(id => document.getElementById(id).textContent = '0');
-    return;
-  }
+  if (!data || !data.length) { list.innerHTML = '<div class="empty">No projects yet — Amir will add your projects here soon.</div>'; ['activeCount','doneCount','reviewCount'].forEach(id=>document.getElementById(id).textContent='0'); return; }
   document.getElementById('activeCount').textContent = data.filter(p=>p.status==='inprogress').length;
   document.getElementById('doneCount').textContent = data.filter(p=>p.status==='done').length;
   document.getElementById('reviewCount').textContent = data.filter(p=>p.status==='review').length;
-  list.innerHTML = data.map(p => `
-    <div class="project-item">
-      <div class="project-info">
-        <h3>${p.title}</h3>
-        <p>${p.description||''} ${p.delivery_date?'· Delivery: '+p.delivery_date:''}</p>
-      </div>
-      <span class="status-badge ${statusClass(p.status)}">${statusLabel(p.status)}</span>
-    </div>`).join('');
+  list.innerHTML = data.map(p=>`<div class="project-item"><div class="project-info"><h3>${p.title}</h3><p>${p.description||''} ${p.delivery_date?'· Delivery: '+p.delivery_date:''}</p></div><span class="status-badge ${statusClass(p.status)}">${statusLabel(p.status)}</span></div>`).join('');
 }
 
 const uploadBox = document.getElementById('uploadBox');
-uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('dragover'); });
-uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragover'));
-uploadBox.addEventListener('drop', e => { e.preventDefault(); uploadBox.classList.remove('dragover'); handleFileUpload(e.dataTransfer.files); });
+uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.style.borderColor='#333'; });
+uploadBox.addEventListener('dragleave', () => uploadBox.style.borderColor='');
+uploadBox.addEventListener('drop', e => { e.preventDefault(); uploadBox.style.borderColor=''; handleFileUpload(e.dataTransfer.files); });
 
 sb.auth.onAuthStateChange((event, session) => {
   if (session) {
@@ -364,6 +418,8 @@ sb.auth.onAuthStateChange((event, session) => {
     document.getElementById('userEmail').textContent = session.user.email;
     loadProjects(session.user);
     loadFiles();
+    loadMessages();
+    subscribeToMessages();
   } else {
     currentUser = null;
     document.getElementById('dashboard').style.display = 'none';
