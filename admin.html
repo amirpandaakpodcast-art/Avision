@@ -286,6 +286,10 @@ async function adminLogout() {
 }
 
 // PROJECTS
+async function sendNotif(client_email, type, title, message) {
+  await sb.from('notifications').insert({ client_email, type, title, message });
+}
+
 async function addProject() {
   const ce=document.getElementById('cEmail').value.trim(), t=document.getElementById('pTitle').value.trim();
   const d=document.getElementById('pDesc').value.trim(), s=document.getElementById('pStatus').value, dt=document.getElementById('pDate').value.trim();
@@ -295,11 +299,20 @@ async function addProject() {
   const { error } = await sb.from('projects').insert({ client_email:ce, title:t, description:d, status:s, delivery_date:dt, delivery_url:delivery||null });
   if (error) return amsg('addMsg', error.message, 'err');
   amsg('addMsg','✓ Project added!','ok');
+  await sendNotif(ce, 'project', '🎬 New Project', `A new project "${t}" has been created for you${dt?' — Delivery: '+dt:''}.`);
   ['cEmail','pTitle','pDesc','pDate','pDelivery'].forEach(id=>document.getElementById(id).value='');
   loadProjects();
 }
 
-async function updateStatus(id, s) { await sb.from('projects').update({ status:s }).eq('id',id); loadProjects(); }
+async function updateStatus(id, s) {
+  const { data } = await sb.from('projects').select('client_email,title').eq('id',id).single();
+  await sb.from('projects').update({ status:s }).eq('id',id);
+  if (data) {
+    const labels = {pending:'Pending',inprogress:'In Progress',review:'Ready for Review',done:'Delivered ✓'};
+    await sendNotif(data.client_email, 'project', '📁 Project Update', `"${data.title}" is now ${labels[s]||s}`);
+  }
+  loadProjects();
+}
 async function updateDeliveryUrl(id, url) { await sb.from('projects').update({ delivery_url:url||null }).eq('id',id); }
 async function deleteProject(id) { if (!confirm('Delete?')) return; await sb.from('projects').delete().eq('id',id); loadProjects(); }
 
@@ -340,7 +353,16 @@ async function addInvoice() {
   loadInvoices();
 }
 
-async function updateInvStatus(id, s) { await sb.from('invoices').update({ status:s }).eq('id',id); loadInvoices(); }
+async function updateInvStatus(id, s) {
+  const { data } = await sb.from('invoices').select('client_email,project_title,amount,currency').eq('id',id).single();
+  await sb.from('invoices').update({ status:s }).eq('id',id);
+  if (data) {
+    const sym = {USD:'$',SAR:'﷼',EUR:'€',GBP:'£'}[data.currency]||'$';
+    const labels = {unpaid:'Unpaid',pending:'Payment Pending',paid:'Paid ✓'};
+    await sendNotif(data.client_email, 'invoice', '💳 Invoice Update', `Invoice for "${data.project_title}" (${sym}${parseFloat(data.amount).toLocaleString()}) is now ${labels[s]||s}`);
+  }
+  loadInvoices();
+}
 async function deleteInvoice(id) { if (!confirm('Delete invoice?')) return; await sb.from('invoices').delete().eq('id',id); loadInvoices(); }
 
 async function loadInvoices() {
