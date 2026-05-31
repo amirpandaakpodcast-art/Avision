@@ -2,206 +2,280 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Client Portal — Avision</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #080808; color: #ccc; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
-    .auth-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
-    .auth-box { width: 100%; max-width: 400px; }
-    .auth-logo { text-align: center; margin-bottom: 2.5rem; }
-    .auth-logo img { height: 40px; }
-    .auth-logo p { color: #555; font-size: 13px; margin-top: 8px; }
-    .auth-tabs { display: flex; border-bottom: 1px solid #1a1a1a; margin-bottom: 2rem; }
-    .auth-tab { flex: 1; text-align: center; padding: 12px; font-size: 13px; color: #555; cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; }
-    .auth-tab.active { color: #fff; border-bottom-color: #fff; }
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
-    .form-group input { width: 100%; background: #111; border: 1px solid #1f1f1f; border-radius: 8px; padding: 12px 14px; color: #fff; font-size: 14px; outline: none; transition: border .2s; }
-    .form-group input:focus { border-color: #333; }
-    .btn-primary { width: 100%; background: #fff; color: #000; border: none; border-radius: 8px; padding: 13px; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity .2s; margin-top: 0.5rem; }
-    .btn-primary:hover { opacity: 0.85; }
-    .auth-msg { text-align: center; font-size: 13px; margin-top: 1rem; min-height: 20px; }
-    .auth-msg.error { color: #ff5555; }
-    .auth-msg.success { color: #4caf50; }
-    .dashboard { display: none; min-height: 100vh; }
-    .topbar { background: #0d0d0d; border-bottom: 1px solid #1a1a1a; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
-    .topbar-left { display: flex; align-items: center; gap: 12px; }
-    .topbar-logo { height: 28px; }
-    .topbar-title { font-size: 13px; color: #555; }
-    .user-badge { background: #1a1a1a; border: 1px solid #222; border-radius: 20px; padding: 6px 14px; font-size: 12px; color: #888; }
-    .btn-logout { background: none; border: 1px solid #222; border-radius: 8px; padding: 7px 14px; color: #555; font-size: 12px; cursor: pointer; transition: all .2s; }
-    .btn-logout:hover { border-color: #444; color: #fff; }
-    .dashboard-body { padding: 2.5rem 2rem; max-width: 900px; margin: 0 auto; }
-    .welcome { margin-bottom: 2.5rem; }
-    .welcome h1 { font-size: 1.5rem; font-weight: 400; color: #fff; }
-    .welcome p { color: #555; font-size: 13px; margin-top: 4px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 2.5rem; }
-    .card { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 12px; padding: 1.25rem; }
-    .card-label { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-    .card-value { font-size: 1.5rem; color: #fff; font-weight: 400; }
-    .card-sub { font-size: 12px; color: #444; margin-top: 4px; }
-    .section-title { font-size: 13px; color: #555; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
-    .project-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 2.5rem; }
-    .project-item { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 10px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; }
-    .project-info h3 { font-size: 14px; color: #fff; font-weight: 400; margin-bottom: 4px; }
-    .project-info p { font-size: 12px; color: #555; }
-    .status-badge { font-size: 11px; padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
-    .status-inprogress { background: #1a2a1a; color: #4caf50; }
-    .status-review { background: #2a2a1a; color: #ffc107; }
-    .status-done { background: #1a1a2a; color: #7c8cf8; }
-    .status-pending { background: #1a1a1a; color: #666; }
-    .empty { text-align: center; padding: 2rem; color: #333; font-size: 13px; }
-    .upload-section { margin-bottom: 2.5rem; }
-    .upload-tabs { display: flex; gap: 8px; margin-bottom: 1rem; }
-    .upload-tab { padding: 8px 16px; border-radius: 8px; border: 1px solid #1f1f1f; background: #0f0f0f; color: #555; font-size: 12px; cursor: pointer; transition: all .2s; }
-    .upload-tab.active { border-color: #333; color: #fff; background: #1a1a1a; }
-    .upload-box { background: #0f0f0f; border: 2px dashed #1f1f1f; border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer; transition: border .2s; }
-    .upload-box:hover { border-color: #333; }
-    .upload-icon { font-size: 2rem; margin-bottom: 0.75rem; }
-    .upload-box h3 { color: #fff; font-size: 14px; font-weight: 400; margin-bottom: 6px; }
-    .upload-box p { color: #444; font-size: 12px; margin-bottom: 1.25rem; }
-    .btn-upload { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 10px 20px; color: #888; font-size: 13px; cursor: pointer; display: inline-block; transition: all .2s; }
-    .btn-upload:hover { border-color: #444; color: #fff; }
-    #fileInput { display: none; }
-    .upload-progress { margin-top: 1rem; display: none; }
-    .progress-bar-bg { background: #1a1a1a; border-radius: 10px; height: 4px; overflow: hidden; }
-    .progress-bar { background: #fff; height: 4px; border-radius: 10px; transition: width .3s; width: 0%; }
-    .upload-status { font-size: 12px; color: #666; margin-top: 8px; }
-    .upload-status.success { color: #4caf50; }
-    .upload-status.error { color: #ff5555; }
-    .files-list { display: flex; flex-direction: column; gap: 8px; margin-top: 1rem; }
-    .file-item { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
-    .file-info { display: flex; align-items: center; gap: 10px; }
-    .file-icon { font-size: 1.2rem; }
-    .file-name { font-size: 13px; color: #ccc; }
-    .file-size { font-size: 11px; color: #444; margin-top: 2px; }
-    .file-date { font-size: 11px; color: #444; }
-    .drive-box { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 12px; padding: 1.5rem; }
-    .drive-box p { font-size: 13px; color: #555; margin-bottom: 1.25rem; line-height: 1.7; }
-    .drive-steps { margin-bottom: 1.5rem; }
-    .drive-step { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
-    .step-num { background: #1a1a1a; border: 1px solid #222; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #666; flex-shrink: 0; margin-top: 1px; }
-    .step-text { font-size: 13px; color: #888; line-height: 1.6; }
-    .drive-input-row { display: flex; gap: 8px; }
-    .drive-input { flex: 1; background: #111; border: 1px solid #1f1f1f; border-radius: 8px; padding: 11px 14px; color: #fff; font-size: 13px; outline: none; }
-    .btn-send-link { background: #fff; color: #000; border: none; border-radius: 8px; padding: 11px 18px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
-    .link-msg { font-size: 12px; margin-top: 10px; min-height: 18px; }
-    .link-msg.success { color: #4caf50; }
-    .link-msg.error { color: #ff5555; }
-    .links-list { display: flex; flex-direction: column; gap: 8px; margin-top: 1rem; }
-    .link-item { background: #111; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .link-item a { color: #7c8cf8; font-size: 12px; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-    .link-date { font-size: 11px; color: #444; white-space: nowrap; }
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-dim: rgba(201,168,76,0.15);
+      --bg: #080707;
+      --bg2: #0f0e0d;
+      --bg3: #161412;
+      --border: rgba(201,168,76,0.12);
+      --border-hover: rgba(201,168,76,0.3);
+      --text: #e8e0d0;
+      --text-muted: #7a7060;
+      --text-dim: #4a4438;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+
+    /* GRAIN OVERLAY */
+    body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; opacity:0.4; }
+
+    /* AUTH */
+    .auth-page { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:2rem; position:relative; }
+    .auth-page::after { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:600px; height:600px; background:radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 70%); pointer-events:none; }
+    .auth-box { width:100%; max-width:420px; position:relative; z-index:1; }
+    .auth-brand { text-align:center; margin-bottom:3rem; }
+    .auth-brand img { height:36px; opacity:0.9; }
+    .auth-brand span { display:block; font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-top:10px; opacity:0.8; }
+    .auth-card { background:var(--bg2); border:1px solid var(--border); border-radius:2px; padding:2.5rem; }
+    .auth-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:2rem; gap:0; }
+    .auth-tab { flex:1; text-align:center; padding:10px; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim); cursor:pointer; border-bottom:1px solid transparent; margin-bottom:-1px; transition:all .2s; }
+    .auth-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+    .fgroup { margin-bottom:1.25rem; }
+    .fgroup label { display:block; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
+    .fgroup input { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:1px; padding:12px 16px; color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif; outline:none; transition:border .2s; }
+    .fgroup input:focus { border-color:var(--gold-dim); border-color:rgba(201,168,76,0.4); }
+    .fgroup input::placeholder { color:var(--text-dim); }
+    .btn-auth { width:100%; background:var(--gold); color:#0a0900; border:none; border-radius:1px; padding:13px; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; transition:all .2s; margin-top:0.5rem; }
+    .btn-auth:hover { background:var(--gold-light); }
+    .auth-msg { text-align:center; font-size:12px; margin-top:1rem; min-height:18px; }
+    .auth-msg.error { color:#c44; }
+    .auth-msg.success { color:#4a8; }
+
+    /* DASHBOARD */
+    .dashboard { display:none; min-height:100vh; }
+
+    /* TOPBAR */
+    .topbar { background:rgba(8,7,7,0.95); border-bottom:1px solid var(--border); padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:60px; position:sticky; top:0; z-index:100; backdrop-filter:blur(10px); }
+    .topbar-brand { display:flex; align-items:center; gap:10px; }
+    .topbar-brand img { height:24px; opacity:0.85; }
+    .topbar-sep { width:1px; height:16px; background:var(--border); }
+    .topbar-sub { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-dim); }
+    .topbar-right { display:flex; align-items:center; gap:12px; }
+    .user-pill { background:var(--gold-dim); border:1px solid var(--border); border-radius:20px; padding:5px 14px; font-size:11px; color:var(--gold); letter-spacing:0.05em; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .btn-out { background:none; border:1px solid var(--border); border-radius:1px; padding:7px 14px; color:var(--text-muted); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; }
+    .btn-out:hover { border-color:var(--border-hover); color:var(--text); }
+
+    /* MAIN */
+    .main { max-width:960px; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
+
+    /* WELCOME */
+    .welcome { margin-bottom:3rem; padding-bottom:2rem; border-bottom:1px solid var(--border); }
+    .welcome-label { font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold); margin-bottom:10px; opacity:0.8; }
+    .welcome h1 { font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:300; color:var(--text); line-height:1.2; }
+    .welcome p { font-size:13px; color:var(--text-muted); margin-top:6px; }
+
+    /* STATS */
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:3rem; }
+    .stat { background:var(--bg2); padding:1.5rem; }
+    .stat-n { font-family:'Cormorant Garamond',serif; font-size:2.5rem; font-weight:300; color:var(--gold); line-height:1; }
+    .stat-l { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-dim); margin-top:6px; }
+
+    /* SECTION LABEL */
+    .sec-label { font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold); margin-bottom:1.25rem; opacity:0.7; display:flex; align-items:center; gap:12px; }
+    .sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* PROJECTS */
+    .projects { display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:3rem; }
+    .proj { background:var(--bg2); padding:1.25rem 1.5rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; transition:background .2s; }
+    .proj:hover { background:var(--bg3); }
+    .proj-title { font-size:14px; color:var(--text); margin-bottom:3px; }
+    .proj-sub { font-size:11px; color:var(--text-dim); }
+    .badge { font-size:10px; padding:4px 12px; border-radius:20px; letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; flex-shrink:0; }
+    .b-progress { background:rgba(100,180,100,0.1); color:#6ab46a; border:1px solid rgba(100,180,100,0.2); }
+    .b-review { background:rgba(201,168,76,0.1); color:var(--gold); border:1px solid var(--border); }
+    .b-done { background:rgba(120,120,200,0.1); color:#9090d0; border:1px solid rgba(120,120,200,0.2); }
+    .b-pending { background:var(--bg3); color:var(--text-dim); border:1px solid var(--border); }
+    .empty-proj { padding:2.5rem; text-align:center; color:var(--text-dim); font-size:12px; letter-spacing:0.08em; background:var(--bg2); }
+
+    /* UPLOAD TABS */
+    .tab-row { display:flex; gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:1px; }
+    .utab { flex:1; padding:12px; text-align:center; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); cursor:pointer; background:var(--bg2); transition:all .2s; }
+    .utab.active { color:var(--gold); background:var(--bg3); }
+
+    /* UPLOAD BOX */
+    .upload-wrap { border:1px solid var(--border); border-top:none; margin-bottom:3rem; }
+    .upload-inner { background:var(--bg2); }
+    .drop-zone { padding:3rem 2rem; text-align:center; cursor:pointer; transition:background .2s; border:2px dashed transparent; }
+    .drop-zone:hover, .drop-zone.over { background:var(--bg3); border-color:var(--border-hover); }
+    .drop-icon { font-size:2rem; margin-bottom:1rem; opacity:0.4; }
+    .drop-zone h3 { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:300; color:var(--text); margin-bottom:6px; }
+    .drop-zone p { font-size:12px; color:var(--text-dim); margin-bottom:1.5rem; }
+    .btn-choose { background:none; border:1px solid var(--border-hover); border-radius:1px; padding:9px 22px; color:var(--gold); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; }
+    .btn-choose:hover { background:var(--gold-dim); }
+    #fi { display:none; }
+    .prog-wrap { display:none; padding:1rem 1.5rem; border-top:1px solid var(--border); }
+    .prog-bg { background:var(--bg3); height:2px; border-radius:1px; overflow:hidden; }
+    .prog-bar { background:var(--gold); height:2px; width:0%; transition:width .3s; }
+    .prog-txt { font-size:11px; color:var(--text-muted); margin-top:8px; }
+    .prog-txt.ok { color:#6ab46a; }
+    .prog-txt.err { color:#c44; }
+    .files-list { border-top:1px solid var(--border); }
+    .ffile { display:flex; align-items:center; justify-content:space-between; padding:10px 1.5rem; border-bottom:1px solid var(--border); }
+    .ffile:last-child { border-bottom:none; }
+    .ffile-l { display:flex; align-items:center; gap:10px; }
+    .ffile-ico { font-size:1.1rem; opacity:0.6; }
+    .ffile-name { font-size:12px; color:var(--text); }
+    .ffile-size { font-size:10px; color:var(--text-dim); margin-top:2px; }
+    .ffile-date { font-size:10px; color:var(--text-dim); }
+
+    /* DRIVE BOX */
+    .drive-inner { padding:2rem 1.5rem; background:var(--bg2); }
+    .drive-inner p { font-size:12px; color:var(--text-muted); margin-bottom:1.5rem; line-height:1.8; }
+    .steps { margin-bottom:1.5rem; display:flex; flex-direction:column; gap:10px; }
+    .step { display:flex; gap:14px; align-items:flex-start; }
+    .step-n { width:22px; height:22px; border:1px solid var(--border-hover); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--gold); flex-shrink:0; margin-top:1px; font-family:'Cormorant Garamond',serif; }
+    .step-t { font-size:12px; color:var(--text-muted); line-height:1.6; }
+    .drive-row { display:flex; gap:8px; }
+    .drive-in { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:1px; padding:11px 14px; color:var(--text); font-size:12px; font-family:'DM Sans',sans-serif; outline:none; transition:border .2s; }
+    .drive-in:focus { border-color:rgba(201,168,76,0.4); }
+    .drive-in::placeholder { color:var(--text-dim); }
+    .btn-drive { background:var(--gold); color:#0a0900; border:none; border-radius:1px; padding:11px 20px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; white-space:nowrap; transition:all .2s; }
+    .btn-drive:hover { background:var(--gold-light); }
+    .link-msg { font-size:11px; margin-top:10px; min-height:16px; }
+    .link-msg.ok { color:#6ab46a; }
+    .link-msg.err { color:#c44; }
+    .links-list { margin-top:1rem; display:flex; flex-direction:column; gap:6px; }
+    .litem { background:var(--bg3); border:1px solid var(--border); border-radius:1px; padding:9px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .litem a { color:var(--gold); font-size:11px; text-decoration:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity:0.8; }
+    .litem-d { font-size:10px; color:var(--text-dim); white-space:nowrap; }
 
     /* CHAT */
-    .chat-section { margin-bottom: 2.5rem; }
-    .chat-box { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 12px; overflow: hidden; }
-    .chat-messages { height: 300px; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 10px; }
-    .chat-messages::-webkit-scrollbar { width: 4px; }
-    .chat-messages::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
-    .msg-row { display: flex; flex-direction: column; }
-    .msg-row.mine { align-items: flex-end; }
-    .msg-row.theirs { align-items: flex-start; }
-    .msg-bubble { max-width: 70%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
-    .msg-row.mine .msg-bubble { background: #fff; color: #000; border-radius: 12px 12px 2px 12px; }
-    .msg-row.theirs .msg-bubble { background: #1a1a1a; color: #ccc; border-radius: 12px 12px 12px 2px; }
-    .msg-time { font-size: 10px; color: #444; margin-top: 4px; }
-    .msg-sender { font-size: 10px; color: #555; margin-bottom: 3px; }
-    .chat-input-row { display: flex; gap: 8px; padding: 1rem; border-top: 1px solid #1a1a1a; }
-    .chat-input { flex: 1; background: #111; border: 1px solid #1f1f1f; border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13px; outline: none; font-family: inherit; }
-    .chat-input:focus { border-color: #333; }
-    .btn-send { background: #fff; color: #000; border: none; border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
-    .btn-send:hover { opacity: 0.85; }
-    .chat-empty { text-align: center; padding: 2rem; color: #333; font-size: 13px; }
+    .chat-wrap { border:1px solid var(--border); margin-bottom:3rem; }
+    .chat-msgs { height:320px; overflow-y:auto; padding:1.5rem; display:flex; flex-direction:column; gap:12px; background:var(--bg2); }
+    .chat-msgs::-webkit-scrollbar { width:3px; }
+    .chat-msgs::-webkit-scrollbar-thumb { background:var(--border); }
+    .mrow { display:flex; flex-direction:column; }
+    .mrow.me { align-items:flex-end; }
+    .mrow.them { align-items:flex-start; }
+    .mbubble { max-width:72%; padding:10px 14px; font-size:13px; line-height:1.6; }
+    .mrow.me .mbubble { background:var(--gold); color:#0a0900; border-radius:12px 12px 2px 12px; }
+    .mrow.them .mbubble { background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:12px 12px 12px 2px; }
+    .mtime { font-size:10px; color:var(--text-dim); margin-top:4px; }
+    .msender { font-size:10px; color:var(--gold); opacity:0.6; margin-bottom:3px; letter-spacing:0.08em; }
+    .chat-input-row { display:flex; border-top:1px solid var(--border); }
+    .chat-in { flex:1; background:var(--bg2); border:none; padding:14px 16px; color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif; outline:none; }
+    .chat-in::placeholder { color:var(--text-dim); }
+    .btn-chat { background:var(--gold); color:#0a0900; border:none; padding:14px 20px; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; transition:background .2s; }
+    .btn-chat:hover { background:var(--gold-light); }
+    .chat-empty { text-align:center; padding:3rem; color:var(--text-dim); font-size:12px; letter-spacing:0.08em; }
+
+    /* MOBILE */
+    @media (max-width:600px) {
+      .topbar { padding:0 1rem; }
+      .user-pill { max-width:120px; font-size:10px; }
+      .main { padding:1.5rem 1rem 3rem; }
+      .welcome h1 { font-size:1.6rem; }
+      .stats { grid-template-columns:repeat(3,1fr); }
+      .stat { padding:1rem; }
+      .stat-n { font-size:1.8rem; }
+      .proj { flex-wrap:wrap; gap:8px; }
+      .drive-row { flex-direction:column; }
+      .btn-drive { width:100%; text-align:center; }
+      .tab-row { flex-direction:column; }
+    }
   </style>
 </head>
 <body>
 
+<!-- AUTH -->
 <div class="auth-page" id="authPage">
   <div class="auth-box">
-    <div class="auth-logo">
+    <div class="auth-brand">
       <img src="https://www.amiravision.com/logos/White.png" alt="Avision" onerror="this.style.display='none'">
-      <p>Client Portal</p>
+      <span>Client Portal</span>
     </div>
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchTab('login')">Sign In</div>
-      <div class="auth-tab" onclick="switchTab('signup')">Create Account</div>
-    </div>
-    <div id="loginForm">
-      <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="your@email.com"></div>
-      <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
-      <button class="btn-primary" onclick="handleLogin()">Sign In →</button>
-      <div class="auth-msg" id="loginMsg"></div>
-    </div>
-    <div id="signupForm" style="display:none;">
-      <div class="form-group"><label>Full Name</label><input type="text" id="signupName" placeholder="Your name"></div>
-      <div class="form-group"><label>Email</label><input type="email" id="signupEmail" placeholder="your@email.com"></div>
-      <div class="form-group"><label>Password</label><input type="password" id="signupPassword" placeholder="Min. 6 characters"></div>
-      <button class="btn-primary" onclick="handleSignup()">Create Account →</button>
-      <div class="auth-msg" id="signupMsg"></div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchTab('login')">Sign In</div>
+        <div class="auth-tab" onclick="switchTab('signup')">Register</div>
+      </div>
+      <div id="loginForm">
+        <div class="fgroup"><label>Email Address</label><input type="email" id="lEmail" placeholder="your@email.com"></div>
+        <div class="fgroup"><label>Password</label><input type="password" id="lPass" placeholder="••••••••"></div>
+        <button class="btn-auth" onclick="doLogin()">Sign In →</button>
+        <div class="auth-msg" id="lMsg"></div>
+      </div>
+      <div id="signupForm" style="display:none;">
+        <div class="fgroup"><label>Full Name</label><input type="text" id="sName" placeholder="Your name"></div>
+        <div class="fgroup"><label>Email Address</label><input type="email" id="sEmail" placeholder="your@email.com"></div>
+        <div class="fgroup"><label>Password</label><input type="password" id="sPass" placeholder="Min. 6 characters"></div>
+        <button class="btn-auth" onclick="doSignup()">Create Account →</button>
+        <div class="auth-msg" id="sMsg"></div>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- DASHBOARD -->
 <div class="dashboard" id="dashboard">
   <div class="topbar">
-    <div class="topbar-left">
-      <img src="https://www.amiravision.com/logos/White.png" class="topbar-logo" alt="Avision" onerror="this.style.display='none'">
-      <span class="topbar-title">Client Portal</span>
+    <div class="topbar-brand">
+      <img src="https://www.amiravision.com/logos/White.png" alt="Avision" onerror="this.style.display='none'">
+      <div class="topbar-sep"></div>
+      <span class="topbar-sub">Client Portal</span>
     </div>
-    <div style="display:flex;align-items:center;gap:12px;">
-      <span class="user-badge" id="userEmail">—</span>
-      <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+    <div class="topbar-right">
+      <span class="user-pill" id="userEmail">—</span>
+      <button class="btn-out" onclick="doLogout()">Exit</button>
     </div>
   </div>
 
-  <div class="dashboard-body">
+  <div class="main">
     <div class="welcome">
-      <h1>Welcome back 👋</h1>
-      <p>Here's an overview of your projects with Avision.</p>
-    </div>
-    <div class="cards">
-      <div class="card"><div class="card-label">Active Projects</div><div class="card-value" id="activeCount">0</div><div class="card-sub">In progress</div></div>
-      <div class="card"><div class="card-label">Completed</div><div class="card-value" id="doneCount">0</div><div class="card-sub">Delivered</div></div>
-      <div class="card"><div class="card-label">Pending Review</div><div class="card-value" id="reviewCount">0</div><div class="card-sub">Awaiting feedback</div></div>
+      <div class="welcome-label">Dashboard</div>
+      <h1 id="welcomeName">Welcome back.</h1>
+      <p>Your projects and files with Avision — all in one place.</p>
     </div>
 
-    <div class="section-title">Your Projects</div>
-    <div class="project-list" id="projectList"><div class="empty">Loading your projects...</div></div>
+    <div class="stats">
+      <div class="stat"><div class="stat-n" id="cActive">0</div><div class="stat-l">Active</div></div>
+      <div class="stat"><div class="stat-n" id="cDone">0</div><div class="stat-l">Completed</div></div>
+      <div class="stat"><div class="stat-n" id="cReview">0</div><div class="stat-l">In Review</div></div>
+    </div>
 
-    <div class="upload-section">
-      <div class="section-title">Send Project Files</div>
-      <div class="upload-tabs">
-        <div class="upload-tab active" onclick="switchUpload('direct')">📁 Direct Upload (max 50MB)</div>
-        <div class="upload-tab" onclick="switchUpload('drive')">☁️ Google Drive Link</div>
-      </div>
-      <div id="directUpload">
-        <div class="upload-box" onclick="document.getElementById('fileInput').click()" id="uploadBox">
-          <div class="upload-icon">📁</div>
-          <h3>Drop files here or click to upload</h3>
-          <p>Videos, images, documents — max 50MB per file</p>
-          <span class="btn-upload">Choose Files</span>
-          <input type="file" id="fileInput" multiple onchange="handleFileUpload(this.files)">
+    <div class="sec-label">Your Projects</div>
+    <div class="projects" id="projList">
+      <div class="empty-proj">No projects yet — Amir will add them here soon.</div>
+    </div>
+
+    <div class="sec-label" style="margin-top:3rem;">Send Files</div>
+    <div class="tab-row">
+      <div class="utab active" onclick="switchUp('direct')">Direct Upload · max 50MB</div>
+      <div class="utab" onclick="switchUp('drive')">Google Drive Link</div>
+    </div>
+    <div class="upload-wrap">
+      <div id="directUp" class="upload-inner">
+        <div class="drop-zone" onclick="document.getElementById('fi').click()" id="dz">
+          <div class="drop-icon">▲</div>
+          <h3>Drop files or click to upload</h3>
+          <p>Videos, images, documents — any format accepted</p>
+          <button class="btn-choose">Choose Files</button>
+          <input type="file" id="fi" multiple onchange="doUpload(this.files)">
         </div>
-        <div class="upload-progress" id="uploadProgress">
-          <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
-          <div class="upload-status" id="uploadStatus">Uploading...</div>
+        <div class="prog-wrap" id="progWrap">
+          <div class="prog-bg"><div class="prog-bar" id="progBar"></div></div>
+          <div class="prog-txt" id="progTxt">Uploading...</div>
         </div>
         <div class="files-list" id="filesList"></div>
       </div>
-      <div id="driveUpload" style="display:none;">
-        <div class="drive-box">
-          <p>For large files, upload to Google Drive and share the link below.</p>
-          <div class="drive-steps">
-            <div class="drive-step"><div class="step-num">1</div><div class="step-text">Upload your file to <strong style="color:#ccc;">Google Drive</strong></div></div>
-            <div class="drive-step"><div class="step-num">2</div><div class="step-text">Right-click → <strong style="color:#ccc;">"Share"</strong> → <strong style="color:#ccc;">"Anyone with the link"</strong></div></div>
-            <div class="drive-step"><div class="step-num">3</div><div class="step-text">Paste the link below</div></div>
+      <div id="driveUp" style="display:none;">
+        <div class="drive-inner">
+          <p>For large files (raw footage, projects), upload to Google Drive and share the link — Amir receives it instantly.</p>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div class="step-t">Upload your file to <strong style="color:var(--text)">Google Drive</strong></div></div>
+            <div class="step"><div class="step-n">2</div><div class="step-t">Right-click → Share → <strong style="color:var(--text)">"Anyone with the link"</strong></div></div>
+            <div class="step"><div class="step-n">3</div><div class="step-t">Paste the link below and send</div></div>
           </div>
-          <div class="drive-input-row">
-            <input type="url" class="drive-input" id="driveLink" placeholder="https://drive.google.com/file/d/...">
-            <button class="btn-send-link" onclick="sendDriveLink()">Send →</button>
+          <div class="drive-row">
+            <input type="url" class="drive-in" id="driveLink" placeholder="https://drive.google.com/file/d/...">
+            <button class="btn-drive" onclick="sendLink()">Send →</button>
           </div>
           <div class="link-msg" id="linkMsg"></div>
           <div class="links-list" id="linksList"></div>
@@ -209,240 +283,185 @@
       </div>
     </div>
 
-    <!-- CHAT -->
-    <div class="chat-section">
-      <div class="section-title">💬 Message Amir</div>
-      <div class="chat-box">
-        <div class="chat-messages" id="chatMessages">
-          <div class="chat-empty">No messages yet — say hello! 👋</div>
-        </div>
-        <div class="chat-input-row">
-          <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()">
-          <button class="btn-send" onclick="sendMessage()">Send →</button>
-        </div>
+    <div class="sec-label">Message Amir</div>
+    <div class="chat-wrap">
+      <div class="chat-msgs" id="chatMsgs"><div class="chat-empty">Start a conversation — Amir will reply shortly.</div></div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-in" id="chatIn" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="btn-chat" onclick="sendMsg()">Send</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://pwrukagppviyyxdlurxs.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV';
-const FUNCTION_URL = 'https://pwrukagppviyyxdlurxs.supabase.co/functions/v1/notify-admin';
+const SB_URL = 'https://pwrukagppviyyxdlurxs.supabase.co';
+const SB_KEY = 'sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV';
+const FN_URL = SB_URL + '/functions/v1/notify-admin';
 const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
-  }
-});
-  // Restore session on page load
-sb.auth.getSession().then(({ data: { session } }) => {
-  if (session) {
-    currentUser = session.user;
-    document.getElementById('authPage').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    document.getElementById('userEmail').textContent = session.user.email;
-    loadProjects(session.user);
-    loadFiles();
-    loadMessages();
-    subscribeToMessages();
-  }
-});
-let currentUser = null;
-let chatSub = null;
+const sb = createClient(SB_URL, SB_KEY, { auth: { storage: window.localStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'avision-auth' } });
+let me = null, chatSub = null;
 
-async function sendNotification(type, content) {
-  try {
-    await fetch(FUNCTION_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY}` },
-      body: JSON.stringify({ client_email: currentUser.email, type, content })
-    });
-  } catch(e) {}
+async function notify(type, content) {
+  try { await fetch(FN_URL, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${SB_KEY}`}, body:JSON.stringify({ client_email: me.email, type, content }) }); } catch(e) {}
 }
 
-function switchTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (tab==='login'&&i===0)||(tab==='signup'&&i===1)));
-  document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
-  document.getElementById('signupForm').style.display = tab==='signup'?'block':'none';
+function switchTab(t) {
+  document.querySelectorAll('.auth-tab').forEach((el,i) => el.classList.toggle('active', t==='login'?i===0:i===1));
+  document.getElementById('loginForm').style.display = t==='login'?'block':'none';
+  document.getElementById('signupForm').style.display = t==='signup'?'block':'none';
 }
 
-function switchUpload(tab) {
-  document.querySelectorAll('.upload-tab').forEach((t,i) => t.classList.toggle('active', (tab==='direct'&&i===0)||(tab==='drive'&&i===1)));
-  document.getElementById('directUpload').style.display = tab==='direct'?'block':'none';
-  document.getElementById('driveUpload').style.display = tab==='drive'?'block':'none';
+function switchUp(t) {
+  document.querySelectorAll('.utab').forEach((el,i) => el.classList.toggle('active', t==='direct'?i===0:i===1));
+  document.getElementById('directUp').style.display = t==='direct'?'block':'none';
+  document.getElementById('driveUp').style.display = t==='drive'?'block':'none';
 }
 
-function showMsg(id, msg, type) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.className = 'auth-msg ' + type;
+function msg(id, text, type) { const el=document.getElementById(id); el.textContent=text; el.className='auth-msg '+type; }
+
+async function doLogin() {
+  const e=document.getElementById('lEmail').value, p=document.getElementById('lPass').value;
+  if (!e||!p) return msg('lMsg','Please fill all fields.','error');
+  msg('lMsg','Signing in...','');
+  const { error } = await sb.auth.signInWithPassword({ email:e, password:p });
+  if (error) return msg('lMsg', error.message, 'error');
 }
 
-async function handleLogin() {
-  const email = document.getElementById('loginEmail').value;
-  const pass = document.getElementById('loginPassword').value;
-  if (!email||!pass) return showMsg('loginMsg','Please fill all fields.','error');
-  showMsg('loginMsg','Signing in...','');
-  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) return showMsg('loginMsg', error.message, 'error');
+async function doSignup() {
+  const n=document.getElementById('sName').value, e=document.getElementById('sEmail').value, p=document.getElementById('sPass').value;
+  if (!n||!e||!p) return msg('sMsg','Please fill all fields.','error');
+  if (p.length<6) return msg('sMsg','Password min. 6 characters.','error');
+  msg('sMsg','Creating account...','');
+  const { error } = await sb.auth.signUp({ email:e, password:p, options:{ data:{ full_name:n } } });
+  if (error) return msg('sMsg', error.message, 'error');
+  msg('sMsg','✓ Check your email to confirm.','success');
 }
 
-async function handleSignup() {
-  const name = document.getElementById('signupName').value;
-  const email = document.getElementById('signupEmail').value;
-  const pass = document.getElementById('signupPassword').value;
-  if (!name||!email||!pass) return showMsg('signupMsg','Please fill all fields.','error');
-  if (pass.length < 6) return showMsg('signupMsg','Min. 6 characters.','error');
-  showMsg('signupMsg','Creating account...','');
-  const { error } = await sb.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
-  if (error) return showMsg('signupMsg', error.message, 'error');
-  showMsg('signupMsg','✓ Check your email to confirm.','success');
-}
-
-async function handleLogout() {
+async function doLogout() {
   if (chatSub) chatSub.unsubscribe();
   await sb.auth.signOut();
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('authPage').style.display = 'flex';
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('authPage').style.display='flex';
 }
 
-function statusClass(s) { return {inprogress:'status-inprogress',review:'status-review',done:'status-done',pending:'status-pending'}[s]||'status-pending'; }
-function statusLabel(s) { return {inprogress:'In Progress',review:'In Review',done:'Done ✓',pending:'Pending'}[s]||s; }
-function fileIcon(name) {
-  const ext = name.split('.').pop().toLowerCase();
-  if (['mp4','mov','avi','mkv'].includes(ext)) return '🎬';
-  if (['jpg','jpeg','png','gif'].includes(ext)) return '🖼️';
-  return '📎';
-}
-function formatSize(bytes) {
-  if (!bytes) return '';
-  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
-  return (bytes/(1024*1024)).toFixed(1) + ' MB';
+function statusBadge(s) {
+  const map = { inprogress:['b-progress','In Progress'], review:['b-review','In Review'], done:['b-done','Done ✓'], pending:['b-pending','Pending'] };
+  const [cls,label] = map[s]||['b-pending',s];
+  return `<span class="badge ${cls}">${label}</span>`;
 }
 
-async function handleFileUpload(files) {
-  if (!files.length || !currentUser) return;
-  const progress = document.getElementById('uploadProgress');
-  const bar = document.getElementById('progressBar');
-  const status = document.getElementById('uploadStatus');
-  progress.style.display = 'block';
-  for (let i = 0; i < files.length; i++) {
-    bar.style.width = Math.round((i/files.length)*100) + '%';
-    status.textContent = `Uploading ${files[i].name}...`;
-    status.className = 'upload-status';
-    const { error } = await sb.storage.from('project-files').upload(`${currentUser.email}/${Date.now()}_${files[i].name}`, files[i]);
-    if (error) { status.textContent = `Error: ${error.message}`; status.className = 'upload-status error'; return; }
+function fileIco(n) {
+  const e=n.split('.').pop().toLowerCase();
+  if (['mp4','mov','avi','mkv'].includes(e)) return '▶';
+  if (['jpg','jpeg','png','gif','webp'].includes(e)) return '◈';
+  if (['pdf','doc','docx'].includes(e)) return '◻';
+  return '◇';
+}
+function fmtSize(b) { if(!b)return''; if(b<1048576)return(b/1024).toFixed(1)+' KB'; return(b/1048576).toFixed(1)+' MB'; }
+
+async function doUpload(files) {
+  if (!files.length||!me) return;
+  const pw=document.getElementById('progWrap'), pb=document.getElementById('progBar'), pt=document.getElementById('progTxt');
+  pw.style.display='block';
+  for (let i=0;i<files.length;i++) {
+    pb.style.width=Math.round((i/files.length)*100)+'%';
+    pt.textContent=`Uploading ${files[i].name}...`; pt.className='prog-txt';
+    const { error } = await sb.storage.from('project-files').upload(`${me.email}/${Date.now()}_${files[i].name}`, files[i]);
+    if (error) { pt.textContent='Error: '+error.message; pt.className='prog-txt err'; return; }
   }
-  bar.style.width = '100%';
-  status.textContent = '✓ Uploaded!';
-  status.className = 'upload-status success';
-  await sendNotification('File Upload', Array.from(files).map(f=>f.name).join(', '));
-  setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 3000);
+  pb.style.width='100%'; pt.textContent='✓ Uploaded successfully!'; pt.className='prog-txt ok';
+  await notify('File Upload', Array.from(files).map(f=>f.name).join(', '));
+  setTimeout(()=>{ pw.style.display='none'; pb.style.width='0%'; }, 3000);
   loadFiles();
 }
 
-async function sendDriveLink() {
-  const link = document.getElementById('driveLink').value.trim();
-  const msgEl = document.getElementById('linkMsg');
-  if (!link) { msgEl.textContent = 'Please paste a link.'; msgEl.className = 'link-msg error'; return; }
-  msgEl.textContent = 'Sending...'; msgEl.className = 'link-msg';
-  await sb.from('shared_links').insert({ client_email: currentUser.email, link });
-  await sendNotification('Google Drive Link', link);
-  msgEl.textContent = '✓ Link sent to Amir!'; msgEl.className = 'link-msg success';
-  document.getElementById('driveLink').value = '';
-  const list = document.getElementById('linksList');
-  const item = document.createElement('div');
-  item.className = 'link-item';
-  item.innerHTML = `<a href="${link}" target="_blank">${link}</a><span class="link-date">Just now</span>`;
-  list.prepend(item);
+async function sendLink() {
+  const link=document.getElementById('driveLink').value.trim(), mel=document.getElementById('linkMsg');
+  if (!link) { mel.textContent='Please paste a link.'; mel.className='link-msg err'; return; }
+  mel.textContent='Sending...'; mel.className='link-msg';
+  await sb.from('shared_links').insert({ client_email:me.email, link });
+  await notify('Google Drive Link', link);
+  mel.textContent='✓ Link sent to Amir!'; mel.className='link-msg ok';
+  document.getElementById('driveLink').value='';
+  const li=document.createElement('div'); li.className='litem';
+  li.innerHTML=`<a href="${link}" target="_blank">${link}</a><span class="litem-d">Just now</span>`;
+  document.getElementById('linksList').prepend(li);
 }
 
-async function sendMessage() {
-  const input = document.getElementById('chatInput');
-  const msg = input.value.trim();
-  if (!msg || !currentUser) return;
-  input.value = '';
-  await sb.from('messages').insert({ client_email: currentUser.email, sender: 'client', message: msg });
-  await sendNotification('New Message', msg);
+async function sendMsg() {
+  const input=document.getElementById('chatIn'), m=input.value.trim();
+  if (!m||!me) return;
+  input.value='';
+  await sb.from('messages').insert({ client_email:me.email, sender:'client', message:m });
+  await notify('New Message', m);
 }
 
-async function loadMessages() {
-  const { data } = await sb.from('messages').select('*').eq('client_email', currentUser.email).order('created_at', { ascending: true });
-  renderMessages(data || []);
-}
-
-function renderMessages(data) {
-  const container = document.getElementById('chatMessages');
-  if (!data.length) { container.innerHTML = '<div class="chat-empty">No messages yet — say hello! 👋</div>'; return; }
-  container.innerHTML = data.map(m => {
-    const isMine = m.sender === 'client';
-    const time = new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    return `<div class="msg-row ${isMine?'mine':'theirs'}">
-      ${!isMine ? '<div class="msg-sender">Amir</div>' : ''}
-      <div class="msg-bubble">${m.message}</div>
-      <div class="msg-time">${time}</div>
-    </div>`;
+function renderMsgs(data) {
+  const c=document.getElementById('chatMsgs');
+  if (!c) return;
+  if (!data.length) { c.innerHTML='<div class="chat-empty">Start a conversation — Amir will reply shortly.</div>'; return; }
+  c.innerHTML=data.map(m=>{
+    const mine=m.sender==='client';
+    const t=new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    return `<div class="mrow ${mine?'me':'them'}">${!mine?'<div class="msender">Amir</div>':''}<div class="mbubble">${m.message}</div><div class="mtime">${t}</div></div>`;
   }).join('');
-  container.scrollTop = container.scrollHeight;
+  c.scrollTop=c.scrollHeight;
 }
 
-function subscribeToMessages() {
-  chatSub = sb.channel('messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `client_email=eq.${currentUser.email}` },
-    payload => {
-      const container = document.getElementById('chatMessages');
-      const m = payload.new;
-      const isMine = m.sender === 'client';
-      const time = new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-      const emptyEl = container.querySelector('.chat-empty');
-      if (emptyEl) emptyEl.remove();
-      const div = document.createElement('div');
-      div.className = `msg-row ${isMine?'mine':'theirs'}`;
-      div.innerHTML = `${!isMine?'<div class="msg-sender">Amir</div>':''}<div class="msg-bubble">${m.message}</div><div class="msg-time">${time}</div>`;
-      container.appendChild(div);
-      container.scrollTop = container.scrollHeight;
-    }).subscribe();
+function subscribeMsgs() {
+  chatSub=sb.channel('portal-chat').on('postgres_changes',{ event:'INSERT', schema:'public', table:'messages', filter:`client_email=eq.${me.email}` }, payload=>{
+    const c=document.getElementById('chatMsgs'); if(!c)return;
+    const m=payload.new, mine=m.sender==='client';
+    const t=new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const e=c.querySelector('.chat-empty'); if(e)e.remove();
+    const d=document.createElement('div'); d.className=`mrow ${mine?'me':'them'}`;
+    d.innerHTML=`${!mine?'<div class="msender">Amir</div>':''}<div class="mbubble">${m.message}</div><div class="mtime">${t}</div>`;
+    c.appendChild(d); c.scrollTop=c.scrollHeight;
+  }).subscribe();
 }
 
 async function loadFiles() {
-  if (!currentUser) return;
-  const { data } = await sb.storage.from('project-files').list(currentUser.email, { sortBy: { column: 'created_at', order: 'desc' } });
-  const list = document.getElementById('filesList');
-  if (!data || !data.length) { list.innerHTML = ''; return; }
-  list.innerHTML = data.map(f => `<div class="file-item"><div class="file-info"><span class="file-icon">${fileIcon(f.name)}</span><div><div class="file-name">${f.name.replace(/^\d+_/,'')}</div><div class="file-size">${f.metadata?formatSize(f.metadata.size):''}</div></div></div><div class="file-date">${new Date(f.created_at).toLocaleDateString()}</div></div>`).join('');
+  const { data }=await sb.storage.from('project-files').list(me.email,{ sortBy:{ column:'created_at', order:'desc' } });
+  const list=document.getElementById('filesList');
+  if (!data||!data.length) { list.innerHTML=''; return; }
+  list.innerHTML=data.map(f=>`<div class="ffile"><div class="ffile-l"><span class="ffile-ico">${fileIco(f.name)}</span><div><div class="ffile-name">${f.name.replace(/^\d+_/,'')}</div><div class="ffile-size">${f.metadata?fmtSize(f.metadata.size):''}</div></div></div><div class="ffile-date">${new Date(f.created_at).toLocaleDateString()}</div></div>`).join('');
 }
 
 async function loadProjects(user) {
-  const { data } = await sb.from('projects').select('*').eq('client_email', user.email).order('created_at', { ascending: false });
-  const list = document.getElementById('projectList');
-  if (!data || !data.length) { list.innerHTML = '<div class="empty">No projects yet — Amir will add your projects here soon.</div>'; ['activeCount','doneCount','reviewCount'].forEach(id=>document.getElementById(id).textContent='0'); return; }
-  document.getElementById('activeCount').textContent = data.filter(p=>p.status==='inprogress').length;
-  document.getElementById('doneCount').textContent = data.filter(p=>p.status==='done').length;
-  document.getElementById('reviewCount').textContent = data.filter(p=>p.status==='review').length;
-  list.innerHTML = data.map(p=>`<div class="project-item"><div class="project-info"><h3>${p.title}</h3><p>${p.description||''} ${p.delivery_date?'· Delivery: '+p.delivery_date:''}</p></div><span class="status-badge ${statusClass(p.status)}">${statusLabel(p.status)}</span></div>`).join('');
+  const { data }=await sb.from('projects').select('*').eq('client_email',user.email).order('created_at',{ascending:false});
+  const list=document.getElementById('projList');
+  if (!data||!data.length) { list.innerHTML='<div class="empty-proj">No projects yet — Amir will add them here soon.</div>'; ['cActive','cDone','cReview'].forEach(id=>document.getElementById(id).textContent='0'); return; }
+  document.getElementById('cActive').textContent=data.filter(p=>p.status==='inprogress').length;
+  document.getElementById('cDone').textContent=data.filter(p=>p.status==='done').length;
+  document.getElementById('cReview').textContent=data.filter(p=>p.status==='review').length;
+  list.innerHTML=data.map(p=>`<div class="proj"><div><div class="proj-title">${p.title}</div><div class="proj-sub">${p.description||''}${p.delivery_date?' · Delivery: '+p.delivery_date:''}</div></div>${statusBadge(p.status)}</div>`).join('');
 }
 
-const uploadBox = document.getElementById('uploadBox');
-uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.style.borderColor='#333'; });
-uploadBox.addEventListener('dragleave', () => uploadBox.style.borderColor='');
-uploadBox.addEventListener('drop', e => { e.preventDefault(); uploadBox.style.borderColor=''; handleFileUpload(e.dataTransfer.files); });
+async function loadMsgs() {
+  const { data }=await sb.from('messages').select('*').eq('client_email',me.email).order('created_at',{ascending:true});
+  renderMsgs(data||[]);
+}
+
+// Drag & drop
+const dz=document.getElementById('dz');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');doUpload(e.dataTransfer.files);});
 
 sb.auth.onAuthStateChange((event, session) => {
   if (session) {
-    currentUser = session.user;
-    document.getElementById('authPage').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    document.getElementById('userEmail').textContent = session.user.email;
-    loadProjects(session.user);
-    loadFiles();
-    loadMessages();
-    subscribeToMessages();
+    me=session.user;
+    document.getElementById('authPage').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    document.getElementById('userEmail').textContent=me.email;
+    const name=me.user_metadata?.full_name;
+    if (name) document.getElementById('welcomeName').textContent=`Welcome, ${name.split(' ')[0]}.`;
+    loadProjects(me); loadFiles(); loadMsgs(); subscribeMsgs();
   } else {
-    currentUser = null;
-    document.getElementById('dashboard').style.display = 'none';
-    document.getElementById('authPage').style.display = 'flex';
+    me=null;
+    document.getElementById('dashboard').style.display='none';
+    document.getElementById('authPage').style.display='flex';
   }
 });
 </script>
