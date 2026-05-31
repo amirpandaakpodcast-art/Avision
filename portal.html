@@ -4,143 +4,300 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Client Portal — Avision</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --gold: #c9a84c; --gold-light: #e8c97a; --gold-dim: rgba(201,168,76,0.15);
-      --bg: #080707; --bg2: #0f0e0d; --bg3: #161412;
-      --border: rgba(201,168,76,0.12); --border-hover: rgba(201,168,76,0.3);
-      --text: #e8e0d0; --text-muted: #7a7060; --text-dim: #4a4438;
+      --bg: #040303; --bg2: #0a0908; --bg3: #120f0e;
+      --border: rgba(201,168,76,0.1); --border-hover: rgba(201,168,76,0.35);
+      --text: #ede5d5; --text-muted: #7a7060; --text-dim: #3a3530;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
-    .auth-page { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:2rem; }
-    .auth-box { width:100%; max-width:420px; }
+    html { scroll-behavior:smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+
+    /* CANVAS BG */
+    #bgCanvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+    /* AUTH PAGE */
+    .auth-page {
+      display:flex; align-items:center; justify-content:center;
+      min-height:100vh; padding:2rem; position:relative; z-index:10;
+    }
+    .auth-box { width:100%; max-width:440px; animation:fadeUp 1s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
     .auth-brand { text-align:center; margin-bottom:3rem; }
-    .auth-brand img { height:36px; opacity:0.9; }
-    .auth-brand span { display:block; font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-top:10px; opacity:0.8; }
-    .auth-card { background:var(--bg2); border:1px solid var(--border); padding:2.5rem; }
-    .auth-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:2rem; }
-    .auth-tab { flex:1; text-align:center; padding:10px; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim); cursor:pointer; border-bottom:1px solid transparent; margin-bottom:-1px; transition:all .2s; }
-    .auth-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+    .auth-logo { height:42px; opacity:0.95; filter:drop-shadow(0 0 20px rgba(201,168,76,0.4)); }
+    .auth-tagline {
+      display:block; font-family:'Cormorant Garamond',serif; font-size:11px;
+      letter-spacing:0.4em; text-transform:uppercase; color:var(--gold);
+      margin-top:12px; opacity:0.8;
+    }
+
+    .auth-card {
+      background:rgba(10,9,8,0.85);
+      border:1px solid var(--border);
+      padding:2.5rem;
+      position:relative;
+      overflow:hidden;
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      box-shadow:0 0 80px rgba(201,168,76,0.05), inset 0 1px 0 rgba(201,168,76,0.1);
+      transition:box-shadow 0.5s ease;
+    }
+    .auth-card::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 60%);
+      pointer-events:none;
+    }
+    .auth-card:hover { box-shadow:0 0 120px rgba(201,168,76,0.1), inset 0 1px 0 rgba(201,168,76,0.15); }
+
+    .auth-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:2rem; gap:0; }
+    .auth-tab {
+      flex:1; text-align:center; padding:12px; font-size:11px;
+      letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim);
+      cursor:pointer; border-bottom:1px solid transparent; margin-bottom:-1px;
+      transition:all .3s; position:relative;
+    }
+    .auth-tab::after {
+      content:''; position:absolute; bottom:-1px; left:50%; right:50%;
+      height:1px; background:var(--gold); transition:all .3s;
+    }
+    .auth-tab.active { color:var(--gold); }
+    .auth-tab.active::after { left:0; right:0; }
+
     .fgroup { margin-bottom:1.25rem; }
-    .fgroup label { display:block; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
-    .fgroup input { width:100%; background:var(--bg3); border:1px solid var(--border); padding:12px 16px; color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif; outline:none; transition:border .2s; }
-    .fgroup input:focus { border-color:rgba(201,168,76,0.4); }
+    .fgroup label {
+      display:block; font-size:10px; letter-spacing:0.2em;
+      text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;
+    }
+    .fgroup input {
+      width:100%; background:rgba(22,18,14,0.8); border:1px solid var(--border);
+      padding:13px 16px; color:var(--text); font-size:13px;
+      font-family:'DM Sans',sans-serif; outline:none; transition:all .3s;
+    }
+    .fgroup input:focus {
+      border-color:var(--gold); background:rgba(30,25,18,0.9);
+      box-shadow:0 0 20px rgba(201,168,76,0.1);
+    }
     .fgroup input::placeholder { color:var(--text-dim); }
-    .btn-auth { width:100%; background:var(--gold); color:#0a0900; border:none; padding:13px; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; transition:all .2s; margin-top:0.5rem; }
-    .btn-auth:hover { background:var(--gold-light); }
-    .auth-msg { text-align:center; font-size:12px; margin-top:1rem; min-height:18px; }
-    .auth-msg.error { color:#c44; }
+
+    .agree-box {
+      display:flex; align-items:flex-start; gap:10px; margin-bottom:1.25rem;
+      padding:1rem; background:rgba(201,168,76,0.04); border:1px solid var(--border);
+    }
+    .agree-box input[type=checkbox] { accent-color:var(--gold); margin-top:2px; flex-shrink:0; cursor:pointer; }
+    .agree-box label { font-size:11px; color:var(--text-muted); line-height:1.7; cursor:pointer; }
+    .agree-box a { color:var(--gold); text-decoration:none; opacity:0.9; }
+
+    .btn-auth {
+      width:100%; background:var(--gold); color:#0a0800; border:none;
+      padding:14px; font-size:11px; letter-spacing:0.2em; text-transform:uppercase;
+      font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer;
+      transition:all .3s; position:relative; overflow:hidden; margin-top:0.5rem;
+    }
+    .btn-auth::before {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform:translateX(-100%); transition:transform 0.5s;
+    }
+    .btn-auth:hover { background:var(--gold-light); box-shadow:0 0 30px rgba(201,168,76,0.4); }
+    .btn-auth:hover::before { transform:translateX(100%); }
+
+    .auth-msg { text-align:center; font-size:12px; margin-top:1rem; min-height:18px; transition:all .3s; }
+    .auth-msg.error { color:#e05555; }
     .auth-msg.success { color:#6ab46a; }
-    .dashboard { display:none; min-height:100vh; }
-    .topbar { background:rgba(8,7,7,0.97); border-bottom:1px solid var(--border); padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:60px; position:sticky; top:0; z-index:100; }
-    .topbar-brand { display:flex; align-items:center; gap:10px; }
-    .topbar-brand img { height:24px; opacity:0.85; }
-    .tb-sep { width:1px; height:16px; background:var(--border); }
-    .tb-sub { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-dim); }
-    .tb-right { display:flex; align-items:center; gap:12px; }
-    .user-pill { background:var(--gold-dim); border:1px solid var(--border); padding:5px 14px; font-size:11px; color:var(--gold); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .btn-out { background:none; border:1px solid var(--border); padding:7px 14px; color:var(--text-muted); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; }
+
+    /* DASHBOARD */
+    .dashboard { display:none; min-height:100vh; position:relative; z-index:10; }
+
+    /* TOPBAR */
+    .topbar {
+      background:rgba(4,3,3,0.9); border-bottom:1px solid var(--border);
+      padding:0 2rem; display:flex; align-items:center; justify-content:space-between;
+      height:64px; position:sticky; top:0; z-index:100;
+      backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+      box-shadow:0 1px 0 rgba(201,168,76,0.08);
+    }
+    .topbar-brand { display:flex; align-items:center; gap:12px; }
+    .topbar-logo { height:26px; opacity:0.9; filter:drop-shadow(0 0 8px rgba(201,168,76,0.3)); }
+    .tb-div { width:1px; height:18px; background:var(--border); }
+    .tb-sub { font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:var(--text-dim); }
+    .tb-right { display:flex; align-items:center; gap:14px; }
+    .user-pill {
+      background:var(--gold-dim); border:1px solid var(--border); padding:6px 16px;
+      font-size:11px; color:var(--gold); max-width:200px; overflow:hidden;
+      text-overflow:ellipsis; white-space:nowrap; letter-spacing:0.05em;
+    }
+    .btn-out {
+      background:none; border:1px solid var(--border); padding:7px 16px;
+      color:var(--text-muted); font-size:11px; letter-spacing:0.12em; text-transform:uppercase;
+      cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .3s;
+    }
     .btn-out:hover { border-color:var(--border-hover); color:var(--text); }
-    .bell-wrap { position:relative; cursor:pointer; }
-    .bell-icon { font-size:18px; opacity:0.6; }
-    .msg-badge { display:none; position:absolute; top:-4px; right:-4px; background:#c44; color:#fff; font-size:9px; width:16px; height:16px; border-radius:50%; align-items:center; justify-content:center; font-weight:500; }
-    .notif-popup { display:none; position:absolute; top:36px; right:0; width:280px; background:var(--bg2); border:1px solid var(--border-hover); z-index:999; box-shadow:0 8px 32px rgba(0,0,0,0.5); }
-    .notif-hdr { padding:10px 14px; border-bottom:1px solid rgba(201,168,76,0.1); font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); opacity:0.8; }
-    .notif-list { max-height:260px; overflow-y:auto; }
-    .notif-foot { padding:10px 14px; border-top:1px solid rgba(201,168,76,0.1); }
-    .notif-foot button { width:100%; background:var(--gold-dim); border:1px solid var(--border); padding:8px; color:var(--gold); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; }
-    .main { max-width:960px; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
-    .welcome { margin-bottom:3rem; padding-bottom:2rem; border-bottom:1px solid var(--border); }
-    .welcome-label { font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold); margin-bottom:10px; opacity:0.8; }
-    .welcome h1 { font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:300; color:var(--text); }
-    .welcome p { font-size:13px; color:var(--text-muted); margin-top:6px; }
-    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:3rem; }
-    .stat { background:var(--bg2); padding:1.5rem; }
-    .stat-n { font-family:'Cormorant Garamond',serif; font-size:2.5rem; font-weight:300; color:var(--gold); line-height:1; }
-    .stat-l { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-dim); margin-top:6px; }
-    .sec-label { font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold); margin-bottom:1.25rem; opacity:0.7; display:flex; align-items:center; gap:12px; }
-    .sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
-    .projects { display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:3rem; }
-    .proj { background:var(--bg2); padding:1.25rem 1.5rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
-    .proj-title { font-size:14px; color:var(--text); margin-bottom:3px; }
-    .proj-sub { font-size:11px; color:var(--text-dim); }
-    .badge { font-size:10px; padding:4px 12px; letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; }
-    .b-progress { background:rgba(100,180,100,0.1); color:#6ab46a; border:1px solid rgba(100,180,100,0.2); }
-    .b-review { background:rgba(201,168,76,0.1); color:var(--gold); border:1px solid var(--border); }
-    .b-done { background:rgba(120,120,200,0.1); color:#9090d0; border:1px solid rgba(120,120,200,0.2); }
-    .b-pending { background:var(--bg3); color:var(--text-dim); border:1px solid var(--border); }
-    .empty-proj { padding:2.5rem; text-align:center; color:var(--text-dim); font-size:12px; letter-spacing:0.08em; background:var(--bg2); }
-    .upload-tabs { display:flex; gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:1px; }
-    .utab { flex:1; padding:12px; text-align:center; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); cursor:pointer; background:var(--bg2); transition:all .2s; }
+    .bell-btn {
+      position:relative; cursor:pointer; width:36px; height:36px;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid var(--border); transition:all .3s;
+    }
+    .bell-btn:hover { border-color:var(--border-hover); background:var(--gold-dim); }
+    .bell-icon { font-size:16px; }
+    .notif-dot {
+      display:none; position:absolute; top:4px; right:4px;
+      width:8px; height:8px; border-radius:50%; background:#e05555;
+      box-shadow:0 0 8px #e05555;
+    }
+    .notif-popup {
+      display:none; position:absolute; top:48px; right:0; width:300px;
+      background:rgba(10,9,8,0.98); border:1px solid var(--border-hover);
+      backdrop-filter:blur(20px); z-index:999;
+      box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.05);
+      animation:fadeDown 0.2s ease;
+    }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
+    .notif-head { padding:12px 16px; border-bottom:1px solid var(--border); font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); opacity:0.8; }
+    .notif-body { max-height:280px; overflow-y:auto; }
+    .notif-item { padding:12px 16px; border-bottom:1px solid rgba(201,168,76,0.05); cursor:pointer; transition:background .2s; }
+    .notif-item:hover { background:rgba(201,168,76,0.05); }
+    .notif-title { font-size:11px; color:var(--gold); margin-bottom:3px; letter-spacing:0.06em; }
+    .notif-msg { font-size:12px; color:var(--text); line-height:1.5; }
+    .notif-foot { padding:10px 16px; }
+    .notif-foot button { width:100%; background:var(--gold-dim); border:1px solid var(--border); padding:8px; color:var(--gold); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; }
+    .notif-foot button:hover { background:rgba(201,168,76,0.2); }
+
+    /* MAIN */
+    .main { max-width:980px; margin:0 auto; padding:3rem 2rem 5rem; }
+
+    /* WELCOME */
+    .welcome {
+      margin-bottom:3rem; padding-bottom:2.5rem; border-bottom:1px solid var(--border);
+      animation:fadeUp 0.8s ease 0.1s both;
+    }
+    .welcome-eyebrow { font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; opacity:0.7; display:flex; align-items:center; gap:10px; }
+    .welcome-eyebrow::before { content:''; width:30px; height:1px; background:var(--gold); opacity:0.5; }
+    .welcome h1 { font-family:'Cormorant Garamond',serif; font-size:2.8rem; font-weight:300; color:var(--text); line-height:1.1; }
+    .welcome h1 em { font-style:italic; color:var(--gold); }
+    .welcome p { font-size:13px; color:var(--text-muted); margin-top:8px; letter-spacing:0.02em; }
+
+    /* STATS */
+    .stats-grid {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+      background:var(--border); border:1px solid var(--border);
+      margin-bottom:3rem; animation:fadeUp 0.8s ease 0.2s both;
+    }
+    .stat-card { background:var(--bg2); padding:1.75rem; position:relative; overflow:hidden; transition:background .3s; }
+    .stat-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg, transparent, var(--gold), transparent); opacity:0; transition:opacity .3s; }
+    .stat-card:hover { background:var(--bg3); }
+    .stat-card:hover::after { opacity:0.5; }
+    .stat-num { font-family:'Cormorant Garamond',serif; font-size:3rem; font-weight:300; color:var(--gold); line-height:1; text-shadow:0 0 30px rgba(201,168,76,0.3); }
+    .stat-lbl { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-dim); margin-top:6px; }
+
+    /* SECTION */
+    .section { animation:fadeUp 0.8s ease 0.3s both; margin-bottom:3rem; }
+    .sec-head { display:flex; align-items:center; gap:14px; margin-bottom:1.5rem; }
+    .sec-title { font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); opacity:0.7; white-space:nowrap; }
+    .sec-line { flex:1; height:1px; background:linear-gradient(90deg, var(--border), transparent); }
+
+    /* PROJECTS */
+    .proj-list { display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border); }
+    .proj-item { background:var(--bg2); padding:1.25rem 1.5rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; transition:background .3s; }
+    .proj-item:hover { background:var(--bg3); }
+    .proj-name { font-size:14px; color:var(--text); margin-bottom:4px; }
+    .proj-meta { font-size:11px; color:var(--text-dim); }
+    .proj-actions { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .dl-btn { background:var(--gold); color:#0a0800; text-decoration:none; padding:6px 14px; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; font-weight:500; transition:all .3s; }
+    .dl-btn:hover { background:var(--gold-light); box-shadow:0 0 20px rgba(201,168,76,0.3); }
+    .status-pill { font-size:10px; padding:4px 12px; letter-spacing:0.08em; text-transform:uppercase; }
+    .s-ip { background:rgba(100,180,100,0.08); color:#6ab46a; border:1px solid rgba(100,180,100,0.2); }
+    .s-rv { background:rgba(201,168,76,0.08); color:var(--gold); border:1px solid var(--border); }
+    .s-dn { background:rgba(120,120,200,0.08); color:#9090d0; border:1px solid rgba(120,120,200,0.2); }
+    .s-pd { background:var(--bg3); color:var(--text-dim); border:1px solid var(--border); }
+    .empty-state { padding:3rem; text-align:center; color:var(--text-dim); font-size:12px; letter-spacing:0.08em; background:var(--bg2); border:1px solid var(--border); }
+
+    /* UPLOAD */
+    .upload-tabs { display:flex; gap:1px; background:var(--border); border:1px solid var(--border); border-bottom:none; }
+    .utab { flex:1; padding:12px; text-align:center; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim); cursor:pointer; background:var(--bg2); transition:all .3s; }
     .utab.active { color:var(--gold); background:var(--bg3); }
-    .upload-wrap { border:1px solid var(--border); border-top:none; margin-bottom:3rem; }
-    .drop-zone { padding:3rem 2rem; text-align:center; cursor:pointer; background:var(--bg2); border:2px dashed transparent; transition:all .2s; }
-    .drop-zone:hover { background:var(--bg3); border-color:var(--border-hover); }
-    .drop-icon { font-size:2rem; margin-bottom:1rem; opacity:0.4; }
-    .drop-zone h3 { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:300; color:var(--text); margin-bottom:6px; }
+    .upload-box { border:1px solid var(--border); }
+    .drop-zone { padding:3rem 2rem; text-align:center; cursor:pointer; background:var(--bg2); border:2px dashed transparent; transition:all .3s; }
+    .drop-zone:hover, .drop-zone.over { background:var(--bg3); border-color:rgba(201,168,76,0.3); }
+    .drop-icon { font-size:2.5rem; margin-bottom:1rem; opacity:0.3; }
+    .drop-zone h3 { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:300; color:var(--text); margin-bottom:6px; }
     .drop-zone p { font-size:12px; color:var(--text-dim); margin-bottom:1.5rem; }
-    .btn-choose { background:none; border:1px solid var(--border-hover); padding:9px 22px; color:var(--gold); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; }
+    .btn-pick { background:none; border:1px solid var(--border-hover); padding:10px 24px; color:var(--gold); font-size:10px; letter-spacing:0.15em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .3s; }
+    .btn-pick:hover { background:var(--gold-dim); box-shadow:0 0 20px rgba(201,168,76,0.15); }
     #fi { display:none; }
-    .prog-wrap { display:none; padding:1rem 1.5rem; border-top:1px solid var(--border); background:var(--bg2); }
-    .prog-bg { background:var(--bg3); height:2px; }
-    .prog-bar { background:var(--gold); height:2px; width:0%; transition:width .3s; }
-    .prog-txt { font-size:11px; color:var(--text-muted); margin-top:8px; }
-    .prog-txt.ok { color:#6ab46a; } .prog-txt.err { color:#c44; }
-    .files-list { border-top:1px solid var(--border); background:var(--bg2); }
-    .ffile { display:flex; align-items:center; justify-content:space-between; padding:10px 1.5rem; border-bottom:1px solid var(--border); }
-    .ffile-l { display:flex; align-items:center; gap:10px; }
-    .ffile-name { font-size:12px; color:var(--text); }
-    .ffile-size { font-size:10px; color:var(--text-dim); margin-top:2px; }
-    .ffile-date { font-size:10px; color:var(--text-dim); }
-    .drive-inner { padding:2rem 1.5rem; background:var(--bg2); }
-    .drive-inner p { font-size:12px; color:var(--text-muted); margin-bottom:1.5rem; line-height:1.8; }
+    .prog-area { display:none; padding:1rem 1.5rem; background:var(--bg2); border-top:1px solid var(--border); }
+    .prog-track { background:var(--bg3); height:2px; border-radius:1px; overflow:hidden; }
+    .prog-fill { background:var(--gold); height:2px; width:0%; transition:width .4s; box-shadow:0 0 10px rgba(201,168,76,0.5); }
+    .prog-text { font-size:11px; color:var(--text-muted); margin-top:8px; }
+    .prog-text.ok { color:#6ab46a; } .prog-text.err { color:#e05555; }
+    .files-list { background:var(--bg2); border-top:1px solid var(--border); }
+    .file-row { display:flex; align-items:center; justify-content:space-between; padding:10px 1.5rem; border-bottom:1px solid rgba(201,168,76,0.04); }
+    .file-info { display:flex; align-items:center; gap:10px; }
+    .file-ico { font-size:1.1rem; opacity:0.5; }
+    .file-name { font-size:12px; color:var(--text); }
+    .file-size { font-size:10px; color:var(--text-dim); margin-top:2px; }
+    .file-date { font-size:10px; color:var(--text-dim); }
+    .drive-area { padding:2rem 1.5rem; background:var(--bg2); }
+    .drive-area p { font-size:12px; color:var(--text-muted); margin-bottom:1.5rem; line-height:1.8; }
     .steps { margin-bottom:1.5rem; }
-    .step { display:flex; gap:14px; align-items:flex-start; margin-bottom:10px; }
+    .step { display:flex; gap:14px; margin-bottom:12px; }
     .step-n { width:22px; height:22px; border:1px solid var(--border-hover); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--gold); flex-shrink:0; font-family:'Cormorant Garamond',serif; }
-    .step-t { font-size:12px; color:var(--text-muted); line-height:1.6; }
+    .step-t { font-size:12px; color:var(--text-muted); line-height:1.6; margin-top:2px; }
     .drive-row { display:flex; gap:8px; }
-    .drive-in { flex:1; background:var(--bg3); border:1px solid var(--border); padding:11px 14px; color:var(--text); font-size:12px; font-family:'DM Sans',sans-serif; outline:none; }
-    .drive-in:focus { border-color:rgba(201,168,76,0.4); }
+    .drive-in { flex:1; background:var(--bg3); border:1px solid var(--border); padding:12px 14px; color:var(--text); font-size:12px; font-family:'DM Sans',sans-serif; outline:none; transition:border .3s; }
+    .drive-in:focus { border-color:var(--gold); }
     .drive-in::placeholder { color:var(--text-dim); }
-    .btn-drive { background:var(--gold); color:#0a0900; border:none; padding:11px 20px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; }
-    .link-msg { font-size:11px; margin-top:10px; min-height:16px; }
-    .link-msg.ok { color:#6ab46a; } .link-msg.err { color:#c44; }
-    .links-list { margin-top:1rem; display:flex; flex-direction:column; gap:6px; }
-    .litem { background:var(--bg3); border:1px solid var(--border); padding:9px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .litem a { color:var(--gold); font-size:11px; text-decoration:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity:0.8; }
-    .litem-d { font-size:10px; color:var(--text-dim); white-space:nowrap; }
-    .inv-table { width:100%; border-collapse:collapse; border:1px solid var(--border); margin-bottom:3rem; }
+    .btn-drive { background:var(--gold); color:#0a0800; border:none; padding:12px 20px; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; transition:all .3s; white-space:nowrap; }
+    .btn-drive:hover { background:var(--gold-light); }
+    .link-note { font-size:11px; margin-top:10px; min-height:16px; }
+    .link-note.ok { color:#6ab46a; } .link-note.err { color:#e05555; }
+    .links-sent { margin-top:1rem; display:flex; flex-direction:column; gap:6px; }
+    .link-sent { background:var(--bg3); border:1px solid var(--border); padding:9px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .link-sent a { color:var(--gold); font-size:11px; text-decoration:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity:0.8; }
+    .link-sent-d { font-size:10px; color:var(--text-dim); white-space:nowrap; }
+
+    /* INVOICES */
+    .inv-table { width:100%; border-collapse:collapse; border:1px solid var(--border); }
     .inv-table th { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-dim); padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); background:var(--bg2); }
-    .inv-table td { padding:12px 14px; font-size:13px; border-bottom:1px solid rgba(201,168,76,0.05); background:var(--bg2); }
-    .inv-amount { font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--gold); }
-    .pay-btn { background:var(--gold); color:#0a0900; border:none; padding:7px 16px; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; font-weight:500; font-family:'DM Sans',sans-serif; }
-    .chat-wrap { border:1px solid var(--border); margin-bottom:3rem; }
-    .chat-msgs { height:320px; overflow-y:auto; padding:1.5rem; display:flex; flex-direction:column; gap:12px; background:var(--bg2); }
+    .inv-table td { padding:12px 14px; font-size:13px; border-bottom:1px solid rgba(201,168,76,0.04); background:var(--bg2); transition:background .2s; }
+    .inv-table tr:hover td { background:var(--bg3); }
+    .inv-amount { font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--gold); text-shadow:0 0 20px rgba(201,168,76,0.2); }
+    .pay-btn { background:var(--gold); color:#0a0800; border:none; padding:8px 18px; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; font-weight:500; font-family:'DM Sans',sans-serif; transition:all .3s; }
+    .pay-btn:hover { background:var(--gold-light); box-shadow:0 0 20px rgba(201,168,76,0.4); }
+    .pay-btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+    /* CHAT */
+    .chat-box { border:1px solid var(--border); }
+    .chat-msgs { height:340px; overflow-y:auto; padding:1.5rem; display:flex; flex-direction:column; gap:12px; background:var(--bg2); scroll-behavior:smooth; }
     .chat-msgs::-webkit-scrollbar { width:2px; }
     .chat-msgs::-webkit-scrollbar-thumb { background:var(--border); }
-    .mrow { display:flex; flex-direction:column; }
-    .mrow.me { align-items:flex-end; }
-    .mrow.them { align-items:flex-start; }
-    .mbubble { max-width:72%; padding:10px 14px; font-size:13px; line-height:1.6; }
-    .mrow.me .mbubble { background:var(--gold); color:#0a0900; border-radius:12px 12px 2px 12px; }
-    .mrow.them .mbubble { background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:12px 12px 12px 2px; }
-    .mtime { font-size:10px; color:var(--text-dim); margin-top:4px; }
-    .msender { font-size:10px; color:var(--gold); opacity:0.6; margin-bottom:3px; letter-spacing:0.08em; }
-    .chat-input-row { display:flex; border-top:1px solid var(--border); }
-    .chat-in { flex:1; background:var(--bg2); border:none; padding:14px 16px; color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif; outline:none; }
-    .chat-in::placeholder { color:var(--text-dim); }
-    .btn-chat { background:var(--gold); color:#0a0900; border:none; padding:14px 20px; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; }
-    .chat-empty { text-align:center; padding:3rem; color:var(--text-dim); font-size:12px; }
-    @media (max-width:600px) {
+    .msg-row { display:flex; flex-direction:column; }
+    .msg-row.me { align-items:flex-end; }
+    .msg-row.them { align-items:flex-start; }
+    .msg-bubble { max-width:72%; padding:10px 14px; font-size:13px; line-height:1.6; }
+    .msg-row.me .msg-bubble { background:var(--gold); color:#0a0800; border-radius:12px 12px 2px 12px; box-shadow:0 4px 20px rgba(201,168,76,0.2); }
+    .msg-row.them .msg-bubble { background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:12px 12px 12px 2px; }
+    .msg-time { font-size:10px; color:var(--text-dim); margin-top:4px; }
+    .msg-sender { font-size:10px; color:var(--gold); opacity:0.6; margin-bottom:3px; letter-spacing:0.06em; }
+    .chat-input-area { display:flex; border-top:1px solid var(--border); }
+    .chat-input { flex:1; background:var(--bg2); border:none; padding:16px 18px; color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif; outline:none; transition:background .3s; }
+    .chat-input:focus { background:var(--bg3); }
+    .chat-input::placeholder { color:var(--text-dim); }
+    .chat-send { background:var(--gold); color:#0a0800; border:none; padding:16px 22px; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; transition:all .3s; }
+    .chat-send:hover { background:var(--gold-light); }
+    .chat-empty { text-align:center; padding:3rem; color:var(--text-dim); font-size:12px; letter-spacing:0.06em; }
+
+    @media (max-width:640px) {
       .topbar { padding:0 1rem; }
-      .main { padding:1.5rem 1rem 3rem; }
-      .welcome h1 { font-size:1.6rem; }
-      .stats { grid-template-columns:repeat(3,1fr); }
-      .stat { padding:1rem; }
-      .stat-n { font-size:1.8rem; }
+      .main { padding:2rem 1rem 4rem; }
+      .welcome h1 { font-size:2rem; }
+      .stats-grid { grid-template-columns:repeat(3,1fr); }
+      .stat-card { padding:1rem; }
+      .stat-num { font-size:2rem; }
       .drive-row { flex-direction:column; }
       .upload-tabs { flex-direction:column; }
     }
@@ -148,11 +305,14 @@
 </head>
 <body>
 
+<canvas id="bgCanvas"></canvas>
+
+<!-- AUTH -->
 <div class="auth-page" id="authPage">
   <div class="auth-box">
     <div class="auth-brand">
-      <img src="https://www.amiravision.com/logos/White.png" alt="Avision" onerror="this.style.display='none'">
-      <span>Client Portal</span>
+      <img src="https://www.amiravision.com/logos/White.png" alt="Avision" class="auth-logo" onerror="this.style.display='none'">
+      <span class="auth-tagline">Client Portal</span>
     </div>
     <div class="auth-card">
       <div class="auth-tabs">
@@ -160,22 +320,21 @@
         <div class="auth-tab" onclick="switchTab('signup')">Register</div>
       </div>
       <div id="loginForm">
-        <div class="fgroup"><label>Email Address</label><input type="email" id="lEmail" placeholder="your@email.com"></div>
-        <div class="fgroup"><label>Password</label><input type="password" id="lPass" placeholder="••••••••"></div>
+        <div class="fgroup"><label>Email Address</label><input type="email" id="lEmail" placeholder="your@email.com" autocomplete="email"></div>
+        <div class="fgroup"><label>Password</label><input type="password" id="lPass" placeholder="••••••••" autocomplete="current-password"></div>
         <button class="btn-auth" onclick="doLogin()">Sign In →</button>
         <div class="auth-msg" id="lMsg"></div>
       </div>
       <div id="signupForm" style="display:none;">
-        <div class="fgroup"><label>Full Name</label><input type="text" id="sName" placeholder="Your name"></div>
-        <div class="fgroup"><label>Email Address</label><input type="email" id="sEmail" placeholder="your@email.com"></div>
-        <div class="fgroup"><label>Password</label><input type="password" id="sPass" placeholder="Min. 6 characters"></div>
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:1rem;padding:1rem;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.12);">
-          <input type="checkbox" id="agreeCheck" style="margin-top:3px;accent-color:#c9a84c;flex-shrink:0;cursor:pointer;">
-          <label for="agreeCheck" style="font-size:11px;color:#7a7060;line-height:1.6;cursor:pointer;">
-            I agree to Avision's
-            <a href="/terms.html" target="_blank" style="color:#c9a84c;">Terms of Service</a>,
-            <a href="/privacy.html" target="_blank" style="color:#c9a84c;">Privacy Policy</a>, and
-            <a href="/refund.html" target="_blank" style="color:#c9a84c;">Refund Policy</a>.
+        <div class="fgroup"><label>Full Name</label><input type="text" id="sName" placeholder="Your name" autocomplete="name"></div>
+        <div class="fgroup"><label>Email Address</label><input type="email" id="sEmail" placeholder="your@email.com" autocomplete="email"></div>
+        <div class="fgroup"><label>Password</label><input type="password" id="sPass" placeholder="Min. 6 characters" autocomplete="new-password"></div>
+        <div class="agree-box">
+          <input type="checkbox" id="agreeCheck">
+          <label for="agreeCheck">
+            I agree to Avision's <a href="/terms.html" target="_blank">Terms of Service</a>,
+            <a href="/privacy.html" target="_blank">Privacy Policy</a>, and
+            <a href="/refund.html" target="_blank">Refund Policy</a>. I understand all projects are subject to these terms.
           </label>
         </div>
         <button class="btn-auth" onclick="doSignup()">Create Account →</button>
@@ -185,21 +344,22 @@
   </div>
 </div>
 
+<!-- DASHBOARD -->
 <div class="dashboard" id="dashboard">
   <div class="topbar">
     <div class="topbar-brand">
-      <img src="https://www.amiravision.com/logos/White.png" alt="Avision" onerror="this.style.display='none'">
-      <div class="tb-sep"></div>
+      <img src="https://www.amiravision.com/logos/White.png" alt="Avision" class="topbar-logo" onerror="this.style.display='none'">
+      <div class="tb-div"></div>
       <span class="tb-sub">Client Portal</span>
     </div>
     <div class="tb-right">
-      <div class="bell-wrap" id="bellWrap" onclick="toggleNotif()">
+      <div class="bell-btn" id="bellBtn" onclick="toggleNotif()">
         <span class="bell-icon">🔔</span>
-        <span class="msg-badge" id="msgBadge">0</span>
+        <span class="notif-dot" id="notifDot"></span>
         <div class="notif-popup" id="notifPopup">
-          <div class="notif-hdr">Notifications</div>
-          <div class="notif-list" id="notifList"></div>
-          <div class="notif-foot"><button onclick="goToChat()">View Messages →</button></div>
+          <div class="notif-head">Notifications</div>
+          <div class="notif-body" id="notifBody"></div>
+          <div class="notif-foot"><button onclick="goToChat()">Open Messages →</button></div>
         </div>
       </div>
       <span class="user-pill" id="userEmail">—</span>
@@ -209,82 +369,189 @@
 
   <div class="main">
     <div class="welcome">
-      <div class="welcome-label">Dashboard</div>
-      <h1 id="welcomeName">Welcome back.</h1>
-      <p>Your projects and files with Avision — all in one place.</p>
+      <div class="welcome-eyebrow">Dashboard</div>
+      <h1 id="welcomeTitle">Welcome <em>back.</em></h1>
+      <p>Your projects, files, and invoices with Avision — all in one place.</p>
     </div>
 
-    <div class="stats">
-      <div class="stat"><div class="stat-n" id="cActive">0</div><div class="stat-l">Active</div></div>
-      <div class="stat"><div class="stat-n" id="cDone">0</div><div class="stat-l">Completed</div></div>
-      <div class="stat"><div class="stat-n" id="cReview">0</div><div class="stat-l">In Review</div></div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="sActive">0</div><div class="stat-lbl">Active</div></div>
+      <div class="stat-card"><div class="stat-num" id="sDone">0</div><div class="stat-lbl">Completed</div></div>
+      <div class="stat-card"><div class="stat-num" id="sReview">0</div><div class="stat-lbl">In Review</div></div>
     </div>
 
-    <div class="sec-label">Your Projects</div>
-    <div class="projects" id="projList"><div class="empty-proj">Loading...</div></div>
-
-    <div class="sec-label" style="margin-top:3rem;">Send Files</div>
-    <div class="upload-tabs">
-      <div class="utab active" onclick="switchUp('direct')">Direct Upload · max 50MB</div>
-      <div class="utab" onclick="switchUp('drive')">Google Drive Link</div>
+    <div class="section">
+      <div class="sec-head"><span class="sec-title">Your Projects</span><div class="sec-line"></div></div>
+      <div id="projList"><div class="empty-state">Loading your projects...</div></div>
     </div>
-    <div class="upload-wrap">
-      <div id="directUp">
-        <div class="drop-zone" onclick="document.getElementById('fi').click()" id="dz">
-          <div class="drop-icon">▲</div>
-          <h3>Drop files or click to upload</h3>
-          <p>Videos, images, documents — any format</p>
-          <button class="btn-choose">Choose Files</button>
-          <input type="file" id="fi" multiple onchange="doUpload(this.files)">
-        </div>
-        <div class="prog-wrap" id="progWrap">
-          <div class="prog-bg"><div class="prog-bar" id="progBar"></div></div>
-          <div class="prog-txt" id="progTxt">Uploading...</div>
-        </div>
-        <div class="files-list" id="filesList"></div>
+
+    <div class="section">
+      <div class="sec-head"><span class="sec-title">Send Files</span><div class="sec-line"></div></div>
+      <div class="upload-tabs">
+        <div class="utab active" onclick="switchUp('direct')">Direct Upload · max 50MB</div>
+        <div class="utab" onclick="switchUp('drive')">Google Drive Link</div>
       </div>
-      <div id="driveUp" style="display:none;">
-        <div class="drive-inner">
-          <p>For large files, upload to Google Drive and share the link below.</p>
-          <div class="steps">
-            <div class="step"><div class="step-n">1</div><div class="step-t">Upload your file to <strong style="color:var(--text)">Google Drive</strong></div></div>
-            <div class="step"><div class="step-n">2</div><div class="step-t">Right-click → Share → <strong style="color:var(--text)">"Anyone with the link"</strong></div></div>
-            <div class="step"><div class="step-n">3</div><div class="step-t">Paste the link below</div></div>
+      <div class="upload-box">
+        <div id="directUp">
+          <div class="drop-zone" onclick="document.getElementById('fi').click()" id="dz">
+            <div class="drop-icon">▲</div>
+            <h3>Drop files or click to browse</h3>
+            <p>Videos, images, documents — any format accepted</p>
+            <button class="btn-pick">Choose Files</button>
+            <input type="file" id="fi" multiple onchange="doUpload(this.files)">
           </div>
-          <div class="drive-row">
-            <input type="url" class="drive-in" id="driveLink" placeholder="https://drive.google.com/file/d/...">
-            <button class="btn-drive" onclick="sendLink()">Send →</button>
+          <div class="prog-area" id="progArea">
+            <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+            <div class="prog-text" id="progText">Uploading...</div>
           </div>
-          <div class="link-msg" id="linkMsg"></div>
-          <div class="links-list" id="linksList"></div>
+          <div class="files-list" id="filesList"></div>
+        </div>
+        <div id="driveUp" style="display:none;">
+          <div class="drive-area">
+            <p>For large files (raw footage, projects), upload to Google Drive and share the link below. Amir receives it instantly.</p>
+            <div class="steps">
+              <div class="step"><div class="step-n">1</div><div class="step-t">Upload to <strong style="color:var(--text)">Google Drive</strong></div></div>
+              <div class="step"><div class="step-n">2</div><div class="step-t">Right-click → Share → <strong style="color:var(--text)">"Anyone with the link"</strong></div></div>
+              <div class="step"><div class="step-n">3</div><div class="step-t">Paste the link below and send</div></div>
+            </div>
+            <div class="drive-row">
+              <input type="url" class="drive-in" id="driveLink" placeholder="https://drive.google.com/file/d/...">
+              <button class="btn-drive" onclick="sendLink()">Send →</button>
+            </div>
+            <div class="link-note" id="linkNote"></div>
+            <div class="links-sent" id="linksSent"></div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="sec-label">Invoices</div>
-    <div id="invSection" style="margin-bottom:3rem;"></div>
+    <div class="section">
+      <div class="sec-head"><span class="sec-title">Invoices</span><div class="sec-line"></div></div>
+      <div id="invSection"></div>
+    </div>
 
-    <div class="sec-label">Message Amir</div>
-    <div class="chat-wrap">
-      <div class="chat-msgs" id="chatMsgs"><div class="chat-empty">Start a conversation.</div></div>
-      <div class="chat-input-row">
-        <input type="text" class="chat-in" id="chatIn" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sendMsg()">
-        <button class="btn-chat" onclick="sendMsg()">Send</button>
+    <div class="section">
+      <div class="sec-head"><span class="sec-title">Message Amir</span><div class="sec-line"></div></div>
+      <div class="chat-box">
+        <div class="chat-msgs" id="chatMsgs"><div class="chat-empty">Start a conversation — Amir will reply shortly.</div></div>
+        <div class="chat-input-area">
+          <input type="text" class="chat-input" id="chatIn" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="chat-send" onclick="sendMsg()">Send</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+// === CANVAS PARTICLE SYSTEM ===
+(function() {
+  var canvas = document.getElementById('bgCanvas');
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var mouse = { x: -1000, y: -1000 };
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  document.addEventListener('mousemove', function(e) { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+  function Particle() {
+    this.reset();
+  }
+  Particle.prototype.reset = function() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 1.5 + 0.3;
+    this.speedX = (Math.random() - 0.5) * 0.3;
+    this.speedY = (Math.random() - 0.5) * 0.3;
+    this.opacity = Math.random() * 0.4 + 0.05;
+    this.gold = Math.random() > 0.7;
+  };
+
+  for (var i = 0; i < 120; i++) particles.push(new Particle());
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Radial glow at mouse
+    var grd = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 300);
+    grd.addColorStop(0, 'rgba(201,168,76,0.04)');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Ambient glow
+    var ag = ctx.createRadialGradient(canvas.width*0.5, canvas.height*0.3, 0, canvas.width*0.5, canvas.height*0.3, canvas.height*0.6);
+    ag.addColorStop(0, 'rgba(201,168,76,0.02)');
+    ag.addColorStop(1, 'transparent');
+    ctx.fillStyle = ag;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(function(p) {
+      // Mouse repulsion
+      var dx = p.x - mouse.x, dy = p.y - mouse.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 100) {
+        p.x += dx/dist * 0.5;
+        p.y += dy/dist * 0.5;
+      }
+
+      p.x += p.speedX;
+      p.y += p.speedY;
+      if (p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) p.reset();
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fillStyle = p.gold ? 'rgba(201,168,76,'+p.opacity+')' : 'rgba(232,224,208,'+p.opacity*0.4+')';
+      ctx.fill();
+
+      if (p.gold && p.size > 1) {
+        ctx.shadowColor = 'rgba(201,168,76,0.5)';
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    });
+
+    // Connect nearby gold particles
+    for (var i = 0; i < particles.length; i++) {
+      if (!particles[i].gold) continue;
+      for (var j = i+1; j < particles.length; j++) {
+        if (!particles[j].gold) continue;
+        var dx2 = particles[i].x - particles[j].x;
+        var dy2 = particles[i].y - particles[j].y;
+        var d2 = Math.sqrt(dx2*dx2+dy2*dy2);
+        if (d2 < 80) {
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(201,168,76,'+(0.05*(1-d2/80))+')';
+          ctx.lineWidth = 0.5;
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// === APP ===
 var SB_URL = 'https://pwrukagppviyyxdlurxs.supabase.co';
 var SB_KEY = 'sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV';
 var FN_URL = SB_URL + '/functions/v1/notify-admin';
+var STRIPE_FN = SB_URL + '/functions/v1/stripe-checkout';
 var me = null;
 var lastMsgId = 0;
 var allNotifs = [];
 
 var sb = supabase.createClient(SB_URL, SB_KEY, {
-  auth: { persistSession: true, autoRefreshToken: true, storageKey: 'avision-auth' }
+  auth: { persistSession:true, autoRefreshToken:true, storageKey:'avision-auth' }
 });
 
 function switchTab(t) {
@@ -299,34 +566,34 @@ function switchUp(t) {
   document.getElementById('driveUp').style.display = t==='drive'?'block':'none';
 }
 
-function showMsg(id, text, type) {
+function setMsg(id, txt, type) {
   var el = document.getElementById(id);
-  el.textContent = text;
-  el.className = 'auth-msg ' + type;
+  el.textContent = txt;
+  el.className = 'auth-msg ' + (type||'');
 }
 
 function doLogin() {
-  var email = document.getElementById('lEmail').value;
-  var pass = document.getElementById('lPass').value;
-  if (!email||!pass) return showMsg('lMsg','Please fill all fields.','error');
-  showMsg('lMsg','Signing in...','');
-  sb.auth.signInWithPassword({ email:email, password:pass }).then(function(res){
-    if (res.error) showMsg('lMsg', res.error.message, 'error');
+  var e = document.getElementById('lEmail').value;
+  var p = document.getElementById('lPass').value;
+  if (!e||!p) return setMsg('lMsg','Please fill all fields.','error');
+  setMsg('lMsg','Signing in...','');
+  sb.auth.signInWithPassword({email:e,password:p}).then(function(r){
+    if (r.error) setMsg('lMsg',r.error.message,'error');
   });
 }
 
 function doSignup() {
-  var name = document.getElementById('sName').value;
-  var email = document.getElementById('sEmail').value;
-  var pass = document.getElementById('sPass').value;
-  if (!name||!email||!pass) return showMsg('sMsg','Please fill all fields.','error');
-  if (pass.length<6) return showMsg('sMsg','Password min. 6 characters.','error');
-  if (!document.getElementById('agreeCheck').checked) return showMsg('sMsg','Please accept the terms.','error');
-  showMsg('sMsg','Creating account...','');
-  sb.auth.signUp({ email:email, password:pass, options:{ data:{ full_name:name } } }).then(function(res){
-    if (res.error) return showMsg('sMsg', res.error.message, 'error');
-    sb.from('clients').upsert({ email:email, full_name:name }, { onConflict:'email' });
-    showMsg('sMsg','✓ Check your email to confirm.','success');
+  var n=document.getElementById('sName').value;
+  var e=document.getElementById('sEmail').value;
+  var p=document.getElementById('sPass').value;
+  if (!n||!e||!p) return setMsg('sMsg','Please fill all fields.','error');
+  if (p.length<6) return setMsg('sMsg','Password min. 6 characters.','error');
+  if (!document.getElementById('agreeCheck').checked) return setMsg('sMsg','Please accept the terms to continue.','error');
+  setMsg('sMsg','Creating account...','');
+  sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}}).then(function(r){
+    if (r.error) return setMsg('sMsg',r.error.message,'error');
+    sb.from('clients').upsert({email:e,full_name:n},{onConflict:'email'});
+    setMsg('sMsg','✓ Check your email to confirm your account.','success');
   });
 }
 
@@ -334,196 +601,182 @@ function doLogout() {
   sb.auth.signOut().then(function(){
     document.getElementById('dashboard').style.display='none';
     document.getElementById('authPage').style.display='flex';
+    me=null;
   });
 }
 
-function statusBadge(s) {
-  var map = { inprogress:['b-progress','In Progress'], review:['b-review','In Review'], done:['b-done','Done ✓'], pending:['b-pending','Pending'] };
-  var d = map[s]||['b-pending',s];
-  return '<span class="badge '+d[0]+'">'+d[1]+'</span>';
+function statusPill(s) {
+  var map = {inprogress:['s-ip','In Progress'],review:['s-rv','In Review'],done:['s-dn','Done ✓'],pending:['s-pd','Pending']};
+  var d=map[s]||['s-pd',s];
+  return '<span class="status-pill '+d[0]+'">'+d[1]+'</span>';
 }
 
 function loadProjects(user) {
-  sb.from('projects').select('*').eq('client_email', user.email).order('created_at', {ascending:false}).then(function(res){
-    var data = res.data;
-    var list = document.getElementById('projList');
-    if (!data||!data.length) {
-      list.innerHTML = '<div class="empty-proj">No projects yet.</div>';
-      document.getElementById('cActive').textContent='0';
-      document.getElementById('cDone').textContent='0';
-      document.getElementById('cReview').textContent='0';
-      return;
-    }
-    document.getElementById('cActive').textContent = data.filter(function(p){return p.status==='inprogress';}).length;
-    document.getElementById('cDone').textContent = data.filter(function(p){return p.status==='done';}).length;
-    document.getElementById('cReview').textContent = data.filter(function(p){return p.status==='review';}).length;
-    list.innerHTML = data.map(function(p){
-      var dlBtn = p.delivery_url ? '<a href="'+p.delivery_url+'" target="_blank" style="background:var(--gold);color:#0a0900;text-decoration:none;padding:6px 14px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500;margin-right:8px;">↓ Download</a>' : '';
-      return '<div class="proj"><div><div class="proj-title">'+p.title+'</div><div class="proj-sub">'+(p.description||'')+(p.delivery_date?' · Delivery: '+p.delivery_date:'')+'</div></div><div style="display:flex;align-items:center;gap:8px;">'+dlBtn+statusBadge(p.status)+'</div></div>';
-    }).join('');
+  sb.from('projects').select('*').eq('client_email',user.email).order('created_at',{ascending:false}).then(function(r){
+    var data=r.data||[];
+    var el=document.getElementById('projList');
+    document.getElementById('sActive').textContent=data.filter(function(p){return p.status==='inprogress';}).length;
+    document.getElementById('sDone').textContent=data.filter(function(p){return p.status==='done';}).length;
+    document.getElementById('sReview').textContent=data.filter(function(p){return p.status==='review';}).length;
+    if (!data.length) { el.innerHTML='<div class="empty-state">No projects yet — Amir will add them here.</div>'; return; }
+    el.innerHTML='<div class="proj-list">'+data.map(function(p){
+      var dl=p.delivery_url?'<a href="'+p.delivery_url+'" target="_blank" class="dl-btn">↓ Download</a>':'';
+      return '<div class="proj-item"><div><div class="proj-name">'+p.title+'</div><div class="proj-meta">'+(p.description||'')+(p.delivery_date?' · Delivery: '+p.delivery_date:'')+'</div></div><div class="proj-actions">'+dl+statusPill(p.status)+'</div></div>';
+    }).join('')+'</div>';
   });
 }
 
 function loadFiles() {
   if (!me) return;
-  sb.storage.from('project-files').list(me.email, {sortBy:{column:'created_at',order:'desc'}}).then(function(res){
-    var data = res.data;
-    var list = document.getElementById('filesList');
-    if (!data||!data.length) { list.innerHTML=''; return; }
-    list.innerHTML = data.map(function(f){
-      var ext = f.name.split('.').pop().toLowerCase();
-      var ico = ['mp4','mov','avi'].includes(ext)?'🎬':['jpg','png','gif'].includes(ext)?'🖼️':'📎';
-      var size = f.metadata?(f.metadata.size<1048576?(f.metadata.size/1024).toFixed(1)+' KB':(f.metadata.size/1048576).toFixed(1)+' MB'):'';
-      return '<div class="ffile"><div class="ffile-l"><span>'+ico+'</span><div><div class="ffile-name">'+f.name.replace(/^\d+_/,'')+'</div><div class="ffile-size">'+size+'</div></div></div><div class="ffile-date">'+new Date(f.created_at).toLocaleDateString()+'</div></div>';
+  sb.storage.from('project-files').list(me.email,{sortBy:{column:'created_at',order:'desc'}}).then(function(r){
+    var data=r.data||[];
+    var el=document.getElementById('filesList');
+    if (!data.length){el.innerHTML='';return;}
+    el.innerHTML=data.map(function(f){
+      var ext=f.name.split('.').pop().toLowerCase();
+      var ico=['mp4','mov','avi'].includes(ext)?'🎬':['jpg','png','gif'].includes(ext)?'🖼️':'📎';
+      var sz=f.metadata?(f.metadata.size<1048576?(f.metadata.size/1024).toFixed(1)+' KB':(f.metadata.size/1048576).toFixed(1)+' MB'):'';
+      return '<div class="file-row"><div class="file-info"><span class="file-ico">'+ico+'</span><div><div class="file-name">'+f.name.replace(/^\d+_/,'')+'</div><div class="file-size">'+sz+'</div></div></div><div class="file-date">'+new Date(f.created_at).toLocaleDateString()+'</div></div>';
     }).join('');
   });
 }
 
 function doUpload(files) {
   if (!files.length||!me) return;
-  var pw=document.getElementById('progWrap'), pb=document.getElementById('progBar'), pt=document.getElementById('progTxt');
-  pw.style.display='block';
+  var pa=document.getElementById('progArea'),pf=document.getElementById('progFill'),pt=document.getElementById('progText');
+  pa.style.display='block';
   var i=0;
-  function uploadNext() {
-    if (i>=files.length) {
-      pb.style.width='100%'; pt.textContent='✓ Uploaded!'; pt.className='prog-txt ok';
-      notifyAdmin('File Upload', Array.from(files).map(function(f){return f.name;}).join(', '));
-      setTimeout(function(){pw.style.display='none';pb.style.width='0%';},3000);
-      loadFiles(); return;
+  function next(){
+    if(i>=files.length){
+      pf.style.width='100%';pt.textContent='✓ Uploaded successfully!';pt.className='prog-text ok';
+      notifyAdmin('File Upload',Array.from(files).map(function(f){return f.name;}).join(', '));
+      setTimeout(function(){pa.style.display='none';pf.style.width='0%';},3000);
+      loadFiles();return;
     }
-    pb.style.width=Math.round((i/files.length)*100)+'%';
-    pt.textContent='Uploading '+files[i].name+'...'; pt.className='prog-txt';
-    var path = me.email+'/'+Date.now()+'_'+files[i].name;
-    sb.storage.from('project-files').upload(path, files[i]).then(function(res){
-      if (res.error) { pt.textContent='Error: '+res.error.message; pt.className='prog-txt err'; return; }
-      i++; uploadNext();
+    pf.style.width=Math.round((i/files.length)*100)+'%';
+    pt.textContent='Uploading '+files[i].name+'...';pt.className='prog-text';
+    sb.storage.from('project-files').upload(me.email+'/'+Date.now()+'_'+files[i].name,files[i]).then(function(r){
+      if(r.error){pt.textContent='Error: '+r.error.message;pt.className='prog-text err';return;}
+      i++;next();
     });
   }
-  uploadNext();
+  next();
 }
 
 function sendLink() {
-  var link=document.getElementById('driveLink').value.trim(), mel=document.getElementById('linkMsg');
-  if (!link) { mel.textContent='Please paste a link.'; mel.className='link-msg err'; return; }
-  mel.textContent='Sending...'; mel.className='link-msg';
-  sb.from('shared_links').insert({client_email:me.email, link:link}).then(function(){
-    notifyAdmin('Google Drive Link', link);
-    mel.textContent='✓ Link sent to Amir!'; mel.className='link-msg ok';
+  var link=document.getElementById('driveLink').value.trim();
+  var note=document.getElementById('linkNote');
+  if(!link){note.textContent='Please paste a link.';note.className='link-note err';return;}
+  note.textContent='Sending...';note.className='link-note';
+  sb.from('shared_links').insert({client_email:me.email,link:link}).then(function(){
+    notifyAdmin('Google Drive Link',link);
+    note.textContent='✓ Link sent to Amir!';note.className='link-note ok';
     document.getElementById('driveLink').value='';
-    var li=document.createElement('div'); li.className='litem';
-    li.innerHTML='<a href="'+link+'" target="_blank">'+link+'</a><span class="litem-d">Just now</span>';
-    document.getElementById('linksList').prepend(li);
+    var li=document.createElement('div');li.className='link-sent';
+    li.innerHTML='<a href="'+link+'" target="_blank">'+link+'</a><span class="link-sent-d">Just now</span>';
+    document.getElementById('linksSent').prepend(li);
   });
 }
 
 function loadInvoices() {
   if (!me) return;
-  var sym = {USD:'$',SAR:'﷼',EUR:'€',GBP:'£'};
-  sb.from('invoices').select('*').eq('client_email', me.email).order('created_at',{ascending:false}).then(function(res){
-    var data = res.data;
-    var section = document.getElementById('invSection');
-    if (!data||!data.length) {
-      section.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-dim);font-size:12px;background:var(--bg2);border:1px solid var(--border);">No invoices yet.</div>';
-      return;
-    }
-    var rows = data.map(function(inv){
-      var s = sym[inv.currency]||'$';
-      var isPaid = inv.status==='paid';
-      var badgeColor = isPaid?'background:rgba(100,180,100,0.1);color:#6ab46a;border:1px solid rgba(100,180,100,0.2);':inv.status==='pending'?'background:rgba(201,168,76,0.1);color:#c9a84c;border:1px solid rgba(201,168,76,0.2);':'background:rgba(200,80,80,0.1);color:#c66;border:1px solid rgba(200,80,80,0.2);';
-      var actionBtn = isPaid ? '<span style="color:#6ab46a;font-size:11px;">✓ Paid</span>' : '<button class="pay-btn" onclick="payInvoice(\''+inv.id+'\',\''+inv.amount+'\',\''+(inv.currency||'USD')+'\',\''+inv.project_title.replace(/'/g,'')+'\')" id="payBtn'+inv.id+'">Pay Now →</button>';
-      return '<tr><td>'+inv.project_title+(inv.notes?'<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">'+inv.notes+'</div>':'')+'</td><td class="inv-amount">'+s+parseFloat(inv.amount).toLocaleString()+'</td><td style="font-size:11px;color:var(--text-dim);">'+(inv.due_date||'—')+'</td><td><span style="font-size:10px;padding:3px 10px;letter-spacing:0.08em;text-transform:uppercase;'+badgeColor+'">'+inv.status.charAt(0).toUpperCase()+inv.status.slice(1)+'</span></td><td>'+actionBtn+'</td></tr>';
+  var sym={USD:'$',SAR:'﷼',EUR:'€',GBP:'£'};
+  sb.from('invoices').select('*').eq('client_email',me.email).order('created_at',{ascending:false}).then(function(r){
+    var data=r.data||[];
+    var sec=document.getElementById('invSection');
+    if(!data.length){sec.innerHTML='<div class="empty-state">No invoices yet.</div>';return;}
+    var rows=data.map(function(inv){
+      var s=sym[inv.currency]||'$';
+      var isPaid=inv.status==='paid';
+      var bc=isPaid?'background:rgba(100,180,100,0.08);color:#6ab46a;border:1px solid rgba(100,180,100,0.2);':inv.status==='pending'?'background:rgba(201,168,76,0.08);color:#c9a84c;border:1px solid rgba(201,168,76,0.2);':'background:rgba(200,80,80,0.08);color:#e05555;border:1px solid rgba(200,80,80,0.2);';
+      var act=isPaid?'<span style="color:#6ab46a;font-size:11px;">✓ Paid</span>':'<button class="pay-btn" id="pb'+inv.id+'" onclick="payNow(\''+inv.id+'\',\''+inv.amount+'\',\''+(inv.currency||'USD')+'\',\''+inv.project_title.replace(/['"]/g,'')+'\')">Pay Now →</button>';
+      return '<tr><td>'+inv.project_title+(inv.notes?'<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">'+inv.notes+'</div>':'')+'</td><td class="inv-amount">'+s+parseFloat(inv.amount).toLocaleString()+'</td><td style="font-size:11px;color:var(--text-dim);">'+(inv.due_date||'—')+'</td><td><span style="font-size:10px;padding:3px 10px;letter-spacing:0.08em;text-transform:uppercase;'+bc+'">'+inv.status.charAt(0).toUpperCase()+inv.status.slice(1)+'</span></td><td>'+act+'</td></tr>';
     }).join('');
-    section.innerHTML = '<table class="inv-table"><thead><tr><th>Project</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table>';
+    sec.innerHTML='<table class="inv-table"><thead><tr><th>Project</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table>';
   });
-  // Handle payment success
-  var params = new URLSearchParams(window.location.search);
-  if (params.get('payment')==='success') {
-    var invId = params.get('invoice');
-    if (invId) {
-      sb.from('invoices').update({status:'paid'}).eq('id',invId).then(function(){ loadInvoices(); });
-      window.history.replaceState({},'',' /portal.html');
-    }
+  var p=new URLSearchParams(window.location.search);
+  if(p.get('payment')==='success'){
+    var id=p.get('invoice');
+    if(id){sb.from('invoices').update({status:'paid'}).eq('id',id).then(function(){loadInvoices();});}
+    window.history.replaceState({},'','/portal.html');
   }
 }
 
-function payInvoice(id, amount, currency, desc) {
-  var btn = document.getElementById('payBtn'+id);
-  if (btn) { btn.textContent='Loading...'; btn.disabled=true; }
-  fetch(SB_URL+'/functions/v1/stripe-checkout', {
+function payNow(id, amount, currency, desc) {
+  var btn=document.getElementById('pb'+id);
+  if(btn){btn.textContent='Loading...';btn.disabled=true;}
+  fetch(STRIPE_FN,{
     method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},
+    headers:{'Content-Type':'application/json'},
     body:JSON.stringify({amount:parseFloat(amount),currency:currency.toLowerCase(),invoice_id:id,client_email:me.email,description:desc})
-  }).then(function(r){return r.json();}).then(function(data){
-    if (data.url) window.location.href=data.url;
-    else { if(btn){btn.textContent='Pay Now →';btn.disabled=false;} }
-  }).catch(function(){ if(btn){btn.textContent='Pay Now →';btn.disabled=false;} });
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.url)window.location.href=d.url;
+    else{if(btn){btn.textContent='Pay Now →';btn.disabled=false;}}
+  }).catch(function(){if(btn){btn.textContent='Pay Now →';btn.disabled=false;}});
 }
 
 function sendMsg() {
-  var input=document.getElementById('chatIn'), m=input.value.trim();
-  if (!m||!me) return;
+  var input=document.getElementById('chatIn'),m=input.value.trim();
+  if(!m||!me)return;
   input.value='';
-  sb.from('messages').insert({client_email:me.email, sender:'client', message:m}).then(function(){
-    notifyAdmin('New Message', m);
+  sb.from('messages').insert({client_email:me.email,sender:'client',message:m}).then(function(){
+    notifyAdmin('New Message',m);
   });
 }
 
 function loadMsgs() {
-  if (!me) return;
-  sb.from('messages').select('*').eq('client_email',me.email).order('created_at',{ascending:true}).then(function(res){
-    renderMsgs(res.data||[]);
+  if(!me)return;
+  sb.from('messages').select('*').eq('client_email',me.email).order('created_at',{ascending:true}).then(function(r){
+    renderMsgs(r.data||[]);
   });
 }
 
 function renderMsgs(data) {
   var c=document.getElementById('chatMsgs');
-  if (!c) return;
-  if (!data.length) { c.innerHTML='<div class="chat-empty">Start a conversation.</div>'; return; }
+  if(!c)return;
+  if(!data.length){c.innerHTML='<div class="chat-empty">Start a conversation — Amir will reply shortly.</div>';return;}
   c.innerHTML=data.map(function(m){
     var mine=m.sender==='client';
     var t=new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    return '<div class="mrow '+(mine?'me':'them')+'">'+(mine?'':'<div class="msender">Amir</div>')+'<div class="mbubble">'+m.message+'</div><div class="mtime">'+t+'</div></div>';
+    return '<div class="msg-row '+(mine?'me':'them')+'">'+(mine?'':'<div class="msg-sender">Amir</div>')+'<div class="msg-bubble">'+m.message+'</div><div class="msg-time">'+t+'</div></div>';
   }).join('');
   c.scrollTop=c.scrollHeight;
 }
 
-function notifyAdmin(type, content) {
+function notifyAdmin(type,content) {
   fetch(FN_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},body:JSON.stringify({client_email:me?me.email:'',type:type,content:content})}).catch(function(){});
 }
 
 function toggleNotif() {
   var popup=document.getElementById('notifPopup');
-  popup.style.display=popup.style.display==='block'?'none':'block';
-  if (popup.style.display==='block') {
-    renderNotifs();
-    hideBadge();
-    if (me) sb.from('notifications').update({is_read:true}).eq('client_email',me.email).eq('is_read',false);
-  }
+  var open=popup.style.display==='block';
+  popup.style.display=open?'none':'block';
+  if(!open){renderNotifs();hideNotifDot();if(me)sb.from('notifications').update({is_read:true}).eq('client_email',me.email).eq('is_read',false);}
 }
 
 function renderNotifs() {
-  var list=document.getElementById('notifList');
-  if (!allNotifs.length) { list.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text-dim);font-size:12px;">No notifications</div>'; return; }
-  list.innerHTML=allNotifs.slice(0,8).map(function(n){
+  var body=document.getElementById('notifBody');
+  if(!allNotifs.length){body.innerHTML='<div style="padding:1.5rem;text-align:center;color:var(--text-dim);font-size:12px;">No notifications yet</div>';return;}
+  body.innerHTML=allNotifs.slice(0,8).map(function(n){
     var t=new Date(n.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    var icon=n.type==='invoice'?'💳':n.type==='project'?'📁':'💬';
-    return '<div style="padding:10px 14px;border-bottom:1px solid rgba(201,168,76,0.06);cursor:pointer;" onclick="goToChat()"><div style="font-size:10px;color:var(--gold);margin-bottom:3px;opacity:0.7;">'+icon+' '+n.title+' · '+t+'</div><div style="font-size:12px;color:var(--text);">'+n.message+'</div></div>';
+    var ic=n.type==='invoice'?'💳':n.type==='project'?'📁':'💬';
+    return '<div class="notif-item" onclick="goToChat()"><div class="notif-title">'+ic+' '+n.title+' · '+t+'</div><div class="notif-msg">'+n.message+'</div></div>';
   }).join('');
 }
 
-function showBadge(n) { var b=document.getElementById('msgBadge'); b.textContent=n>9?'9+':n; b.style.display='flex'; }
-function hideBadge() { var b=document.getElementById('msgBadge'); b.style.display='none'; }
-function goToChat() { document.getElementById('notifPopup').style.display='none'; document.querySelector('.chat-wrap').scrollIntoView({behavior:'smooth'}); }
+function showNotifDot(){document.getElementById('notifDot').style.display='block';}
+function hideNotifDot(){document.getElementById('notifDot').style.display='none';}
+function goToChat(){document.getElementById('notifPopup').style.display='none';document.querySelector('.chat-box').scrollIntoView({behavior:'smooth'});}
 
-document.addEventListener('click', function(e){
-  var w=document.getElementById('bellWrap');
-  if (w&&!w.contains(e.target)) document.getElementById('notifPopup').style.display='none';
+document.addEventListener('click',function(e){
+  var b=document.getElementById('bellBtn');
+  if(b&&!b.contains(e.target))document.getElementById('notifPopup').style.display='none';
 });
 
 var dz=document.getElementById('dz');
-dz.addEventListener('dragover',function(e){e.preventDefault();dz.style.borderColor='rgba(201,168,76,0.4)';});
-dz.addEventListener('dragleave',function(){dz.style.borderColor='transparent';});
-dz.addEventListener('drop',function(e){e.preventDefault();dz.style.borderColor='transparent';doUpload(e.dataTransfer.files);});
+dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over');});
+dz.addEventListener('dragleave',function(){dz.classList.remove('over');});
+dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('over');doUpload(e.dataTransfer.files);});
 
 function startDashboard(user) {
   me=user;
@@ -531,37 +784,32 @@ function startDashboard(user) {
   document.getElementById('dashboard').style.display='block';
   document.getElementById('userEmail').textContent=user.email;
   var name=user.user_metadata&&user.user_metadata.full_name;
-  if (name) document.getElementById('welcomeName').textContent='Welcome, '+name.split(' ')[0]+'.';
-  loadProjects(user); loadFiles(); loadMsgs(); loadInvoices();
-  // Load notifications
-  sb.from('notifications').select('*').eq('client_email',user.email).order('created_at',{ascending:false}).then(function(res){
-    allNotifs=res.data||[];
+  if(name){var first=name.split(' ')[0];document.getElementById('welcomeTitle').innerHTML='Welcome, <em>'+first+'.</em>';}
+  loadProjects(user);loadFiles();loadMsgs();loadInvoices();
+  sb.from('notifications').select('*').eq('client_email',user.email).order('created_at',{ascending:false}).then(function(r){
+    allNotifs=r.data||[];
     var unread=allNotifs.filter(function(n){return !n.is_read;});
-    if (unread.length) showBadge(unread.length);
+    if(unread.length)showNotifDot();
   });
-  // Poll messages and notifications
   setInterval(function(){
-    if (!me) return;
-    sb.from('messages').select('*').eq('client_email',me.email).order('created_at',{ascending:true}).then(function(res){
-      var data=res.data||[];
-      if (!data.length) return;
+    if(!me)return;
+    sb.from('messages').select('*').eq('client_email',me.email).order('created_at',{ascending:true}).then(function(r){
+      var data=r.data||[];if(!data.length)return;
       var latest=data[data.length-1];
-      if (latest.id!==lastMsgId) { lastMsgId=latest.id; renderMsgs(data); }
+      if(latest.id!==lastMsgId){lastMsgId=latest.id;renderMsgs(data);}
     });
-    sb.from('notifications').select('*').eq('client_email',me.email).eq('is_read',false).then(function(res){
-      var data=res.data||[];
-      if (data.length) { allNotifs=data; showBadge(data.length); }
+    sb.from('notifications').select('*').eq('client_email',me.email).eq('is_read',false).then(function(r){
+      var d=r.data||[];if(d.length){allNotifs=d;showNotifDot();}
     });
-  }, 4000);
+  },4000);
 }
 
-sb.auth.getSession().then(function(res){
-  if (res.data&&res.data.session) startDashboard(res.data.session.user);
+sb.auth.getSession().then(function(r){
+  if(r.data&&r.data.session)startDashboard(r.data.session.user);
 });
-
-sb.auth.onAuthStateChange(function(event, session){
-  if (session) startDashboard(session.user);
-  else { me=null; document.getElementById('dashboard').style.display='none'; document.getElementById('authPage').style.display='flex'; }
+sb.auth.onAuthStateChange(function(event,session){
+  if(session)startDashboard(session.user);
+  else{me=null;document.getElementById('dashboard').style.display='none';document.getElementById('authPage').style.display='flex';}
 });
 </script>
 </body>
