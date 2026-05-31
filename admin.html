@@ -4,25 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Avision</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --gold: #c9a84c; --gold-light: #e8c97a; --gold-dim: rgba(201,168,76,0.15);
-      --bg: #080707; --bg2: #0f0e0d; --bg3: #161412;
-      --border: rgba(201,168,76,0.12); --border-hover: rgba(201,168,76,0.3);
-      --text: #e8e0d0; --text-muted: #7a7060; --text-dim: #4a4438;
+      --bg: #040303; --bg2: #0a0908; --bg3: #120f0e;
+      --border: rgba(201,168,76,0.1); --border-hover: rgba(201,168,76,0.35);
+      --text: #ede5d5; --text-muted: #7a7060; --text-dim: #3a3530;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
     .login-page { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:2rem; }
-    .login-box { width:100%; max-width:400px; }
+    .login-box { width:100%; max-width:400px; animation:fadeUp 1s ease both; }
     .login-brand { text-align:center; margin-bottom:3rem; }
-    .login-brand img { height:34px; opacity:0.9; }
-    .login-brand span { display:block; font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-top:10px; opacity:0.8; }
-    .login-card { background:var(--bg2); border:1px solid var(--border); padding:2.5rem; }
-    .login-card h2 { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:300; margin-bottom:0.4rem; }
-    .login-card p { font-size:11px; color:var(--text-dim); letter-spacing:0.08em; margin-bottom:2rem; text-transform:uppercase; }
+    .login-brand img { height:36px; opacity:0.95; filter:drop-shadow(0 0 20px rgba(201,168,76,0.4)); }
+    .login-brand span { display:block; font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:0.35em; text-transform:uppercase; color:var(--gold); margin-top:12px; opacity:0.8; }
+    .login-card { background:rgba(10,9,8,0.85); border:1px solid var(--border); padding:2.5rem; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); box-shadow:0 0 80px rgba(201,168,76,0.05), inset 0 1px 0 rgba(201,168,76,0.1); position:relative; overflow:hidden; transition:box-shadow .5s; }
+    .login-card::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 60%); pointer-events:none; }
+    .login-card:hover { box-shadow:0 0 120px rgba(201,168,76,0.1), inset 0 1px 0 rgba(201,168,76,0.15); }
+    .login-card h2 { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:300; margin-bottom:0.4rem; }
+    .login-card p { font-size:11px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:2rem; text-transform:uppercase; }
     .fgroup { margin-bottom:1.25rem; }
     .fgroup label { display:block; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
     .fgroup input, .fgroup select, .fgroup textarea { width:100%; background:var(--bg3); border:1px solid var(--border); padding:11px 14px; color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif; outline:none; transition:border .2s; }
@@ -30,16 +33,18 @@
     .fgroup input::placeholder, .fgroup textarea::placeholder { color:var(--text-dim); }
     .fgroup select option { background:var(--bg2); }
     .fgroup textarea { resize:vertical; min-height:70px; }
-    .btn-gold { width:100%; background:var(--gold); color:#0a0900; border:none; padding:13px; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; transition:all .2s; }
-    .btn-gold:hover { background:var(--gold-light); }
+    .btn-gold { width:100%; background:var(--gold); color:#0a0900; border:none; padding:13px; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; transition:all .3s; position:relative; overflow:hidden; }
+    .btn-gold::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transform:translateX(-100%); transition:transform .5s; }
+    .btn-gold:hover { background:var(--gold-light); box-shadow:0 0 30px rgba(201,168,76,0.4); }
+    .btn-gold:hover::before { transform:translateX(100%); }
     .btn-ghost { background:none; border:1px solid var(--border); padding:9px 16px; color:var(--text-muted); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .2s; }
     .btn-ghost:hover { border-color:var(--border-hover); color:var(--text); }
     .amsg { font-size:12px; margin-top:1rem; min-height:18px; }
     .amsg.err { color:#c44; } .amsg.ok { color:#6ab46a; }
     .admin { display:none; min-height:100vh; flex-direction:column; }
-    .topbar { background:rgba(8,7,7,0.97); border-bottom:1px solid var(--border); padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:60px; position:sticky; top:0; z-index:100; backdrop-filter:blur(10px); }
+    .topbar { background:rgba(4,3,3,0.92); border-bottom:1px solid var(--border); padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); box-shadow:0 1px 0 rgba(201,168,76,0.08); }
     .tb-brand { display:flex; align-items:center; gap:10px; }
-    .tb-brand img { height:24px; opacity:0.85; }
+    .tb-brand img { height:24px; opacity:0.9; filter:drop-shadow(0 0 8px rgba(201,168,76,0.3)); }
     .tb-sep { width:1px; height:16px; background:var(--border); }
     .tb-label { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-dim); }
     .tb-badge { background:rgba(201,168,76,0.1); border:1px solid var(--border); padding:4px 12px; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); }
@@ -117,8 +122,9 @@
   </style>
 </head>
 <body>
+<canvas id="bgCanvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;"></canvas>
 
-<div class="login-page" id="loginPage">
+<div class="login-page" id="loginPage" style="position:relative;z-index:10;">
   <div class="login-box">
     <div class="login-brand">
       <img src="https://www.amiravision.com/logos/White.png" alt="Avision" onerror="this.style.display='none'">
@@ -135,7 +141,7 @@
   </div>
 </div>
 
-<div class="admin" id="adminDash">
+<div class="admin" id="adminDash" style="position:relative;z-index:10;">
   <div class="topbar">
     <div class="tb-brand">
       <img src="https://www.amiravision.com/logos/White.png" alt="Avision" onerror="this.style.display='none'">
@@ -517,6 +523,67 @@ async function adminSend() {
   if (!m) return; input.value='';
   await sb.from('messages').insert({ client_email:activeClient, sender:'admin', message:m });
 }
+
+// === PARTICLE SYSTEM ===
+(function() {
+  var canvas = document.getElementById('bgCanvas');
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var mouse = { x: -1000, y: -1000 };
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  document.addEventListener('mousemove', function(e) { mouse.x = e.clientX; mouse.y = e.clientY; });
+  function Particle() { this.reset(); }
+  Particle.prototype.reset = function() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 1.5 + 0.3;
+    this.speedX = (Math.random() - 0.5) * 0.25;
+    this.speedY = (Math.random() - 0.5) * 0.25;
+    this.opacity = Math.random() * 0.35 + 0.05;
+    this.gold = Math.random() > 0.65;
+  };
+  for (var i = 0; i < 100; i++) particles.push(new Particle());
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var grd = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 250);
+    grd.addColorStop(0, 'rgba(201,168,76,0.04)');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    var ag = ctx.createRadialGradient(canvas.width*0.5, canvas.height*0.3, 0, canvas.width*0.5, canvas.height*0.3, canvas.height*0.5);
+    ag.addColorStop(0, 'rgba(201,168,76,0.025)'); ag.addColorStop(1, 'transparent');
+    ctx.fillStyle = ag; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(function(p) {
+      var dx = p.x - mouse.x, dy = p.y - mouse.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 100) { p.x += dx/dist * 0.4; p.y += dy/dist * 0.4; }
+      p.x += p.speedX; p.y += p.speedY;
+      if (p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) p.reset();
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fillStyle = p.gold ? 'rgba(201,168,76,'+p.opacity+')' : 'rgba(232,224,208,'+(p.opacity*0.3)+')';
+      ctx.fill();
+    });
+    for (var i = 0; i < particles.length; i++) {
+      if (!particles[i].gold) continue;
+      for (var j = i+1; j < particles.length; j++) {
+        if (!particles[j].gold) continue;
+        var dx2 = particles[i].x - particles[j].x, dy2 = particles[i].y - particles[j].y;
+        var d2 = Math.sqrt(dx2*dx2 + dy2*dy2);
+        if (d2 < 80) {
+          ctx.beginPath(); ctx.strokeStyle = 'rgba(201,168,76,'+(0.04*(1-d2/80))+')';
+          ctx.lineWidth = 0.5; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Add entrance animation to login card
+var loginBox = document.querySelector('.login-box');
+if (loginBox) { loginBox.style.animation = 'fadeUp 1s ease both'; }
 
 sb.auth.onAuthStateChange((event, session) => {
   if (session && session.user.email===ADMIN_EMAIL) {
