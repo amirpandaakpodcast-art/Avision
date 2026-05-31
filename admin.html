@@ -153,6 +153,7 @@
     <div class="atab active" onclick="showTab('projects')">Projects</div>
     <div class="atab" onclick="showTab('invoices')">Invoices</div>
     <div class="atab" onclick="showTab('chat');clearMsgBadge()">Messages <span id="adminMsgBadge" style="display:none;background:#c44;color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;margin-left:4px;vertical-align:middle;">0</span></div>
+    <div class="atab" onclick="showTab('clients')">Clients</div>
   </div>
 
   <!-- PROJECTS TAB -->
@@ -249,6 +250,23 @@
       </div>
     </div>
   </div>
+
+  <!-- CLIENTS TAB -->
+  <div class="tab-content" id="tab-clients">
+    <div style="padding:2rem;">
+      <div class="stats" style="grid-template-columns:repeat(3,1fr);max-width:500px;margin-bottom:2.5rem;">
+        <div class="stat"><div class="stat-n" id="cliTotal">0</div><div class="stat-l">Total Clients</div></div>
+        <div class="stat"><div class="stat-n" id="cliToday">0</div><div class="stat-l">Today</div></div>
+        <div class="stat"><div class="stat-n" id="cliWeek">0</div><div class="stat-l">This Week</div></div>
+      </div>
+      <div class="slabel">All Registered Clients</div>
+      <table class="ptable">
+        <thead><tr><th>Name</th><th>Email</th><th>Registered</th><th>Quick Action</th></tr></thead>
+        <tbody id="cliBody"><tr><td colspan="4" class="empty-row">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -262,11 +280,43 @@ let activeClient = null, chatSub = null;
 function amsg(id, text, type) { const el=document.getElementById(id); el.textContent=text; el.className='amsg '+type; }
 
 function showTab(t) {
-  document.querySelectorAll('.atab').forEach((el,i) => el.classList.toggle('active', ['projects','invoices','chat'][i]===t));
+  document.querySelectorAll('.atab').forEach((el,i) => el.classList.toggle('active', ['projects','invoices','chat','clients'][i]===t));
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-'+t).classList.add('active');
   if (t==='invoices') loadInvoices();
   if (t==='chat') loadClients();
+  if (t==='clients') loadAllClients();
+}
+
+async function loadAllClients() {
+  const { data } = await sb.from('clients').select('*').order('created_at', { ascending: false });
+  const tbody = document.getElementById('cliBody');
+  if (!data || !data.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-row">No clients registered yet.</td></tr>';
+    ['cliTotal','cliToday','cliWeek'].forEach(id => document.getElementById(id).textContent = '0');
+    return;
+  }
+  const now = new Date();
+  const today = data.filter(c => new Date(c.created_at).toDateString() === now.toDateString()).length;
+  const weekAgo = new Date(now - 7*24*60*60*1000);
+  const week = data.filter(c => new Date(c.created_at) > weekAgo).length;
+  document.getElementById('cliTotal').textContent = data.length;
+  document.getElementById('cliToday').textContent = today;
+  document.getElementById('cliWeek').textContent = week;
+  tbody.innerHTML = data.map(c => `<tr>
+    <td style="color:var(--text)">${c.full_name || '—'}</td>
+    <td style="font-size:12px;color:var(--text-muted)">${c.email}</td>
+    <td style="font-size:11px;color:var(--text-dim)">${new Date(c.created_at).toLocaleDateString()}</td>
+    <td>
+      <button onclick="prefillEmail('${c.email}')" style="background:var(--gold-dim);border:1px solid var(--border-hover);padding:5px 12px;color:var(--gold);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add Project</button>
+    </td>
+  </tr>`).join('');
+}
+
+function prefillEmail(email) {
+  showTab('projects');
+  document.getElementById('cEmail').value = email;
+  document.getElementById('pTitle').focus();
 }
 
 async function adminLogin() {
