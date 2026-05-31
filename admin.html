@@ -173,6 +173,7 @@
             </select>
           </div>
           <div class="fgroup"><label>Delivery Date</label><input type="text" id="pDate" placeholder="e.g. June 15, 2026"></div>
+          <div class="fgroup"><label>Final Video URL</label><input type="url" id="pDelivery" placeholder="https://drive.google.com/..."></div>
           <button class="btn-gold" onclick="addProject()">Add Project →</button>
           <div class="amsg" id="addMsg"></div>
         </div>
@@ -186,7 +187,7 @@
         </div>
         <div class="slabel">All Projects</div>
         <table class="ptable">
-          <thead><tr><th>Project</th><th>Client</th><th>Status</th><th>Delivery</th><th></th></tr></thead>
+          <thead><tr><th>Project</th><th>Client</th><th>Status</th><th>Delivery</th><th>Video URL</th><th></th></tr></thead>
           <tbody id="projBody"><tr><td colspan="5" class="empty-row">Loading...</td></tr></tbody>
         </table>
       </div>
@@ -288,16 +289,18 @@ async function adminLogout() {
 async function addProject() {
   const ce=document.getElementById('cEmail').value.trim(), t=document.getElementById('pTitle').value.trim();
   const d=document.getElementById('pDesc').value.trim(), s=document.getElementById('pStatus').value, dt=document.getElementById('pDate').value.trim();
+  const delivery=document.getElementById('pDelivery').value.trim();
   if (!ce||!t) return amsg('addMsg','Email and title required.','err');
   amsg('addMsg','Adding...','');
-  const { error } = await sb.from('projects').insert({ client_email:ce, title:t, description:d, status:s, delivery_date:dt });
+  const { error } = await sb.from('projects').insert({ client_email:ce, title:t, description:d, status:s, delivery_date:dt, delivery_url:delivery||null });
   if (error) return amsg('addMsg', error.message, 'err');
   amsg('addMsg','✓ Project added!','ok');
-  ['cEmail','pTitle','pDesc','pDate'].forEach(id=>document.getElementById(id).value='');
+  ['cEmail','pTitle','pDesc','pDate','pDelivery'].forEach(id=>document.getElementById(id).value='');
   loadProjects();
 }
 
 async function updateStatus(id, s) { await sb.from('projects').update({ status:s }).eq('id',id); loadProjects(); }
+async function updateDeliveryUrl(id, url) { await sb.from('projects').update({ delivery_url:url||null }).eq('id',id); }
 async function deleteProject(id) { if (!confirm('Delete?')) return; await sb.from('projects').delete().eq('id',id); loadProjects(); }
 
 async function loadProjects() {
@@ -314,6 +317,8 @@ async function loadProjects() {
     <td style="font-size:11px;color:var(--text-muted)">${p.client_email||'—'}</td>
     <td><select class="status-sel" onchange="updateStatus(${p.id},this.value)">${opts.map(o=>`<option value="${o}" ${o===p.status?'selected':''}>${labels[o]}</option>`).join('')}</select></td>
     <td style="font-size:11px;color:var(--text-dim)">${p.delivery_date||'—'}</td>
+    <td>${p.delivery_url?`<input style="background:var(--bg3);border:1px solid var(--border);padding:5px 8px;color:var(--gold);font-size:11px;width:160px;" value="${p.delivery_url}" onchange="updateDeliveryUrl(${p.id},this.value)" placeholder="Paste URL...">`:
+    `<input style="background:var(--bg3);border:1px solid var(--border);padding:5px 8px;color:var(--text-muted);font-size:11px;width:160px;" placeholder="Paste video URL..." onchange="updateDeliveryUrl(${p.id},this.value)">`}</td>
     <td><button class="del-btn" onclick="deleteProject(${p.id})">✕</button></td>
   </tr>`).join('');
 }
