@@ -30,7 +30,6 @@
     .topbar-left { display: flex; align-items: center; gap: 12px; }
     .topbar-logo { height: 28px; }
     .topbar-title { font-size: 13px; color: #555; }
-    .topbar-right { display: flex; align-items: center; gap: 12px; }
     .user-badge { background: #1a1a1a; border: 1px solid #222; border-radius: 20px; padding: 6px 14px; font-size: 12px; color: #888; }
     .btn-logout { background: none; border: 1px solid #222; border-radius: 8px; padding: 7px 14px; color: #555; font-size: 12px; cursor: pointer; transition: all .2s; }
     .btn-logout:hover { border-color: #444; color: #fff; }
@@ -48,16 +47,39 @@
     .project-item { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 10px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; }
     .project-info h3 { font-size: 14px; color: #fff; font-weight: 400; margin-bottom: 4px; }
     .project-info p { font-size: 12px; color: #555; }
-    .status-badge { font-size: 11px; padding: 4px 12px; border-radius: 20px; }
+    .status-badge { font-size: 11px; padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
     .status-inprogress { background: #1a2a1a; color: #4caf50; }
     .status-review { background: #2a2a1a; color: #ffc107; }
     .status-done { background: #1a1a2a; color: #7c8cf8; }
     .status-pending { background: #1a1a1a; color: #666; }
-    .upload-box { background: #0f0f0f; border: 1px dashed #222; border-radius: 12px; padding: 2rem; text-align: center; }
-    .upload-box p { color: #555; font-size: 13px; margin-bottom: 1rem; }
-    .btn-upload { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 10px 20px; color: #888; font-size: 13px; cursor: pointer; text-decoration: none; display: inline-block; transition: all .2s; }
-    .btn-upload:hover { border-color: #444; color: #fff; }
     .empty { text-align: center; padding: 2rem; color: #333; font-size: 13px; }
+
+    /* UPLOAD SECTION */
+    .upload-section { margin-bottom: 2.5rem; }
+    .upload-box { background: #0f0f0f; border: 2px dashed #1f1f1f; border-radius: 12px; padding: 2rem; text-align: center; transition: border .2s; cursor: pointer; }
+    .upload-box:hover { border-color: #333; }
+    .upload-box.dragover { border-color: #555; background: #111; }
+    .upload-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .upload-box h3 { color: #fff; font-size: 14px; font-weight: 400; margin-bottom: 6px; }
+    .upload-box p { color: #444; font-size: 12px; margin-bottom: 1.25rem; }
+    .btn-upload { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 10px 20px; color: #888; font-size: 13px; cursor: pointer; transition: all .2s; display: inline-block; }
+    .btn-upload:hover { border-color: #444; color: #fff; }
+    #fileInput { display: none; }
+    .upload-progress { margin-top: 1rem; display: none; }
+    .progress-bar-bg { background: #1a1a1a; border-radius: 10px; height: 4px; overflow: hidden; }
+    .progress-bar { background: #fff; height: 4px; border-radius: 10px; transition: width .3s; width: 0%; }
+    .upload-status { font-size: 12px; color: #666; margin-top: 8px; }
+    .upload-status.success { color: #4caf50; }
+    .upload-status.error { color: #ff5555; }
+
+    /* FILES LIST */
+    .files-list { display: flex; flex-direction: column; gap: 8px; margin-top: 1rem; }
+    .file-item { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
+    .file-info { display: flex; align-items: center; gap: 10px; }
+    .file-icon { font-size: 1.2rem; }
+    .file-name { font-size: 13px; color: #ccc; }
+    .file-size { font-size: 11px; color: #444; margin-top: 2px; }
+    .file-date { font-size: 11px; color: #444; }
   </style>
 </head>
 <body>
@@ -94,29 +116,44 @@
       <img src="https://www.amiravision.com/logos/White.png" class="topbar-logo" alt="Avision" onerror="this.style.display='none'">
       <span class="topbar-title">Client Portal</span>
     </div>
-    <div class="topbar-right">
+    <div style="display:flex;align-items:center;gap:12px;">
       <span class="user-badge" id="userEmail">—</span>
       <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
     </div>
   </div>
+
   <div class="dashboard-body">
     <div class="welcome">
       <h1>Welcome back 👋</h1>
       <p>Here's an overview of your projects with Avision.</p>
     </div>
+
     <div class="cards">
       <div class="card"><div class="card-label">Active Projects</div><div class="card-value" id="activeCount">0</div><div class="card-sub">In progress</div></div>
       <div class="card"><div class="card-label">Completed</div><div class="card-value" id="doneCount">0</div><div class="card-sub">Delivered</div></div>
       <div class="card"><div class="card-label">Pending Review</div><div class="card-value" id="reviewCount">0</div><div class="card-sub">Awaiting feedback</div></div>
     </div>
+
     <div class="section-title">Your Projects</div>
     <div class="project-list" id="projectList">
       <div class="empty">Loading your projects...</div>
     </div>
-    <div class="section-title">Send Files</div>
-    <div class="upload-box">
-      <p>Share your raw footage or project files securely with Amir.</p>
-      <a href="mailto:amirouaddah.for.business@gmail.com?subject=Project Files" class="btn-upload">📎 Send Files via Email</a>
+
+    <!-- UPLOAD -->
+    <div class="upload-section">
+      <div class="section-title">Upload Project Files</div>
+      <div class="upload-box" onclick="document.getElementById('fileInput').click()" id="uploadBox">
+        <div class="upload-icon">📁</div>
+        <h3>Drop files here or click to upload</h3>
+        <p>Videos, images, documents — any format accepted (max 50MB)</p>
+        <span class="btn-upload">Choose Files</span>
+        <input type="file" id="fileInput" multiple onchange="handleFileUpload(this.files)">
+      </div>
+      <div class="upload-progress" id="uploadProgress">
+        <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="upload-status" id="uploadStatus">Uploading...</div>
+      </div>
+      <div class="files-list" id="filesList"></div>
     </div>
   </div>
 </div>
@@ -126,6 +163,7 @@ const SUPABASE_URL = 'https://pwrukagppviyyxdlurxs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+let currentUser = null;
 
 function switchTab(tab) {
   document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (tab==='login'&&i===0)||(tab==='signup'&&i===1)));
@@ -167,25 +205,83 @@ async function handleLogout() {
 }
 
 function statusClass(s) {
-  return { inprogress:'status-inprogress', review:'status-review', done:'status-done', pending:'status-pending' }[s] || 'status-pending';
+  return {inprogress:'status-inprogress',review:'status-review',done:'status-done',pending:'status-pending'}[s]||'status-pending';
 }
 function statusLabel(s) {
-  return { inprogress:'In Progress', review:'In Review', done:'Done ✓', pending:'Pending' }[s] || s;
+  return {inprogress:'In Progress',review:'In Review',done:'Done ✓',pending:'Pending'}[s]||s;
+}
+function fileIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  if (['mp4','mov','avi','mkv'].includes(ext)) return '🎬';
+  if (['jpg','jpeg','png','gif','webp'].includes(ext)) return '🖼️';
+  if (['pdf','doc','docx'].includes(ext)) return '📄';
+  if (['zip','rar'].includes(ext)) return '📦';
+  return '📎';
+}
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(1) + ' MB';
 }
 
-async function showDashboard(user) {
-  document.getElementById('authPage').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'block';
-  document.getElementById('userEmail').textContent = user.email;
+async function handleFileUpload(files) {
+  if (!files.length || !currentUser) return;
+  const progress = document.getElementById('uploadProgress');
+  const bar = document.getElementById('progressBar');
+  const status = document.getElementById('uploadStatus');
+  progress.style.display = 'block';
 
-  // Fetch projects by client_email
-  const { data, error } = await sb.from('projects')
-    .select('*')
-    .eq('client_email', user.email)
-    .order('created_at', { ascending: false });
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const pct = Math.round(((i) / files.length) * 100);
+    bar.style.width = pct + '%';
+    status.textContent = `Uploading ${file.name}...`;
+    status.className = 'upload-status';
 
+    const path = `${currentUser.email}/${Date.now()}_${file.name}`;
+    const { error } = await sb.storage.from('project-files').upload(path, file);
+
+    if (error) {
+      status.textContent = `Error: ${error.message}`;
+      status.className = 'upload-status error';
+      return;
+    }
+  }
+
+  bar.style.width = '100%';
+  status.textContent = '✓ Files uploaded successfully!';
+  status.className = 'upload-status success';
+  setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 3000);
+  loadFiles();
+}
+
+// Drag & drop
+const uploadBox = document.getElementById('uploadBox');
+uploadBox && uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('dragover'); });
+uploadBox && uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragover'));
+uploadBox && uploadBox.addEventListener('drop', e => { e.preventDefault(); uploadBox.classList.remove('dragover'); handleFileUpload(e.dataTransfer.files); });
+
+async function loadFiles() {
+  if (!currentUser) return;
+  const { data, error } = await sb.storage.from('project-files').list(currentUser.email, { sortBy: { column: 'created_at', order: 'desc' } });
+  const list = document.getElementById('filesList');
+  if (error || !data || data.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = data.map(f => `
+    <div class="file-item">
+      <div class="file-info">
+        <span class="file-icon">${fileIcon(f.name)}</span>
+        <div>
+          <div class="file-name">${f.name.replace(/^\d+_/, '')}</div>
+          <div class="file-size">${f.metadata ? formatSize(f.metadata.size) : ''}</div>
+        </div>
+      </div>
+      <div class="file-date">${new Date(f.created_at).toLocaleDateString()}</div>
+    </div>`).join('');
+}
+
+async function loadProjects(user) {
+  const { data, error } = await sb.from('projects').select('*').eq('client_email', user.email).order('created_at', { ascending: false });
   const list = document.getElementById('projectList');
-
   if (error || !data || data.length === 0) {
     list.innerHTML = '<div class="empty">No projects yet — Amir will add your projects here soon.</div>';
     document.getElementById('activeCount').textContent = '0';
@@ -193,23 +289,32 @@ async function showDashboard(user) {
     document.getElementById('reviewCount').textContent = '0';
     return;
   }
-
   document.getElementById('activeCount').textContent = data.filter(p=>p.status==='inprogress').length;
   document.getElementById('doneCount').textContent = data.filter(p=>p.status==='done').length;
   document.getElementById('reviewCount').textContent = data.filter(p=>p.status==='review').length;
-
   list.innerHTML = data.map(p => `
     <div class="project-item">
       <div class="project-info">
         <h3>${p.title}</h3>
-        <p>${p.description || ''} ${p.delivery_date ? '· Delivery: '+p.delivery_date : ''}</p>
+        <p>${p.description||''} ${p.delivery_date ? '· Delivery: '+p.delivery_date : ''}</p>
       </div>
       <span class="status-badge ${statusClass(p.status)}">${statusLabel(p.status)}</span>
     </div>`).join('');
 }
 
 sb.auth.onAuthStateChange((event, session) => {
-  if (session) showDashboard(session.user);
+  if (session) {
+    currentUser = session.user;
+    document.getElementById('authPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('userEmail').textContent = session.user.email;
+    loadProjects(session.user);
+    loadFiles();
+  } else {
+    currentUser = null;
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('authPage').style.display = 'flex';
+  }
 });
 </script>
 </body>
