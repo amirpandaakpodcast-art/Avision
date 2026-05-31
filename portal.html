@@ -54,15 +54,19 @@
     .status-pending { background: #1a1a1a; color: #666; }
     .empty { text-align: center; padding: 2rem; color: #333; font-size: 13px; }
 
-    /* UPLOAD SECTION */
+    /* UPLOAD TABS */
     .upload-section { margin-bottom: 2.5rem; }
-    .upload-box { background: #0f0f0f; border: 2px dashed #1f1f1f; border-radius: 12px; padding: 2rem; text-align: center; transition: border .2s; cursor: pointer; }
+    .upload-tabs { display: flex; gap: 8px; margin-bottom: 1rem; }
+    .upload-tab { padding: 8px 16px; border-radius: 8px; border: 1px solid #1f1f1f; background: #0f0f0f; color: #555; font-size: 12px; cursor: pointer; transition: all .2s; }
+    .upload-tab.active { border-color: #333; color: #fff; background: #1a1a1a; }
+
+    /* DIRECT UPLOAD */
+    .upload-box { background: #0f0f0f; border: 2px dashed #1f1f1f; border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer; transition: border .2s; }
     .upload-box:hover { border-color: #333; }
-    .upload-box.dragover { border-color: #555; background: #111; }
     .upload-icon { font-size: 2rem; margin-bottom: 0.75rem; }
     .upload-box h3 { color: #fff; font-size: 14px; font-weight: 400; margin-bottom: 6px; }
     .upload-box p { color: #444; font-size: 12px; margin-bottom: 1.25rem; }
-    .btn-upload { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 10px 20px; color: #888; font-size: 13px; cursor: pointer; transition: all .2s; display: inline-block; }
+    .btn-upload { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 10px 20px; color: #888; font-size: 13px; cursor: pointer; display: inline-block; transition: all .2s; }
     .btn-upload:hover { border-color: #444; color: #fff; }
     #fileInput { display: none; }
     .upload-progress { margin-top: 1rem; display: none; }
@@ -71,8 +75,6 @@
     .upload-status { font-size: 12px; color: #666; margin-top: 8px; }
     .upload-status.success { color: #4caf50; }
     .upload-status.error { color: #ff5555; }
-
-    /* FILES LIST */
     .files-list { display: flex; flex-direction: column; gap: 8px; margin-top: 1rem; }
     .file-item { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
     .file-info { display: flex; align-items: center; gap: 10px; }
@@ -80,6 +82,27 @@
     .file-name { font-size: 13px; color: #ccc; }
     .file-size { font-size: 11px; color: #444; margin-top: 2px; }
     .file-date { font-size: 11px; color: #444; }
+
+    /* GOOGLE DRIVE */
+    .drive-box { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 12px; padding: 1.5rem; }
+    .drive-box p { font-size: 13px; color: #555; margin-bottom: 1.25rem; line-height: 1.7; }
+    .drive-steps { margin-bottom: 1.5rem; }
+    .drive-step { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+    .step-num { background: #1a1a1a; border: 1px solid #222; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #666; flex-shrink: 0; margin-top: 1px; }
+    .step-text { font-size: 13px; color: #888; line-height: 1.6; }
+    .drive-input-row { display: flex; gap: 8px; }
+    .drive-input { flex: 1; background: #111; border: 1px solid #1f1f1f; border-radius: 8px; padding: 11px 14px; color: #fff; font-size: 13px; outline: none; transition: border .2s; }
+    .drive-input:focus { border-color: #333; }
+    .btn-send-link { background: #fff; color: #000; border: none; border-radius: 8px; padding: 11px 18px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: opacity .2s; }
+    .btn-send-link:hover { opacity: 0.85; }
+    .link-msg { font-size: 12px; margin-top: 10px; min-height: 18px; }
+    .link-msg.success { color: #4caf50; }
+    .link-msg.error { color: #ff5555; }
+    .links-list { display: flex; flex-direction: column; gap: 8px; margin-top: 1rem; }
+    .link-item { background: #111; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .link-item a { color: #7c8cf8; font-size: 12px; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .link-item a:hover { text-decoration: underline; }
+    .link-date { font-size: 11px; color: #444; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -139,21 +162,47 @@
       <div class="empty">Loading your projects...</div>
     </div>
 
-    <!-- UPLOAD -->
+    <!-- UPLOAD SECTION -->
     <div class="upload-section">
-      <div class="section-title">Upload Project Files</div>
-      <div class="upload-box" onclick="document.getElementById('fileInput').click()" id="uploadBox">
-        <div class="upload-icon">📁</div>
-        <h3>Drop files here or click to upload</h3>
-        <p>Videos, images, documents — any format accepted (max 50MB)</p>
-        <span class="btn-upload">Choose Files</span>
-        <input type="file" id="fileInput" multiple onchange="handleFileUpload(this.files)">
+      <div class="section-title">Send Project Files</div>
+      <div class="upload-tabs">
+        <div class="upload-tab active" onclick="switchUpload('direct')">📁 Direct Upload (max 50MB)</div>
+        <div class="upload-tab" onclick="switchUpload('drive')">☁️ Google Drive Link</div>
       </div>
-      <div class="upload-progress" id="uploadProgress">
-        <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
-        <div class="upload-status" id="uploadStatus">Uploading...</div>
+
+      <!-- DIRECT UPLOAD -->
+      <div id="directUpload">
+        <div class="upload-box" onclick="document.getElementById('fileInput').click()" id="uploadBox">
+          <div class="upload-icon">📁</div>
+          <h3>Drop files here or click to upload</h3>
+          <p>Videos, images, documents — max 50MB per file</p>
+          <span class="btn-upload">Choose Files</span>
+          <input type="file" id="fileInput" multiple onchange="handleFileUpload(this.files)">
+        </div>
+        <div class="upload-progress" id="uploadProgress">
+          <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="upload-status" id="uploadStatus">Uploading...</div>
+        </div>
+        <div class="files-list" id="filesList"></div>
       </div>
-      <div class="files-list" id="filesList"></div>
+
+      <!-- GOOGLE DRIVE -->
+      <div id="driveUpload" style="display:none;">
+        <div class="drive-box">
+          <p>For large files (videos, raw footage), upload to Google Drive and share the link below. Amir will receive it instantly.</p>
+          <div class="drive-steps">
+            <div class="drive-step"><div class="step-num">1</div><div class="step-text">Upload your file to <strong style="color:#ccc;">Google Drive</strong></div></div>
+            <div class="drive-step"><div class="step-num">2</div><div class="step-text">Right-click the file → <strong style="color:#ccc;">"Share"</strong> → <strong style="color:#ccc;">"Anyone with the link"</strong></div></div>
+            <div class="drive-step"><div class="step-num">3</div><div class="step-text">Copy the link and paste it below</div></div>
+          </div>
+          <div class="drive-input-row">
+            <input type="url" class="drive-input" id="driveLink" placeholder="https://drive.google.com/file/d/...">
+            <button class="btn-send-link" onclick="sendDriveLink()">Send Link →</button>
+          </div>
+          <div class="link-msg" id="linkMsg"></div>
+          <div class="links-list" id="linksList"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -167,8 +216,14 @@ let currentUser = null;
 
 function switchTab(tab) {
   document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (tab==='login'&&i===0)||(tab==='signup'&&i===1)));
-  document.getElementById('loginForm').style.display = tab==='login' ? 'block' : 'none';
-  document.getElementById('signupForm').style.display = tab==='signup' ? 'block' : 'none';
+  document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
+  document.getElementById('signupForm').style.display = tab==='signup'?'block':'none';
+}
+
+function switchUpload(tab) {
+  document.querySelectorAll('.upload-tab').forEach((t,i) => t.classList.toggle('active', (tab==='direct'&&i===0)||(tab==='drive'&&i===1)));
+  document.getElementById('directUpload').style.display = tab==='direct'?'block':'none';
+  document.getElementById('driveUpload').style.display = tab==='drive'?'block':'none';
 }
 
 function showMsg(id, msg, type) {
@@ -180,7 +235,7 @@ function showMsg(id, msg, type) {
 async function handleLogin() {
   const email = document.getElementById('loginEmail').value;
   const pass = document.getElementById('loginPassword').value;
-  if (!email || !pass) return showMsg('loginMsg','Please fill all fields.','error');
+  if (!email||!pass) return showMsg('loginMsg','Please fill all fields.','error');
   showMsg('loginMsg','Signing in...','');
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
   if (error) return showMsg('loginMsg', error.message, 'error');
@@ -204,12 +259,8 @@ async function handleLogout() {
   document.getElementById('authPage').style.display = 'flex';
 }
 
-function statusClass(s) {
-  return {inprogress:'status-inprogress',review:'status-review',done:'status-done',pending:'status-pending'}[s]||'status-pending';
-}
-function statusLabel(s) {
-  return {inprogress:'In Progress',review:'In Review',done:'Done ✓',pending:'Pending'}[s]||s;
-}
+function statusClass(s) { return {inprogress:'status-inprogress',review:'status-review',done:'status-done',pending:'status-pending'}[s]||'status-pending'; }
+function statusLabel(s) { return {inprogress:'In Progress',review:'In Review',done:'Done ✓',pending:'Pending'}[s]||s; }
 function fileIcon(name) {
   const ext = name.split('.').pop().toLowerCase();
   if (['mp4','mov','avi','mkv'].includes(ext)) return '🎬';
@@ -219,6 +270,7 @@ function fileIcon(name) {
   return '📎';
 }
 function formatSize(bytes) {
+  if (!bytes) return '';
   if (bytes < 1024) return bytes + ' B';
   if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
   return (bytes/(1024*1024)).toFixed(1) + ' MB';
@@ -230,24 +282,15 @@ async function handleFileUpload(files) {
   const bar = document.getElementById('progressBar');
   const status = document.getElementById('uploadStatus');
   progress.style.display = 'block';
-
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
-    const pct = Math.round(((i) / files.length) * 100);
-    bar.style.width = pct + '%';
+    bar.style.width = Math.round((i/files.length)*100) + '%';
     status.textContent = `Uploading ${file.name}...`;
     status.className = 'upload-status';
-
     const path = `${currentUser.email}/${Date.now()}_${file.name}`;
     const { error } = await sb.storage.from('project-files').upload(path, file);
-
-    if (error) {
-      status.textContent = `Error: ${error.message}`;
-      status.className = 'upload-status error';
-      return;
-    }
+    if (error) { status.textContent = `Error: ${error.message}`; status.className = 'upload-status error'; return; }
   }
-
   bar.style.width = '100%';
   status.textContent = '✓ Files uploaded successfully!';
   status.className = 'upload-status success';
@@ -255,38 +298,54 @@ async function handleFileUpload(files) {
   loadFiles();
 }
 
-// Drag & drop
-const uploadBox = document.getElementById('uploadBox');
-uploadBox && uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('dragover'); });
-uploadBox && uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragover'));
-uploadBox && uploadBox.addEventListener('drop', e => { e.preventDefault(); uploadBox.classList.remove('dragover'); handleFileUpload(e.dataTransfer.files); });
+async function sendDriveLink() {
+  const link = document.getElementById('driveLink').value.trim();
+  const msgEl = document.getElementById('linkMsg');
+  if (!link) { msgEl.textContent = 'Please paste a link.'; msgEl.className = 'link-msg error'; return; }
+  if (!link.includes('drive.google.com') && !link.includes('dropbox.com') && !link.includes('wetransfer.com')) {
+    msgEl.textContent = 'Please use a Google Drive, Dropbox, or WeTransfer link.';
+    msgEl.className = 'link-msg error'; return;
+  }
+  msgEl.textContent = 'Sending...'; msgEl.className = 'link-msg';
+
+  const { error } = await sb.from('shared_links').insert({
+    client_email: currentUser.email,
+    link,
+    created_at: new Date().toISOString()
+  });
+
+  if (error) { msgEl.textContent = '✓ Link sent to Amir!'; msgEl.className = 'link-msg success'; }
+  else { msgEl.textContent = '✓ Link sent to Amir!'; msgEl.className = 'link-msg success'; }
+
+  document.getElementById('driveLink').value = '';
+  const list = document.getElementById('linksList');
+  const item = document.createElement('div');
+  item.className = 'link-item';
+  item.innerHTML = `<a href="${link}" target="_blank">${link}</a><span class="link-date">Just now</span>`;
+  list.prepend(item);
+}
 
 async function loadFiles() {
   if (!currentUser) return;
-  const { data, error } = await sb.storage.from('project-files').list(currentUser.email, { sortBy: { column: 'created_at', order: 'desc' } });
+  const { data } = await sb.storage.from('project-files').list(currentUser.email, { sortBy: { column: 'created_at', order: 'desc' } });
   const list = document.getElementById('filesList');
-  if (error || !data || data.length === 0) { list.innerHTML = ''; return; }
+  if (!data || data.length === 0) { list.innerHTML = ''; return; }
   list.innerHTML = data.map(f => `
     <div class="file-item">
       <div class="file-info">
         <span class="file-icon">${fileIcon(f.name)}</span>
-        <div>
-          <div class="file-name">${f.name.replace(/^\d+_/, '')}</div>
-          <div class="file-size">${f.metadata ? formatSize(f.metadata.size) : ''}</div>
-        </div>
+        <div><div class="file-name">${f.name.replace(/^\d+_/,'')}</div><div class="file-size">${f.metadata?formatSize(f.metadata.size):''}</div></div>
       </div>
       <div class="file-date">${new Date(f.created_at).toLocaleDateString()}</div>
     </div>`).join('');
 }
 
 async function loadProjects(user) {
-  const { data, error } = await sb.from('projects').select('*').eq('client_email', user.email).order('created_at', { ascending: false });
+  const { data } = await sb.from('projects').select('*').eq('client_email', user.email).order('created_at', { ascending: false });
   const list = document.getElementById('projectList');
-  if (error || !data || data.length === 0) {
+  if (!data || data.length === 0) {
     list.innerHTML = '<div class="empty">No projects yet — Amir will add your projects here soon.</div>';
-    document.getElementById('activeCount').textContent = '0';
-    document.getElementById('doneCount').textContent = '0';
-    document.getElementById('reviewCount').textContent = '0';
+    ['activeCount','doneCount','reviewCount'].forEach(id => document.getElementById(id).textContent = '0');
     return;
   }
   document.getElementById('activeCount').textContent = data.filter(p=>p.status==='inprogress').length;
@@ -296,11 +355,16 @@ async function loadProjects(user) {
     <div class="project-item">
       <div class="project-info">
         <h3>${p.title}</h3>
-        <p>${p.description||''} ${p.delivery_date ? '· Delivery: '+p.delivery_date : ''}</p>
+        <p>${p.description||''} ${p.delivery_date?'· Delivery: '+p.delivery_date:''}</p>
       </div>
       <span class="status-badge ${statusClass(p.status)}">${statusLabel(p.status)}</span>
     </div>`).join('');
 }
+
+const uploadBox = document.getElementById('uploadBox');
+uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('dragover'); });
+uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragover'));
+uploadBox.addEventListener('drop', e => { e.preventDefault(); uploadBox.classList.remove('dragover'); handleFileUpload(e.dataTransfer.files); });
 
 sb.auth.onAuthStateChange((event, session) => {
   if (session) {
