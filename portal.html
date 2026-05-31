@@ -299,7 +299,14 @@ const SB_URL = 'https://pwrukagppviyyxdlurxs.supabase.co';
 const SB_KEY = 'sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV';
 const FN_URL = SB_URL + '/functions/v1/notify-admin';
 const { createClient } = supabase;
-const sb = createClient(SB_URL, SB_KEY, { auth: { storage: window.localStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'avision-auth' } });
+const sb = createClient(SB_URL, SB_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storageKey: 'sb-pwrukagppviyyxdlurxs-auth-token'
+  }
+});
 let me = null, chatSub = null;
 
 async function notify(type, content) {
