@@ -735,6 +735,17 @@ async function doReset(){
   if(error)return sm('rM',error.message,'err');
   sm('rM','✓ Reset link sent! Check your email.','ok');
 }
+  async function doResetSave(){
+  var p1=document.getElementById('rpw1').value,p2=document.getElementById('rpw2').value,msg=document.getElementById('rpwMsg');
+  if(!p1||!p2){msg.textContent='Please fill both fields.';msg.style.color='#ef4444';return;}
+  if(p1.length<6){msg.textContent='Min. 6 characters.';msg.style.color='#ef4444';return;}
+  if(p1!==p2){msg.textContent='Passwords do not match.';msg.style.color='#ef4444';return;}
+  msg.textContent='Updating...';msg.style.color='#888';
+  const{error}=await sb.auth.updateUser({password:p1});
+  if(error){msg.textContent=error.message;msg.style.color='#ef4444';return;}
+  msg.textContent='✓ Password updated!';msg.style.color='#22c55e';
+  setTimeout(function(){window.location.href='/portal.html';},2000);
+}
 </script>
 </body>
 </html>
