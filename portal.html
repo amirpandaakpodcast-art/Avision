@@ -53,14 +53,10 @@
     .status-done { background: #1a1a2a; color: #7c8cf8; }
     .status-pending { background: #1a1a1a; color: #666; }
     .empty { text-align: center; padding: 2rem; color: #333; font-size: 13px; }
-
-    /* UPLOAD TABS */
     .upload-section { margin-bottom: 2.5rem; }
     .upload-tabs { display: flex; gap: 8px; margin-bottom: 1rem; }
     .upload-tab { padding: 8px 16px; border-radius: 8px; border: 1px solid #1f1f1f; background: #0f0f0f; color: #555; font-size: 12px; cursor: pointer; transition: all .2s; }
     .upload-tab.active { border-color: #333; color: #fff; background: #1a1a1a; }
-
-    /* DIRECT UPLOAD */
     .upload-box { background: #0f0f0f; border: 2px dashed #1f1f1f; border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer; transition: border .2s; }
     .upload-box:hover { border-color: #333; }
     .upload-icon { font-size: 2rem; margin-bottom: 0.75rem; }
@@ -82,8 +78,6 @@
     .file-name { font-size: 13px; color: #ccc; }
     .file-size { font-size: 11px; color: #444; margin-top: 2px; }
     .file-date { font-size: 11px; color: #444; }
-
-    /* GOOGLE DRIVE */
     .drive-box { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 12px; padding: 1.5rem; }
     .drive-box p { font-size: 13px; color: #555; margin-bottom: 1.25rem; line-height: 1.7; }
     .drive-steps { margin-bottom: 1.5rem; }
@@ -150,19 +144,14 @@
       <h1>Welcome back 👋</h1>
       <p>Here's an overview of your projects with Avision.</p>
     </div>
-
     <div class="cards">
       <div class="card"><div class="card-label">Active Projects</div><div class="card-value" id="activeCount">0</div><div class="card-sub">In progress</div></div>
       <div class="card"><div class="card-label">Completed</div><div class="card-value" id="doneCount">0</div><div class="card-sub">Delivered</div></div>
       <div class="card"><div class="card-label">Pending Review</div><div class="card-value" id="reviewCount">0</div><div class="card-sub">Awaiting feedback</div></div>
     </div>
-
     <div class="section-title">Your Projects</div>
-    <div class="project-list" id="projectList">
-      <div class="empty">Loading your projects...</div>
-    </div>
+    <div class="project-list" id="projectList"><div class="empty">Loading your projects...</div></div>
 
-    <!-- UPLOAD SECTION -->
     <div class="upload-section">
       <div class="section-title">Send Project Files</div>
       <div class="upload-tabs">
@@ -170,7 +159,6 @@
         <div class="upload-tab" onclick="switchUpload('drive')">☁️ Google Drive Link</div>
       </div>
 
-      <!-- DIRECT UPLOAD -->
       <div id="directUpload">
         <div class="upload-box" onclick="document.getElementById('fileInput').click()" id="uploadBox">
           <div class="upload-icon">📁</div>
@@ -186,13 +174,12 @@
         <div class="files-list" id="filesList"></div>
       </div>
 
-      <!-- GOOGLE DRIVE -->
       <div id="driveUpload" style="display:none;">
         <div class="drive-box">
           <p>For large files (videos, raw footage), upload to Google Drive and share the link below. Amir will receive it instantly.</p>
           <div class="drive-steps">
             <div class="drive-step"><div class="step-num">1</div><div class="step-text">Upload your file to <strong style="color:#ccc;">Google Drive</strong></div></div>
-            <div class="drive-step"><div class="step-num">2</div><div class="step-text">Right-click the file → <strong style="color:#ccc;">"Share"</strong> → <strong style="color:#ccc;">"Anyone with the link"</strong></div></div>
+            <div class="drive-step"><div class="step-num">2</div><div class="step-text">Right-click → <strong style="color:#ccc;">"Share"</strong> → <strong style="color:#ccc;">"Anyone with the link"</strong></div></div>
             <div class="drive-step"><div class="step-num">3</div><div class="step-text">Copy the link and paste it below</div></div>
           </div>
           <div class="drive-input-row">
@@ -210,9 +197,20 @@
 <script>
 const SUPABASE_URL = 'https://pwrukagppviyyxdlurxs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV';
+const FUNCTION_URL = 'https://pwrukagppviyyxdlurxs.supabase.co/functions/v1/notify-admin';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
+
+async function sendNotification(type, content) {
+  try {
+    await fetch(FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY}` },
+      body: JSON.stringify({ client_email: currentUser.email, type, content })
+    });
+  } catch(e) { console.log('Notification error:', e); }
+}
 
 function switchTab(tab) {
   document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (tab==='login'&&i===0)||(tab==='signup'&&i===1)));
@@ -294,6 +292,8 @@ async function handleFileUpload(files) {
   bar.style.width = '100%';
   status.textContent = '✓ Files uploaded successfully!';
   status.className = 'upload-status success';
+  // Send notification
+  await sendNotification('File Upload', Array.from(files).map(f=>f.name).join(', '));
   setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 3000);
   loadFiles();
 }
@@ -302,21 +302,11 @@ async function sendDriveLink() {
   const link = document.getElementById('driveLink').value.trim();
   const msgEl = document.getElementById('linkMsg');
   if (!link) { msgEl.textContent = 'Please paste a link.'; msgEl.className = 'link-msg error'; return; }
-  if (!link.includes('drive.google.com') && !link.includes('dropbox.com') && !link.includes('wetransfer.com')) {
-    msgEl.textContent = 'Please use a Google Drive, Dropbox, or WeTransfer link.';
-    msgEl.className = 'link-msg error'; return;
-  }
   msgEl.textContent = 'Sending...'; msgEl.className = 'link-msg';
-
-  const { error } = await sb.from('shared_links').insert({
-    client_email: currentUser.email,
-    link,
-    created_at: new Date().toISOString()
-  });
-
-  if (error) { msgEl.textContent = '✓ Link sent to Amir!'; msgEl.className = 'link-msg success'; }
-  else { msgEl.textContent = '✓ Link sent to Amir!'; msgEl.className = 'link-msg success'; }
-
+  await sb.from('shared_links').insert({ client_email: currentUser.email, link });
+  // Send notification
+  await sendNotification('Google Drive Link', link);
+  msgEl.textContent = '✓ Link sent to Amir!'; msgEl.className = 'link-msg success';
   document.getElementById('driveLink').value = '';
   const list = document.getElementById('linksList');
   const item = document.createElement('div');
