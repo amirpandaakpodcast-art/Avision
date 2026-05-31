@@ -152,7 +152,7 @@
   <div class="admin-tabs">
     <div class="atab active" onclick="showTab('projects')">Projects</div>
     <div class="atab" onclick="showTab('invoices')">Invoices</div>
-    <div class="atab" onclick="showTab('chat')">Messages</div>
+    <div class="atab" onclick="showTab('chat');clearMsgBadge()">Messages <span id="adminMsgBadge" style="display:none;background:#c44;color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;margin-left:4px;vertical-align:middle;">0</span></div>
   </div>
 
   <!-- PROJECTS TAB -->
@@ -371,6 +371,12 @@ async function loadInvoices() {
 }
 
 // CHAT
+function clearMsgBadge() {
+  const badge = document.getElementById('adminMsgBadge');
+  if (badge) badge.style.display = 'none';
+  localStorage.setItem('adminLastMsgId', Date.now());
+}
+
 async function loadClients() {
   const { data } = await sb.from('messages').select('client_email').order('created_at',{ascending:false});
   const unique=[...new Set((data||[]).map(m=>m.client_email))];
@@ -434,6 +440,23 @@ sb.auth.onAuthStateChange((event, session) => {
     document.getElementById('loginPage').style.display='none';
     document.getElementById('adminDash').style.display='flex';
     loadProjects();
+    // Poll for new client messages every 5 seconds
+    let lastAdminMsgId = parseInt(localStorage.getItem('adminLastMsgId') || '0');
+    setInterval(async () => {
+      const { data } = await sb.from('messages').select('id,sender').order('created_at', { ascending: false }).limit(1);
+      if (!data || !data.length) return;
+      const latest = data[0];
+      if (latest.id > lastAdminMsgId && latest.sender === 'client') {
+        const badge = document.getElementById('adminMsgBadge');
+        if (badge) {
+          const current = parseInt(badge.textContent) || 0;
+          badge.textContent = current + 1;
+          badge.style.display = 'inline';
+        }
+        lastAdminMsgId = latest.id;
+        localStorage.setItem('adminLastMsgId', lastAdminMsgId);
+      }
+    }, 5000);
   } else if (!session) {
     document.getElementById('adminDash').style.display='none';
     document.getElementById('loginPage').style.display='flex';
