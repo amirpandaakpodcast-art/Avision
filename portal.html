@@ -436,6 +436,7 @@ function renderMsgs(data) {
 
 let lastSeenMsgId = parseInt(localStorage.getItem('lastSeenMsgId') || '0');
 let notifMessages = [];
+let allNotifs = [];
 
 function toggleNotifPopup() {
   const popup = document.getElementById('notifPopup');
@@ -444,20 +445,31 @@ function toggleNotifPopup() {
   if (!isVisible) {
     renderNotifList();
     hideBadge();
+    markNotifsRead();
   }
+}
+
+async function markNotifsRead() {
+  if (!me) return;
+  await sb.from('notifications').update({ is_read: true }).eq('client_email', me.email).eq('is_read', false);
 }
 
 function renderNotifList() {
   const list = document.getElementById('notifList');
-  if (!notifMessages.length) {
-    list.innerHTML = '<div style="padding:1rem;text-align:center;color:#4a4438;font-size:12px;">No new messages</div>';
+  const combined = [...allNotifs, ...notifMessages].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 8);
+  if (!combined.length) {
+    list.innerHTML = '<div style="padding:1rem;text-align:center;color:#4a4438;font-size:12px;">No notifications yet</div>';
     return;
   }
-  list.innerHTML = notifMessages.slice(-5).reverse().map(m => {
-    const t = new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  list.innerHTML = combined.map(n => {
+    const t = new Date(n.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const isMsg = n.sender !== undefined;
+    const icon = isMsg ? '💬' : (n.type === 'invoice' ? '💳' : '📁');
+    const title = isMsg ? 'New message from Amir' : n.title;
+    const body = isMsg ? n.message : n.message;
     return `<div style="padding:10px 14px;border-bottom:1px solid rgba(201,168,76,0.06);cursor:pointer;" onclick="goToChat()">
-      <div style="font-size:11px;color:#c9a84c;margin-bottom:3px;opacity:0.7;">Amir · ${t}</div>
-      <div style="font-size:13px;color:#e8e0d0;">${m.message}</div>
+      <div style="font-size:10px;color:#c9a84c;margin-bottom:3px;opacity:0.7;">${icon} ${title} · ${t}</div>
+      <div style="font-size:12px;color:#e8e0d0;line-height:1.5;">${body}</div>
     </div>`;
   }).join('');
 }
@@ -481,7 +493,6 @@ function hideBadge() {
   if (me) localStorage.setItem('lastSeenMsgId', lastSeenMsgId);
 }
 
-// Close popup when clicking outside
 document.addEventListener('click', e => {
   const wrap = document.getElementById('bellWrap');
   if (wrap && !wrap.contains(e.target)) {
@@ -489,6 +500,14 @@ document.addEventListener('click', e => {
     if (popup) popup.style.display = 'none';
   }
 });
+
+async function loadNotifs() {
+  if (!me) return;
+  const { data } = await sb.from('notifications').select('*').eq('client_email', me.email).order('created_at', { ascending: false }).limit(10);
+  allNotifs = data || [];
+  const unread = allNotifs.filter(n => !n.is_read);
+  if (unread.length > 0) showBadge(unread.length);
+}
 
 let lastMsgId = 0;
 function subscribeMsgs() {
@@ -590,7 +609,16 @@ sb.auth.onAuthStateChange((event, session) => {
     document.getElementById('userEmail').textContent=me.email;
     const name=me.user_metadata?.full_name;
     if (name) document.getElementById('welcomeName').textContent=`Welcome, ${name.split(' ')[0]}.`;
-    loadProjects(me); loadFiles(); loadMsgs(); loadInvoices(); subscribeMsgs();
+    loadProjects(me); loadFiles(); loadMsgs(); loadInvoices(); loadNotifs(); subscribeMsgs();
+    // Poll notifications every 5 seconds
+    setInterval(async () => {
+      if (!me) return;
+      const { data } = await sb.from('notifications').select('*').eq('client_email', me.email).eq('is_read', false);
+      if (data && data.length > 0) {
+        allNotifs = data;
+        showBadge(data.length);
+      }
+    }, 5000);
   } else {
     me=null;
     document.getElementById('dashboard').style.display='none';
