@@ -230,7 +230,13 @@ const SUPABASE_URL = 'https://pwrukagppviyyxdlurxs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV';
 const FUNCTION_URL = 'https://pwrukagppviyyxdlurxs.supabase.co/functions/v1/notify-admin';
 const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 let currentUser = null;
 let chatSub = null;
 
