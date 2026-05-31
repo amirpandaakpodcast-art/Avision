@@ -229,8 +229,36 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 .lsi a{color:var(--g);font-size:11px;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;opacity:.8;}
 .lsi-d{font-size:10px;color:var(--td);white-space:nowrap;}
 
-/* INVOICES */
-.it{width:100%;border-collapse:collapse;border:1px solid var(--b);}
+/* PASSWORD TOGGLE */
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-right:44px;}
+.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--td);cursor:pointer;font-size:16px;transition:color .2s;padding:4px;}
+.pw-eye:hover{color:var(--g);}
+
+/* PROFILE POPUP */
+.prof-wrap{position:relative;cursor:pointer;}
+.upill{background:var(--gd);border:1px solid var(--b);padding:5px 16px;font-size:11px;color:var(--g);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.04em;transition:all .3s;}
+.upill:hover{border-color:var(--b2);background:rgba(201,168,76,.18);}
+.prof-pop{display:none;position:absolute;top:46px;right:0;width:260px;background:rgba(6,5,4,.98);border:1px solid var(--b2);z-index:999;box-shadow:0 24px 64px rgba(0,0,0,.8);animation:drop .2s cubic-bezier(.22,1,.36,1);}
+.prof-pop::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--g),transparent);}
+.prof-head{padding:1.25rem 1.25rem .75rem;}
+.prof-avatar{width:44px;height:44px;border:2px solid var(--b2);border-radius:50%;background:var(--gd);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--g);margin-bottom:.75rem;}
+.prof-name{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;color:var(--t);margin-bottom:2px;}
+.prof-email{font-size:11px;color:var(--td);}
+.prof-divider{height:1px;background:var(--b);margin:0 1.25rem;}
+.prof-menu{padding:.5rem 0;}
+.prof-item{display:flex;align-items:center;gap:10px;padding:10px 1.25rem;font-size:12px;color:var(--tm);cursor:pointer;transition:all .2s;letter-spacing:.04em;}
+.prof-item:hover{background:var(--gd);color:var(--g);}
+.prof-item span{font-size:16px;opacity:.7;}
+
+/* CHANGE PASSWORD MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9998;backdrop-filter:blur(4px);align-items:center;justify-content:center;}
+.modal-bg.show{display:flex;}
+.modal{background:rgba(8,6,4,.98);border:1px solid var(--b2);padding:2rem;width:100%;max-width:380px;position:relative;animation:rise .3s cubic-bezier(.22,1,.36,1);}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--g),transparent);}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.1em;margin-bottom:1.5rem;}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--td);font-size:20px;cursor:pointer;transition:color .2s;}
+.modal-close:hover{color:var(--t);}
 .it th{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.2em;color:var(--td);padding:10px 14px;text-align:left;border-bottom:1px solid var(--b);background:var(--s1);}
 .it td{padding:12px 14px;font-size:13px;border-bottom:1px solid rgba(201,168,76,.04);background:var(--s1);transition:all .2s;}
 .it tr:hover td{background:var(--s2);}
@@ -281,6 +309,28 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 <canvas id="cvs"></canvas>
 <div id="toast"></div>
 
+<!-- CHANGE PASSWORD MODAL -->
+<div class="modal-bg" id="changePwModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeChangePw()">×</button>
+    <div class="modal-title">Change Password</div>
+    <div class="fg"><label>New Password</label>
+      <div class="pw-wrap">
+        <input type="password" id="newPw" placeholder="Min. 6 characters">
+        <button type="button" class="pw-eye" onclick="togPw('newPw',this)">👁</button>
+      </div>
+    </div>
+    <div class="fg"><label>Confirm New Password</label>
+      <div class="pw-wrap">
+        <input type="password" id="newPw2" placeholder="Repeat new password">
+        <button type="button" class="pw-eye" onclick="togPw('newPw2',this)">👁</button>
+      </div>
+    </div>
+    <button class="btn-g" onclick="doChangePw()" style="font-size:13px;padding:12px;">UPDATE PASSWORD →</button>
+    <div class="amsg" id="pwMsg"></div>
+  </div>
+</div>
+
 <!-- AUTH -->
 <div class="ap" id="authPage">
   <div class="ab">
@@ -295,14 +345,30 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       </div>
       <div id="lForm">
         <div class="fg"><label>Email Address</label><input type="email" id="lE" placeholder="your@email.com" autocomplete="email"></div>
-        <div class="fg"><label>Password</label><input type="password" id="lP" placeholder="••••••••" autocomplete="current-password"></div>
+        <div class="fg"><label>Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="lP" placeholder="••••••••" autocomplete="current-password">
+            <button type="button" class="pw-eye" onclick="togPw('lP',this)">👁</button>
+          </div>
+        </div>
         <button class="btn-g" onclick="doLogin()">ACCESS PORTAL →</button>
         <div class="amsg" id="lM"></div>
       </div>
       <div id="sForm" style="display:none;">
         <div class="fg"><label>Full Name</label><input type="text" id="sN" placeholder="Your name" autocomplete="name"></div>
         <div class="fg"><label>Email Address</label><input type="email" id="sE" placeholder="your@email.com" autocomplete="email"></div>
-        <div class="fg"><label>Password</label><input type="password" id="sP" placeholder="Min. 6 characters" autocomplete="new-password"></div>
+        <div class="fg"><label>Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="sP" placeholder="Min. 6 characters" autocomplete="new-password">
+            <button type="button" class="pw-eye" onclick="togPw('sP',this)">👁</button>
+          </div>
+        </div>
+        <div class="fg"><label>Confirm Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="sP2" placeholder="Repeat password" autocomplete="new-password">
+            <button type="button" class="pw-eye" onclick="togPw('sP2',this)">👁</button>
+          </div>
+        </div>
         <div class="agree">
           <input type="checkbox" id="agr">
           <label for="agr">I agree to Avision's <a href="/terms.html" target="_blank">Terms of Service</a>, <a href="/privacy.html" target="_blank">Privacy Policy</a>, and <a href="/refund.html" target="_blank">Refund Policy</a>.</label>
@@ -332,7 +398,21 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
           <div class="nf"><button onclick="goChat()">OPEN MESSAGES →</button></div>
         </div>
       </div>
-      <span class="upill" id="uEmail">—</span>
+      <div class="prof-wrap" id="profWrap" onclick="togProf()">
+        <span class="upill" id="uEmail">—</span>
+        <div class="prof-pop" id="profPop">
+          <div class="prof-head">
+            <div class="prof-avatar" id="profAvatar">A</div>
+            <div class="prof-name" id="profName">—</div>
+            <div class="prof-email" id="profEmailDisp">—</div>
+          </div>
+          <div class="prof-divider"></div>
+          <div class="prof-menu">
+            <div class="prof-item" onclick="openChangePw(event)"><span>🔑</span> Change Password</div>
+            <div class="prof-item" style="color:#e05555;" onclick="doLogout()"><span>🚪</span> Sign Out</div>
+          </div>
+        </div>
+      </div>
       <button class="btn-x" onclick="doLogout()">EXIT</button>
     </div>
   </div>
@@ -471,6 +551,52 @@ function toast(msg,type){
   setTimeout(function(){d.classList.remove('show');setTimeout(function(){d.remove();},500);},3200);
 }
 
+// PASSWORD TOGGLE
+function togPw(id,btn){
+  var inp=document.getElementById(id);
+  var show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.style.opacity=show?'1':'.5';
+}
+
+// PROFILE POPUP
+function togProf(){
+  var pop=document.getElementById('profPop');
+  pop.style.display=pop.style.display==='block'?'none':'block';
+}
+
+function openChangePw(e){
+  e.stopPropagation();
+  document.getElementById('profPop').style.display='none';
+  document.getElementById('changePwModal').classList.add('show');
+}
+function closeChangePw(){
+  document.getElementById('changePwModal').classList.remove('show');
+  document.getElementById('newPw').value='';
+  document.getElementById('newPw2').value='';
+  document.getElementById('pwMsg').textContent='';
+}
+async function doChangePw(){
+  var p1=document.getElementById('newPw').value;
+  var p2=document.getElementById('newPw2').value;
+  var msg=document.getElementById('pwMsg');
+  msg.className='amsg';
+  if(!p1||!p2){msg.textContent='Please fill both fields.';msg.className='amsg err';return;}
+  if(p1.length<6){msg.textContent='Min. 6 characters.';msg.className='amsg err';return;}
+  if(p1!==p2){msg.textContent='Passwords do not match.';msg.className='amsg err';return;}
+  msg.textContent='Updating...';
+  const{error}=await sb.auth.updateUser({password:p1});
+  if(error){msg.textContent=error.message;msg.className='amsg err';return;}
+  msg.textContent='✓ Password updated!';msg.className='amsg ok';
+  toast('Password updated successfully','ok');
+  setTimeout(closeChangePw,2000);
+}
+
+document.addEventListener('click',function(e){
+  var w=document.getElementById('profWrap');
+  if(w&&!w.contains(e.target))document.getElementById('profPop').style.display='none';
+});
+
 function swTab(v){
   document.querySelectorAll('.tab').forEach(function(el,i){el.classList.toggle('on',v==='login'?i===0:i===1);});
   document.getElementById('lForm').style.display=v==='login'?'block':'none';
@@ -490,9 +616,10 @@ function doLogin(){
   sb.auth.signInWithPassword({email:e,password:p}).then(function(r){if(r.error)sm('lM',r.error.message,'err');});
 }
 function doSignup(){
-  var n=document.getElementById('sN').value,e=document.getElementById('sE').value,p=document.getElementById('sP').value;
-  if(!n||!e||!p)return sm('sM','Please fill all fields.','err');
+  var n=document.getElementById('sN').value,e=document.getElementById('sE').value,p=document.getElementById('sP').value,p2=document.getElementById('sP2').value;
+  if(!n||!e||!p||!p2)return sm('sM','Please fill all fields.','err');
   if(p.length<6)return sm('sM','Password min. 6 characters.','err');
+  if(p!==p2)return sm('sM','Passwords do not match.','err');
   if(!document.getElementById('agr').checked)return sm('sM','Please accept the terms to continue.','err');
   sm('sM','Creating your account...','');
   sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}}).then(function(r){
@@ -702,7 +829,12 @@ function startDash(user){
   document.getElementById('dash').style.display='block';
   document.getElementById('uEmail').textContent=user.email;
   var name=user.user_metadata&&user.user_metadata.full_name;
-  if(name)document.getElementById('wTitle').innerHTML='WELCOME, <em>'+name.split(' ')[0].toUpperCase()+'.</em>';
+  var firstName=name?name.split(' ')[0]:'';
+  if(firstName)document.getElementById('wTitle').innerHTML='WELCOME, <em>'+firstName.toUpperCase()+'.</em>';
+  // Profile popup
+  document.getElementById('profEmailDisp').textContent=user.email;
+  document.getElementById('profName').textContent=name||user.email;
+  document.getElementById('profAvatar').textContent=(name?name.charAt(0):user.email.charAt(0)).toUpperCase();
   loadProjects(user);loadFiles();loadMsgs();loadInvoices();
   sb.from('notifications').select('*').eq('client_email',user.email).order('created_at',{ascending:false}).then(function(r){
     notifs=r.data||[];
