@@ -352,6 +352,13 @@ async function sendNotif(client_email, type, title, message) {
   await sb.from('notifications').insert({ client_email, type, title, message });
 }
 
+async function sendNotif(client_email, type, title, message) {
+  try {
+    const { error } = await sb.from('notifications').insert({ client_email, type, title, message });
+    if (error) console.log('Notif error:', error.message);
+  } catch(e) { console.log('Notif catch:', e); }
+}
+
 async function addProject() {
   const ce=document.getElementById('cEmail').value.trim(), t=document.getElementById('pTitle').value.trim();
   const d=document.getElementById('pDesc').value.trim(), s=document.getElementById('pStatus').value, dt=document.getElementById('pDate').value.trim();
@@ -522,6 +529,7 @@ async function adminSend() {
   const input=document.getElementById('adminIn'), m=input.value.trim();
   if (!m) return; input.value='';
   await sb.from('messages').insert({ client_email:activeClient, sender:'admin', message:m });
+  await sendNotif(activeClient, 'message', '💬 New message from Amir', m);
 }
 
 // === PARTICLE SYSTEM ===
