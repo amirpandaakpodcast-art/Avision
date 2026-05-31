@@ -206,16 +206,16 @@
         <div class="fgroup"><label>Full Name</label><input type="text" id="sName" placeholder="Your name"></div>
         <div class="fgroup"><label>Email Address</label><input type="email" id="sEmail" placeholder="your@email.com"></div>
         <div class="fgroup"><label>Password</label><input type="password" id="sPass" placeholder="Min. 6 characters"></div>
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:1rem;padding:1rem;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.12);border-radius:2px;">
-  <input type="checkbox" id="agreeCheck" style="margin-top:3px;accent-color:#c9a84c;flex-shrink:0;">
-  <label for="agreeCheck" style="font-size:11px;color:#7a7060;line-height:1.6;cursor:pointer;">
-    I agree to Avision's 
-    <a href="/terms.html" target="_blank" style="color:#c9a84c;">Terms of Service</a>, 
-    <a href="/privacy.html" target="_blank" style="color:#c9a84c;">Privacy Policy</a>, and 
-    <a href="/refund.html" target="_blank" style="color:#c9a84c;">Refund Policy</a>. 
-    I understand that all projects are subject to these terms.
-  </label>
-</div>
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:1rem;padding:1rem;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.12);">
+          <input type="checkbox" id="agreeCheck" style="margin-top:3px;accent-color:#c9a84c;flex-shrink:0;cursor:pointer;">
+          <label for="agreeCheck" style="font-size:11px;color:#7a7060;line-height:1.6;cursor:pointer;">
+            I agree to Avision's
+            <a href="/terms.html" target="_blank" style="color:#c9a84c;">Terms of Service</a>,
+            <a href="/privacy.html" target="_blank" style="color:#c9a84c;">Privacy Policy</a>, and
+            <a href="/refund.html" target="_blank" style="color:#c9a84c;">Refund Policy</a>.
+            I understand that all projects are subject to these terms.
+          </label>
+        </div>
         <button class="btn-auth" onclick="doSignup()">Create Account →</button>
         <div class="auth-msg" id="sMsg"></div>
       </div>
@@ -341,10 +341,11 @@ async function doLogin() {
   if (error) return msg('lMsg', error.message, 'error');
 }
 
-async function doSignup() {   const n=document.getElementById('sName').value;   const e=document.getElementById('sEmail').value;   const p=document.getElementById('sPass').value;   if (!n||!e||!p) return msg('sMsg','Please fill all fields.','error');   if (p.length<6) return msg('sMsg','Min. 6 characters.','error');   if (!document.getElementById('agreeCheck').checked) return msg('sMsg','Please accept the terms to continue.','error');   msg('sMsg','Creating account...','');   const { error } = await sb.auth.signUp({ email:e, password:p, options:{ data:{ full_name:n } } });   if (error) return msg('sMsg', error.message, 'error');   msg('sMsg','✓ Check your email to confirm.','success'); }
+async function doSignup() {
   const n=document.getElementById('sName').value, e=document.getElementById('sEmail').value, p=document.getElementById('sPass').value;
   if (!n||!e||!p) return msg('sMsg','Please fill all fields.','error');
   if (p.length<6) return msg('sMsg','Password min. 6 characters.','error');
+  if (!document.getElementById('agreeCheck').checked) return msg('sMsg','Please accept the terms to continue.','error');
   msg('sMsg','Creating account...','');
   const { error } = await sb.auth.signUp({ email:e, password:p, options:{ data:{ full_name:n } } });
   if (error) return msg('sMsg', error.message, 'error');
