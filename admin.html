@@ -330,6 +330,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/></svg>
       Calendar
     </div>
+    <div class="atab" onclick="swTab('meetings')">
+      <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm12.553 1.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/></svg>
+      Meetings
+    </div>
     <div class="atab" onclick="swTab('clients')">
       <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
       Clients
@@ -529,6 +533,36 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
     </div>
   </div>
 
+  <!-- MEETINGS -->
+  <div class="tc" id="tc-meetings">
+    <div class="two-col">
+      <div class="col-l">
+        <div class="slbl">Add available slot</div>
+        <div class="add-card">
+          <div class="fg"><label>Date</label><input type="date" id="slotDate"></div>
+          <div class="fg"><label>Time</label><input type="time" id="slotTime" placeholder="09:00"></div>
+          <div class="fg"><label>Google Meet link (optional)</label><input type="url" id="slotMeet" placeholder="https://meet.google.com/..."></div>
+          <button class="btn-primary" onclick="addSlot()">Add slot</button>
+          <div class="amsg" id="slotMsg"></div>
+        </div>
+        <div class="slbl" style="margin-top:1rem;">Booked meetings</div>
+        <div id="bookedList" style="display:flex;flex-direction:column;gap:.5rem;"></div>
+      </div>
+      <div class="col-m">
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
+          <div class="stat-card"><div class="stat-l">Total slots</div><div class="stat-n" id="slotTotal">0</div></div>
+          <div class="stat-card"><div class="stat-l">Booked</div><div class="stat-n" style="color:var(--accent);" id="slotBooked">0</div></div>
+          <div class="stat-card"><div class="stat-l">Available</div><div class="stat-n" style="color:var(--green);" id="slotFree">0</div></div>
+        </div>
+        <div class="slbl">All slots</div>
+        <table class="pt">
+          <thead><tr><th>Date</th><th>Time</th><th>Client</th><th>Notes</th><th>Meet Link</th><th>Status</th><th></th></tr></thead>
+          <tbody id="slotsBody"><tr><td colspan="7" class="erow">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- CLIENTS -->
   <div class="tc" id="tc-clients">
     <div class="pad">
@@ -573,7 +607,7 @@ function amsg(id,txt,type){var e=document.getElementById(id);e.textContent=txt;e
 // TABS
 function swTab(t){
   localStorage.setItem('adminTab',t);
-  document.querySelectorAll('.atab').forEach(function(el,i){el.classList.toggle('on',['overview','projects','invoices','chat','calendar','clients'][i]===t);});
+  document.querySelectorAll('.atab').forEach(function(el,i){el.classList.toggle('on',['overview','projects','invoices','chat','calendar','meetings','clients'][i]===t);});
   document.querySelectorAll('.tc').forEach(function(el){el.classList.remove('on');});
   document.getElementById('tc-'+t).classList.add('on');
   if(t==='overview')loadOverview();
@@ -581,7 +615,70 @@ function swTab(t){
   if(t==='invoices')loadInvoices();
   if(t==='chat')loadClients();
   if(t==='calendar')loadCalendar();
+  if(t==='meetings')loadMeetings();
   if(t==='clients')loadAllClients();
+}
+
+async function addSlot(){
+  var date=document.getElementById('slotDate').value;
+  var time=document.getElementById('slotTime').value;
+  var meet=document.getElementById('slotMeet').value.trim();
+  if(!date||!time)return amsg('slotMsg','Date and time required.','err');
+  // Format time to 12hr
+  var t=new Date('2000-01-01T'+time);
+  var timeStr=t.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
+  amsg('slotMsg','Adding...','');
+  const{error}=await sb.from('availability').insert({date:date,time_slot:timeStr,is_booked:false,meet_link:meet||null});
+  if(error)return amsg('slotMsg',error.message,'err');
+  amsg('slotMsg','Slot added!','ok');
+  document.getElementById('slotDate').value='';
+  document.getElementById('slotTime').value='';
+  document.getElementById('slotMeet').value='';
+  loadMeetings();
+}
+async function updateMeetLink(id,url){await sb.from('availability').update({meet_link:url||null}).eq('id',id);}
+async function deleteSlot(id){if(!confirm('Delete slot?'))return;await sb.from('availability').delete().eq('id',id);loadMeetings();}
+async function sendMeetLink(id,email,date,time,link){
+  if(!link)return toast('Add a Meet link first','err');
+  await sendNotif(email,'meeting','📅 Your meeting is confirmed','Your Google Meet link for '+date+' at '+time+': '+link);
+  toast('Meet link sent to '+email,'ok');
+}
+
+async function loadMeetings(){
+  const{data}=await sb.from('availability').select('*').order('date',{ascending:true}).order('time_slot',{ascending:true});
+  var slots=data||[];
+  document.getElementById('slotTotal').textContent=slots.length;
+  document.getElementById('slotBooked').textContent=slots.filter(function(s){return s.is_booked;}).length;
+  document.getElementById('slotFree').textContent=slots.filter(function(s){return !s.is_booked;}).length;
+  // Booked list
+  var booked=slots.filter(function(s){return s.is_booked;});
+  var bl=document.getElementById('bookedList');
+  bl.innerHTML=booked.length?booked.map(function(s){
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:.75rem 1rem;border-left:2px solid var(--accent);">'+
+      '<div style="font-size:13px;font-weight:500;">'+s.date+' at '+s.time_slot+'</div>'+
+      '<div style="font-size:12px;color:var(--text3);margin-top:2px;">'+s.client_email+'</div>'+
+      (s.notes?'<div style="font-size:12px;color:var(--text2);margin-top:3px;">'+s.notes+'</div>':'')+
+    '</div>';
+  }).join(''):'<div style="font-size:13px;color:var(--text3);">No bookings yet</div>';
+  // All slots table
+  var tbody=document.getElementById('slotsBody');
+  if(!slots.length){tbody.innerHTML='<tr><td colspan="7" class="erow">No slots yet</td></tr>';return;}
+  tbody.innerHTML=slots.map(function(s){
+    var bc=s.is_booked?'b-rv':'b-ip';
+    var label=s.is_booked?'Booked':'Available';
+    return '<tr>'+
+      '<td style="font-weight:500;">'+s.date+'</td>'+
+      '<td>'+s.time_slot+'</td>'+
+      '<td style="font-size:12px;color:var(--text2);">'+(s.client_email||'—')+'</td>'+
+      '<td style="font-size:12px;color:var(--text3);max-width:150px;overflow:hidden;text-overflow:ellipsis;">'+(s.notes||'—')+'</td>'+
+      '<td><input class="url-inp" value="'+(s.meet_link||'')+'" placeholder="meet.google.com/..." onchange="updateMeetLink('+s.id+',this.value)" style="width:160px;"></td>'+
+      '<td><span class="bs '+bc+'">'+label+'</span></td>'+
+      '<td style="display:flex;gap:4px;">'+
+        (s.is_booked&&s.client_email?'<button class="btn-sm" onclick="sendMeetLink('+s.id+',\''+s.client_email+'\',\''+s.date+'\',\''+s.time_slot+'\','+(s.meet_link?'\''+s.meet_link+'\'':'null')+')">Send link</button>':'')+
+        '<button class="del" onclick="deleteSlot('+s.id+')">✕</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
 }
 function clearBadge(){var b=document.getElementById('msgBadge');b.style.display='none';}
 
