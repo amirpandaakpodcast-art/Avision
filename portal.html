@@ -234,7 +234,37 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .modal h3{font-size:16px;font-weight:600;margin-bottom:1.25rem;}
 .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;transition:color .2s;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;}
 .modal-close:hover{color:var(--text);background:var(--surface2);}
-/* OTP SCREEN */
+/* BOOKING CALENDAR */
+.booking-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.booking-cal{padding:1.25rem;border-right:1px solid var(--border);}
+.bcal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.bcal-title{font-size:14px;font-weight:600;}
+.bcal-nav{background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--text2);cursor:pointer;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;}
+.bcal-nav:hover{border-color:var(--accent);color:var(--accent);}
+.bcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.bcal-dow{font-size:10px;font-weight:600;color:var(--text3);text-align:center;padding:.3rem 0;text-transform:uppercase;}
+.bcal-day{font-size:12px;color:var(--text2);text-align:center;padding:.4rem;cursor:default;border-radius:6px;transition:all .2s;min-height:30px;display:flex;align-items:center;justify-content:center;}
+.bcal-day.available{color:var(--text);cursor:pointer;background:var(--accent3);border:1px solid rgba(201,168,76,.15);}
+.bcal-day.available:hover{background:var(--accent2);border-color:var(--accent);}
+.bcal-day.selected{background:var(--accent);color:#000;font-weight:600;}
+.bcal-day.today{font-weight:700;color:var(--accent);}
+.bcal-day.past{opacity:.3;cursor:not-allowed;}
+.bcal-day.other-month{opacity:.25;}
+.booking-slots{padding:1.25rem;display:flex;flex-direction:column;}
+.slots-header{font-size:13px;font-weight:500;margin-bottom:.75rem;color:var(--text2);}
+.slots-list{display:flex;flex-direction:column;gap:.4rem;flex:1;overflow-y:auto;max-height:260px;}
+.slots-list::-webkit-scrollbar{width:3px;}
+.slots-list::-webkit-scrollbar-thumb{background:var(--border2);}
+.slot-item{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:.65rem .9rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all .2s;}
+.slot-item:hover{border-color:var(--accent);background:var(--accent3);}
+.slot-item.booked{opacity:.45;cursor:not-allowed;}
+.slot-item.booked:hover{border-color:var(--border);background:var(--surface2);}
+.slot-time{font-size:13px;font-weight:500;}
+.slot-dur{font-size:11px;color:var(--text3);}
+.slot-status{font-size:11px;font-weight:500;}
+.slot-status.free{color:var(--green);}
+.slot-status.taken{color:var(--red);}
+@media(max-width:600px){.booking-wrap{grid-template-columns:1fr;}.booking-cal{border-right:none;border-bottom:1px solid var(--border);}}
 .otp-screen{display:none;text-align:center;}
 .otp-icon{font-size:2.5rem;margin-bottom:.75rem;}
 .otp-title{font-size:16px;font-weight:600;margin-bottom:.25rem;}
@@ -445,6 +475,42 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <div id="invSec"><div class="empty-card">No invoices yet.</div></div>
     </div>
     <div class="sect">
+      <div class="sect">
+        <div class="sect-h"><span class="sect-title">Book a Meeting</span></div>
+        <div class="booking-wrap">
+          <!-- CALENDAR -->
+          <div class="booking-cal">
+            <div class="bcal-header">
+              <span class="bcal-title" id="bcalTitle">June 2026</span>
+              <div style="display:flex;gap:.4rem;">
+                <button class="bcal-nav" onclick="bcalNav(-1)">‹</button>
+                <button class="bcal-nav" onclick="bcalNav(1)">›</button>
+              </div>
+            </div>
+            <div class="bcal-grid">
+              <div class="bcal-dow">Su</div><div class="bcal-dow">Mo</div><div class="bcal-dow">Tu</div><div class="bcal-dow">We</div><div class="bcal-dow">Th</div><div class="bcal-dow">Fr</div><div class="bcal-dow">Sa</div>
+              <div id="bcalDays"></div>
+            </div>
+          </div>
+          <!-- TIME SLOTS -->
+          <div class="booking-slots">
+            <div class="slots-header" id="slotsHeader">Select a date to see available times</div>
+            <div id="slotsList" class="slots-list"></div>
+          </div>
+        </div>
+        <!-- BOOKING MODAL -->
+        <div id="bookingModal" style="display:none;margin-top:1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;">
+          <div style="font-size:14px;font-weight:500;margin-bottom:.25rem;" id="bookingTitle">Confirm booking</div>
+          <div style="font-size:13px;color:var(--text3);margin-bottom:1rem;" id="bookingInfo">—</div>
+          <div class="fg" style="margin-bottom:.75rem;"><label>Your message (optional)</label><textarea id="bookingNote" placeholder="What would you like to discuss?" style="min-height:60px;resize:none;width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;"></textarea></div>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn-primary" style="flex:1;" onclick="confirmBooking()">Confirm Booking</button>
+            <button onclick="document.getElementById('bookingModal').style.display='none'" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:10px 16px;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;">Cancel</button>
+          </div>
+          <div class="amsg" id="bookingMsg"></div>
+        </div>
+      </div>
+
       <div class="sect-h"><span class="sect-title">Messages</span></div>
       <div class="chat-wrap">
         <!-- CHAT HEADER with online status -->
@@ -885,7 +951,103 @@ function checkPresence(){
     }
   });
 }
-// ── EMOJI PICKER ──
+// ── BOOKING CALENDAR ──
+var bcalDate=new Date(),selectedDate=null,selectedSlot=null,allSlots=[];
+var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function bcalNav(dir){bcalDate=new Date(bcalDate.getFullYear(),bcalDate.getMonth()+dir,1);renderBcal();}
+
+async function renderBcal(){
+  var year=bcalDate.getFullYear(),month=bcalDate.getMonth();
+  document.getElementById('bcalTitle').textContent=months[month]+' '+year;
+  // Get available slots this month
+  var from=year+'-'+(month+1<10?'0':'')+(month+1)+'-01';
+  var to=year+'-'+(month+1<10?'0':'')+(month+1)+'-31';
+  var{data}=await sb.from('availability').select('date,is_booked').gte('date',from).lte('date',to);
+  var availDates={};
+  (data||[]).forEach(function(s){
+    if(!availDates[s.date])availDates[s.date]={total:0,free:0};
+    availDates[s.date].total++;
+    if(!s.is_booked)availDates[s.date].free++;
+  });
+  var first=new Date(year,month,1).getDay();
+  var daysInMonth=new Date(year,month+1,0).getDate();
+  var today=new Date();today.setHours(0,0,0,0);
+  var html='';
+  for(var i=0;i<first;i++)html+='<div class="bcal-day other-month"></div>';
+  for(var d=1;d<=daysInMonth;d++){
+    var dateStr=year+'-'+(month+1<10?'0':'')+(month+1)+'-'+(d<10?'0':'')+d;
+    var dayDate=new Date(year,month,d);
+    var isToday=dayDate.getTime()===today.getTime();
+    var isPast=dayDate<today;
+    var hasSlots=availDates[dateStr]&&availDates[dateStr].free>0;
+    var cls='bcal-day'+(isToday?' today':'')+(isPast?' past':hasSlots?' available':'');
+    var click=hasSlots&&!isPast?'onclick="selectBcalDate(\''+dateStr+'\')"':'';
+    html+='<div class="'+cls+'" '+click+' title="'+(hasSlots?availDates[dateStr].free+' slots available':'')+'">'+d+'</div>';
+  }
+  document.getElementById('bcalDays').innerHTML=html;
+  if(selectedDate)document.querySelectorAll('.bcal-day.selected').forEach(function(el){el.classList.remove('selected');});
+}
+
+async function selectBcalDate(date){
+  selectedDate=date;
+  // Highlight selected
+  document.querySelectorAll('.bcal-day').forEach(function(el){el.classList.remove('selected');});
+  event.target.classList.add('selected');
+  // Load slots
+  var{data}=await sb.from('availability').select('*').eq('date',date).order('time_slot',{ascending:true});
+  allSlots=data||[];
+  var header=document.getElementById('slotsHeader');
+  var d=new Date(date+'T00:00:00');
+  header.textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  var list=document.getElementById('slotsList');
+  if(!allSlots.length){list.innerHTML='<div style="font-size:13px;color:var(--text3);padding:1rem;text-align:center;">No slots available this day</div>';return;}
+  list.innerHTML=allSlots.map(function(s){
+    var booked=s.is_booked;
+    return '<div class="slot-item'+(booked?' booked':'')+'" '+(booked?'':'onclick="selectSlot(\''+s.id+'\')"')+'>'+
+      '<div><div class="slot-time">'+s.time_slot+'</div><div class="slot-dur">30 min · Google Meet</div></div>'+
+      '<span class="slot-status '+(booked?'taken':'free')+'">'+(booked?'Booked':'Available')+'</span>'+
+    '</div>';
+  }).join('');
+  document.getElementById('bookingModal').style.display='none';
+}
+
+function selectSlot(id){
+  selectedSlot=allSlots.find(function(s){return s.id==id;});
+  if(!selectedSlot)return;
+  var d=new Date(selectedDate+'T00:00:00');
+  document.getElementById('bookingTitle').textContent='Confirm your booking';
+  document.getElementById('bookingInfo').textContent='📅 '+d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})+' at '+selectedSlot.time_slot+' · 30 min Google Meet';
+  document.getElementById('bookingModal').style.display='block';
+  document.getElementById('bookingMsg').textContent='';
+  document.getElementById('bookingNote').value='';
+  document.getElementById('bookingModal').scrollIntoView({behavior:'smooth'});
+}
+
+async function confirmBooking(){
+  if(!selectedSlot||!me)return;
+  var note=document.getElementById('bookingNote').value.trim();
+  var msg=document.getElementById('bookingMsg');
+  msg.textContent='Booking...';msg.className='amsg';
+  // Check still available
+  var{data}=await sb.from('availability').select('is_booked').eq('id',selectedSlot.id).single();
+  if(!data||data.is_booked){msg.textContent='Sorry, this slot was just booked. Please choose another.';msg.className='amsg err';return;}
+  // Book it
+  await sb.from('availability').update({is_booked:true,client_email:me.email,notes:note}).eq('id',selectedSlot.id);
+  // Notify admin
+  notifyAdmin('Meeting Booked',me.email+' booked '+selectedDate+' at '+selectedSlot.time_slot+(note?' — '+note:''));
+  msg.textContent='✓ Booked! Amir will send you the Google Meet link shortly.';msg.className='amsg ok';
+  toast('Meeting booked! 🎉','ok');
+  setTimeout(function(){
+    document.getElementById('bookingModal').style.display='none';
+    selectBcalDate(selectedDate);
+  },2500);
+}
+
+// Init calendar on load
+function initBooking(){renderBcal();}
+
+notifyAdmin=function(type,content){fetch(FN,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SBK},body:JSON.stringify({client_email:me?me.email:'',type:type,content:content})}).catch(function(){});}
 var EMOJIS=['😊','😂','🔥','❤️','👍','🙏','😍','🎉','✅','💯','😎','🤩','🚀','⚡','💪','👏','🎬','📹','✨','💫','😅','🤔','👀','💡','🎯','📌','💎','🌟','😁','🙌','👌','💬','📱','🎥','🏆','⭐','💰','📅','🔄','📁','✓','🎊','😄','😆','🤝','👋','🥳','😇','🤜','🤛'];
 (function(){
   var grid=document.getElementById('emojiGrid');
@@ -983,7 +1145,7 @@ function startDash(user){
   document.getElementById('profName').textContent=name||user.email;
   document.getElementById('profEmailTxt').textContent=user.email;
   document.getElementById('profAv').textContent=(name?name.charAt(0):user.email.charAt(0)).toUpperCase();
-  loadProjects(user);loadFiles();loadMsgs();loadInvoices();
+  loadProjects(user);loadFiles();loadMsgs();loadInvoices();initBooking();
   sb.from('notifications').select('*').eq('client_email',user.email).order('created_at',{ascending:false}).then(function(r){
     notifs=r.data||[];var u=notifs.filter(function(n){return !n.is_read;});
     if(u.length)showDot();
