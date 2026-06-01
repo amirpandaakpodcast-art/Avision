@@ -374,6 +374,12 @@ async function updateStatus(id,s){
   await sb.from('projects').update({status:s}).eq('id',id);
   if(data){var labels={pending:'Pending',inprogress:'In progress',review:'Ready for review',done:'Delivered ✓'};await sendNotif(data.client_email,'project','📁 Project update','"'+data.title+'" is now '+labels[s]);}
   loadProjects();
+  // Update admin presence immediately on login + every 60s
+async function updatePresence(){
+  await sb.from('admin_presence').update({last_seen:new Date().toISOString()}).eq('id',1);
+}
+updatePresence();
+setInterval(updatePresence, 60000);
 }
 async function updateDeliveryUrl(id,url){await sb.from('projects').update({delivery_url:url||null}).eq('id',id);}
 async function deleteProject(id){if(!confirm('Delete?'))return;await sb.from('projects').delete().eq('id',id);loadProjects();}
