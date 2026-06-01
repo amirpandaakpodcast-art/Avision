@@ -594,19 +594,18 @@ async function sendOTPCode(email){
   return code;
 }
 async function verifyOTP(){
-  var code=['o1','o2','o3','o4','o5','o6'].map(function(id){return document.getElementById(id).value;}).join('');
+  var code=['o1','o2','o3','o4','o5','o6'].map(function(id){return document.getElementById(id).value.trim();}).join('');
   if(code.length<6)return sm('otpMsg','Please enter the full 6-digit code.','err');
   sm('otpMsg','Verifying...','');
-  // Check DB
-  var{data,error}=await sb.from('otp_codes').select('*').eq('email',otpEmail).eq('code',code).eq('used',false).order('created_at',{ascending:false}).limit(1);
-  if(error||!data||!data.length)return sm('otpMsg','Invalid code. Please try again.','err');
-  var otp=data[0];
-  if(new Date(otp.expires_at)<new Date())return sm('otpMsg','Code expired. Please request a new one.','err');
-  // Mark used
-  await sb.from('otp_codes').update({used:true}).eq('id',otp.id);
+  var now=new Date().toISOString();
+  var{data,error}=await sb.from('otp_codes').select('*').eq('email',otpEmail).eq('used',false).gte('expires_at',now).order('created_at',{ascending:false}).limit(5);
+  if(error||!data||!data.length)return sm('otpMsg','Code not found. Please request a new one.','err');
+  var match=data.find(function(r){return r.code===code;});
+  if(!match)return sm('otpMsg','Invalid code. Please try again.','err');
+  await sb.from('otp_codes').update({used:true}).eq('id',match.id);
   if(otpTimerInterval)clearInterval(otpTimerInterval);
+  sessionStorage.setItem('otp_verified','true');
   sm('otpMsg','✓ Verified!','ok');
-  // Complete sign in - pendingSession already set
   if(pendingSession){
     document.getElementById('otpScreen').style.display='none';
     startDash(pendingSession.user);
@@ -652,6 +651,8 @@ function doSignup(){
 }
 function doLogout(){
   if(poll)clearInterval(poll);
+  if(window._presencePoll)clearInterval(window._presencePoll);
+  sessionStorage.removeItem('otp_verified');
   sb.auth.signOut().then(function(){
     document.getElementById('dash').style.display='none';
     document.getElementById('authPage').style.display='flex';
@@ -1004,10 +1005,19 @@ async function doResetSave(){
   msg.textContent='✓ Password updated!';msg.style.color='#22c55e';
   setTimeout(function(){window.location.href='/portal.html';},2000);
 }
-sb.auth.getSession().then(function(r){if(r.data&&r.data.session)startDash(r.data.session.user);});
+sb.auth.getSession().then(function(r){
+  if(r.data&&r.data.session){
+    // Check if OTP was verified this session
+    if(sessionStorage.getItem('otp_verified')==='true'){
+      startDash(r.data.session.user);
+    } else {
+      // Active session but OTP not completed — sign out
+      sb.auth.signOut();
+    }
+  }
+});
 sb.auth.onAuthStateChange(function(ev,session){
-  // Only auto-login on TOKEN_REFRESHED (returning user) not SIGNED_IN (that goes through OTP)
-  if(session&&ev==='TOKEN_REFRESHED')startDash(session.user);
+  if(session&&ev==='TOKEN_REFRESHED'&&sessionStorage.getItem('otp_verified')==='true')startDash(session.user);
   else if(session&&ev==='USER_UPDATED')startDash(session.user);
   else if(!session){me=null;document.getElementById('dash').style.display='none';document.getElementById('authPage').style.display='flex';}
 });
