@@ -843,7 +843,7 @@ function startDash(user){
     )
     .subscribe();
 
-  // ── PRESENCE + NOTIF POLL (every 5s, lightweight) ──
+  // ── PRESENCE + NOTIF POLL (every 8s) ──
   if(window._presencePoll)clearInterval(window._presencePoll);
   window._presencePoll=setInterval(function(){
     if(!me)return;
@@ -851,7 +851,9 @@ function startDash(user){
     sb.from('notifications').select('*').eq('client_email',me.email).eq('is_read',false).then(function(r){
       var d=r.data||[];if(d.length){notifs=d;showDot();}
     });
-  },5000);
+  },8000);
+  // Check immediately on load
+  setTimeout(checkPresence,1000);
 }
 (function(){
   var h=window.location.hash.substring(1),s=window.location.search.substring(1);
