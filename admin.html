@@ -409,6 +409,7 @@ function toast(msg,type){
 function amsg(id,txt,type){var e=document.getElementById(id);e.textContent=txt;e.className='amsg '+(type||'');}
 
 function swTab(t){
+  localStorage.setItem('adminTab',t);
   document.querySelectorAll('.atab').forEach(function(el,i){el.classList.toggle('on',['overview','projects','invoices','chat','clients'][i]===t);});
   document.querySelectorAll('.tc').forEach(function(el){el.classList.remove('on');});
   document.getElementById('tc-'+t).classList.add('on');
@@ -692,39 +693,68 @@ async function loadAllClients(){
 function prefillEmail(email){swTab('projects');document.getElementById('cEmail').value=email;document.getElementById('pTitle').focus();}
 function msgClient(email){swTab('chat');setTimeout(function(){selectClient(email);},200);}
 
+// ── CHECK SESSION ON LOAD (fix logout on refresh) ──
+sb.auth.getSession().then(function(r){
+  if(r.data&&r.data.session&&r.data.session.user.email===ADMIN){
+    startAdmin(r.data.session);
+  }
+});
+
 sb.auth.onAuthStateChange(function(ev,session){
   if(session&&session.user.email===ADMIN){
-    document.getElementById('lPage').style.display='none';
-    document.getElementById('aDash').style.display='flex';
-    loadProjects();
-    loadOverview();
+    if(ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED')startAdmin(session);
+  }else if(!session){
+    document.getElementById('aDash').style.display='none';
+    document.getElementById('lPage').style.display='flex';
+  }
+});
 
-    // ── REALTIME: instant new message detection ──
-    sb.channel('admin-messages')
-      .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},function(payload){
-        var m=payload.new;
-        if(m.sender==='client'){
-          var b=document.getElementById('msgBadge');
-          b.textContent=(parseInt(b.textContent)||0)+1;b.style.display='inline';
-          toast('⚡ New message from client','');
-          // If this client is open, refresh chat
-          if(activeClient===m.client_email){
-            sb.from('messages').select('*').eq('client_email',activeClient).order('created_at',{ascending:true}).then(function(r){renderMsgs(r.data||[]);});
-          }
+var adminStarted=false;
+function startAdmin(session){
+  if(adminStarted)return;
+  adminStarted=true;
+
+  document.getElementById('lPage').style.display='none';
+  document.getElementById('aDash').style.display='flex';
+
+  // ── RESTORE LAST TAB ──
+  var savedTab=localStorage.getItem('adminTab')||'overview';
+  swTab(savedTab);
+  loadProjects();
+
+  // ── REALTIME: instant messages ──
+  sb.channel('admin-msgs-'+Date.now())
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},function(payload){
+      var m=payload.new;
+      if(m.sender==='client'){
+        var b=document.getElementById('msgBadge');
+        var cur=parseInt(b.textContent)||0;
+        b.textContent=cur+1;b.style.display='inline';
+        toast('⚡ '+m.client_email+': '+m.message.substring(0,40),'');
+        if(activeClient===m.client_email){
+          sb.from('messages').select('*').eq('client_email',activeClient).order('created_at',{ascending:true}).then(function(r){renderMsgs(r.data||[]);});
         }
-      })
-      .subscribe();
-
-    // EMOJI PICKER INIT
-    var EMOJIS=['😊','😂','🔥','❤️','👍','🙏','😍','🎉','✅','💯','😎','🤩','🚀','⚡','💪','👏','🎬','📹','✨','💫','😅','🤔','👀','💡','🎯','💎','🌟','😁','🙌','👌','💬','📱','🎥','🏆','⭐','💰','📅','🔄','📁','🎊','🤝','👋','🥳'];
-    window._adminEmojis=EMOJIS;
-    document.addEventListener('click',function(e){
-      var ep=document.getElementById('adminEmojiPicker');
-      if(ep&&ep.style.display==='block'&&!e.target.closest('.chat-input'))ep.style.display='none';
+      }
+    })
+    .subscribe(function(status){
+      if(status==='SUBSCRIBED')console.log('✅ Realtime connected');
     });
 
-  }else if(!session){document.getElementById('aDash').style.display='none';document.getElementById('lPage').style.display='flex';}
-});
+  // ── PRESENCE: update every 30s ──
+  async function updatePresence(){
+    try{await sb.from('admin_presence').update({last_seen:new Date().toISOString()}).eq('id',1);}catch(e){}
+  }
+  updatePresence();
+  setInterval(updatePresence,30000);
+
+  // EMOJI PICKER INIT
+  var EMOJIS=['😊','😂','🔥','❤️','👍','🙏','😍','🎉','✅','💯','😎','🤩','🚀','⚡','💪','👏','🎬','📹','✨','💫','😅','🤔','👀','💡','🎯','💎','🌟','😁','🙌','👌','💬','📱','🎥','🏆','⭐','💰','📅','🔄','📁','🎊','🤝','👋','🥳'];
+  window._adminEmojis=EMOJIS;
+  document.addEventListener('click',function(e){
+    var ep=document.getElementById('adminEmojiPicker');
+    if(ep&&ep.style.display==='block'&&!e.target.closest('.chat-input'))ep.style.display='none';
+  });
+}
 </script>
 </body>
 </html>
