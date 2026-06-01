@@ -595,10 +595,10 @@ async function sendAdminOTP(){
   var code=Math.floor(100000+Math.random()*900000).toString();
   var expires=new Date(Date.now()+5*60*1000).toISOString();
   await sb.from('otp_codes').insert({email:ADMIN,code:code,expires_at:expires,used:false});
-  // Send to admin email via edge function
-  await fetch('https://pwrukagppviyyxdlurxs.supabase.co/functions/v1/notify-admin',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV'},
-    body:JSON.stringify({client_email:ADMIN,type:'OTP',content:'Your admin verification code is: '+code+'\n\nExpires in 5 minutes.'})
+  await fetch('https://pwrukagppviyyxdlurxs.supabase.co/functions/v1/send-otp',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV'},
+    body:JSON.stringify({email:ADMIN,code:code})
   }).catch(function(){});
   return code;
 }
