@@ -225,7 +225,22 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 /* EMOJI */
 #adminEmojiPicker{display:none;position:absolute;bottom:56px;left:0;right:0;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:.75rem;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.5);max-height:180px;overflow-y:auto;}
 
-.pad{padding:1.5rem;}
+/* OTP */
+.otp-screen{display:none;text-align:center;margin-top:.5rem;}
+.otp-icon{font-size:2rem;margin-bottom:.5rem;}
+.otp-title{font-size:15px;font-weight:600;margin-bottom:.25rem;}
+.otp-sub{font-size:12px;color:var(--text2);margin-bottom:1.25rem;line-height:1.6;}
+.otp-sub span{color:var(--accent);font-weight:500;}
+.otp-inputs{display:flex;gap:.4rem;justify-content:center;margin-bottom:1rem;}
+.otp-inp{width:42px;height:50px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;text-align:center;font-size:1.2rem;font-weight:700;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border .2s;}
+.otp-inp:focus{border-color:var(--accent);}
+.otp-inp.filled{border-color:var(--accent);background:var(--accent2);}
+.otp-timer{font-size:11px;color:var(--text3);margin-bottom:.75rem;}
+.otp-timer span{color:var(--accent);font-weight:600;}
+.otp-resend{font-size:11px;color:var(--text3);cursor:pointer;transition:color .2s;}
+.otp-resend:hover{color:var(--text);}
+.otp-back{font-size:11px;color:var(--text3);cursor:pointer;display:block;margin-top:.5rem;transition:color .2s;}
+.otp-back:hover{color:var(--text);}
 
 @media(max-width:1100px){
   .two-col,.three-col{grid-template-columns:1fr;}
@@ -255,6 +270,26 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <div class="fg"><label>Password</label><input type="password" id="aP" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
       <button class="btn-primary" onclick="adminLogin()">Sign in</button>
       <div class="amsg" id="lMsg"></div>
+
+      <!-- OTP SCREEN -->
+      <div class="otp-screen" id="adminOtpScreen">
+        <div class="otp-icon">🔐</div>
+        <div class="otp-title">Verify your identity</div>
+        <div class="otp-sub">6-digit code sent to<br><span>contact@amiravision.com</span></div>
+        <div class="otp-inputs">
+          <input class="otp-inp" id="a1" type="text" maxlength="1" oninput="aotpMove(this,'a2')" onkeydown="aotpBack(event,this,'')">
+          <input class="otp-inp" id="a2" type="text" maxlength="1" oninput="aotpMove(this,'a3')" onkeydown="aotpBack(event,this,'a1')">
+          <input class="otp-inp" id="a3" type="text" maxlength="1" oninput="aotpMove(this,'a4')" onkeydown="aotpBack(event,this,'a2')">
+          <input class="otp-inp" id="a4" type="text" maxlength="1" oninput="aotpMove(this,'a5')" onkeydown="aotpBack(event,this,'a3')">
+          <input class="otp-inp" id="a5" type="text" maxlength="1" oninput="aotpMove(this,'a6')" onkeydown="aotpBack(event,this,'a4')">
+          <input class="otp-inp" id="a6" type="text" maxlength="1" oninput="aotpMove(this,'')" onkeydown="aotpBack(event,this,'a5')">
+        </div>
+        <button class="btn-primary" onclick="adminVerifyOTP()">Verify →</button>
+        <div class="amsg" id="aotpMsg"></div>
+        <div class="otp-timer">Expires in <span id="aotpTimer">05:00</span></div>
+        <div class="otp-resend" onclick="adminResendOTP()">Resend code</div>
+        <span class="otp-back" onclick="adminBackToLogin()">← Back</span>
+      </div>
     </div>
   </div>
 </div>
@@ -554,6 +589,82 @@ function clearBadge(){var b=document.getElementById('msgBadge');b.style.display=
 async function sendNotif(email,type,title,msg){try{await sb.from('notifications').insert({client_email:email,type,title,message:msg});}catch(e){}}
 
 // AUTH
+// OTP SYSTEM
+var aotpTimerInterval=null,adminPendingSession=null;
+async function sendAdminOTP(){
+  var code=Math.floor(100000+Math.random()*900000).toString();
+  var expires=new Date(Date.now()+5*60*1000).toISOString();
+  await sb.from('otp_codes').insert({email:ADMIN,code:code,expires_at:expires,used:false});
+  // Send to admin email via edge function
+  await fetch('https://pwrukagppviyyxdlurxs.supabase.co/functions/v1/notify-admin',{
+    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV'},
+    body:JSON.stringify({client_email:ADMIN,type:'OTP',content:'Your admin verification code is: '+code+'\n\nExpires in 5 minutes.'})
+  }).catch(function(){});
+  return code;
+}
+function showAdminOTP(){
+  document.getElementById('aE').closest('.fg').style.display='none';
+  document.getElementById('aP').closest('.fg').style.display='none';
+  document.querySelector('#lPage .btn-primary').style.display='none';
+  document.getElementById('lMsg').style.display='none';
+  document.getElementById('adminOtpScreen').style.display='block';
+  ['a1','a2','a3','a4','a5','a6'].forEach(function(id){document.getElementById(id).value='';document.getElementById(id).classList.remove('filled');});
+  setTimeout(function(){document.getElementById('a1').focus();},100);
+  startAOTPTimer();
+}
+function adminBackToLogin(){
+  document.getElementById('adminOtpScreen').style.display='none';
+  document.getElementById('aE').closest('.fg').style.display='block';
+  document.getElementById('aP').closest('.fg').style.display='block';
+  document.querySelector('#lPage .btn-primary').style.display='block';
+  document.getElementById('lMsg').style.display='block';
+  if(aotpTimerInterval)clearInterval(aotpTimerInterval);
+  if(adminPendingSession){sb.auth.signOut();adminPendingSession=null;adminStarted=false;}
+}
+function startAOTPTimer(){
+  if(aotpTimerInterval)clearInterval(aotpTimerInterval);
+  var secs=300;
+  function update(){
+    var m=Math.floor(secs/60),s=secs%60;
+    var el=document.getElementById('aotpTimer');
+    if(el)el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    if(secs<=0){clearInterval(aotpTimerInterval);if(el)el.textContent='Expired';}
+    secs--;
+  }
+  update();aotpTimerInterval=setInterval(update,1000);
+}
+function aotpMove(inp,nextId){
+  inp.value=inp.value.replace(/[^0-9]/g,'');
+  if(inp.value)inp.classList.add('filled');else inp.classList.remove('filled');
+  if(inp.value&&nextId)document.getElementById(nextId).focus();
+  var code=['a1','a2','a3','a4','a5','a6'].map(function(id){return document.getElementById(id).value;}).join('');
+  if(code.length===6)adminVerifyOTP();
+}
+function aotpBack(e,inp,prevId){if(e.key==='Backspace'&&!inp.value&&prevId)document.getElementById(prevId).focus();}
+async function adminVerifyOTP(){
+  var code=['a1','a2','a3','a4','a5','a6'].map(function(id){return document.getElementById(id).value;}).join('');
+  if(code.length<6)return amsg('aotpMsg','Please enter the full 6-digit code.','err');
+  amsg('aotpMsg','Verifying...','');
+  var{data,error}=await sb.from('otp_codes').select('*').eq('email',ADMIN).eq('code',code).eq('used',false).order('created_at',{ascending:false}).limit(1);
+  if(error||!data||!data.length)return amsg('aotpMsg','Invalid code. Please try again.','err');
+  if(new Date(data[0].expires_at)<new Date())return amsg('aotpMsg','Code expired. Request a new one.','err');
+  await sb.from('otp_codes').update({used:true}).eq('id',data[0].id);
+  if(aotpTimerInterval)clearInterval(aotpTimerInterval);
+  amsg('aotpMsg','✓ Verified!','ok');
+  setTimeout(function(){
+    document.getElementById('adminOtpScreen').style.display='none';
+    startAdmin();
+  },500);
+}
+async function adminResendOTP(){
+  amsg('aotpMsg','Sending...','');
+  ['a1','a2','a3','a4','a5','a6'].forEach(function(id){document.getElementById(id).value='';document.getElementById(id).classList.remove('filled');});
+  await sendAdminOTP();
+  startAOTPTimer();
+  amsg('aotpMsg','New code sent!','ok');
+  setTimeout(function(){amsg('aotpMsg','','');},3000);
+}
+
 async function adminLogin(){
   var e=document.getElementById('aE').value,p=document.getElementById('aP').value;
   if(!e||!p)return amsg('lMsg','Please fill all fields.','err');
@@ -561,6 +672,12 @@ async function adminLogin(){
   amsg('lMsg','Signing in...','');
   const{error}=await sb.auth.signInWithPassword({email:e,password:p});
   if(error)return amsg('lMsg',error.message,'err');
+  // Password OK — now send OTP
+  adminPendingSession=true;
+  amsg('lMsg','Sending verification code...','');
+  await sendAdminOTP();
+  amsg('lMsg','','');
+  showAdminOTP();
 }
 async function adminLogout(){
   if(chatSub){clearInterval(chatSub);chatSub=null;}
@@ -1007,7 +1124,8 @@ sb.auth.getSession().then(function(r){
   if(r.data&&r.data.session&&r.data.session.user.email===ADMIN)startAdmin();
 });
 sb.auth.onAuthStateChange(function(ev,session){
-  if(session&&session.user.email===ADMIN&&(ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED'))startAdmin();
+  // Only auto-start on TOKEN_REFRESHED (returning user), not SIGNED_IN (needs OTP)
+  if(session&&session.user.email===ADMIN&&ev==='TOKEN_REFRESHED')startAdmin();
   else if(!session){adminStarted=false;document.getElementById('aDash').style.display='none';document.getElementById('lPage').style.display='flex';}
 });
 </script>
