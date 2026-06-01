@@ -291,14 +291,14 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
         <div class="otp-title">Verify your identity</div>
         <div class="otp-sub">We sent a 6-digit code to<br><span id="otpEmailDisp">your email</span></div>
         <div class="otp-inputs">
-          <input class="otp-inp" id="o1" type="text" maxlength="1" oninput="otpMove(this,'o2')" onkeydown="otpBack(event,this,'')">
-          <input class="otp-inp" id="o2" type="text" maxlength="1" oninput="otpMove(this,'o3')" onkeydown="otpBack(event,this,'o1')">
-          <input class="otp-inp" id="o3" type="text" maxlength="1" oninput="otpMove(this,'o4')" onkeydown="otpBack(event,this,'o2')">
-          <input class="otp-inp" id="o4" type="text" maxlength="1" oninput="otpMove(this,'o5')" onkeydown="otpBack(event,this,'o3')">
-          <input class="otp-inp" id="o5" type="text" maxlength="1" oninput="otpMove(this,'o6')" onkeydown="otpBack(event,this,'o4')">
-          <input class="otp-inp" id="o6" type="text" maxlength="1" oninput="otpMove(this,'')" onkeydown="otpBack(event,this,'o5')">
+          <input class="otp-inp" id="o1" type="text" maxlength="1" inputmode="numeric" oninput="otpMove(this,'o2')" onkeydown="otpKey(event,this,'')" onpaste="otpPaste(event)">
+          <input class="otp-inp" id="o2" type="text" maxlength="1" inputmode="numeric" oninput="otpMove(this,'o3')" onkeydown="otpKey(event,this,'o1')">
+          <input class="otp-inp" id="o3" type="text" maxlength="1" inputmode="numeric" oninput="otpMove(this,'o4')" onkeydown="otpKey(event,this,'o2')">
+          <input class="otp-inp" id="o4" type="text" maxlength="1" inputmode="numeric" oninput="otpMove(this,'o5')" onkeydown="otpKey(event,this,'o3')">
+          <input class="otp-inp" id="o5" type="text" maxlength="1" inputmode="numeric" oninput="otpMove(this,'o6')" onkeydown="otpKey(event,this,'o4')">
+          <input class="otp-inp" id="o6" type="text" maxlength="1" inputmode="numeric" oninput="otpMove(this,'')" onkeydown="otpKey(event,this,'o5')">
         </div>
-        <button class="btn-primary" onclick="verifyOTP()">Verify →</button>
+        <button class="btn-primary" id="otpVerifyBtn" onclick="verifyOTP()">Verify →</button>
         <div class="amsg" id="otpMsg"></div>
         <div class="otp-timer">Code expires in <span id="otpTimer">05:00</span></div>
         <div class="otp-resend" onclick="resendOTP()">Didn't receive it? Resend code</div>
@@ -564,10 +564,26 @@ function otpMove(inp,nextId){
   if(inp.value&&nextId)document.getElementById(nextId).focus();
   // Auto verify when all filled
   var code=['o1','o2','o3','o4','o5','o6'].map(function(id){return document.getElementById(id).value;}).join('');
-  if(code.length===6)verifyOTP();
+  if(code.length===6)setTimeout(verifyOTP,150);
 }
-function otpBack(e,inp,prevId){
-  if(e.key==='Backspace'&&!inp.value&&prevId){document.getElementById(prevId).focus();}
+function otpKey(e,inp,prevId){
+  if(e.key==='Backspace'&&!inp.value&&prevId)document.getElementById(prevId).focus();
+  if(e.key==='Enter')verifyOTP();
+}
+function otpPaste(e){
+  e.preventDefault();
+  var text=(e.clipboardData||window.clipboardData).getData('text').replace(/[^0-9]/g,'').substring(0,6);
+  var ids=['o1','o2','o3','o4','o5','o6'];
+  for(var i=0;i<text.length;i++){
+    var el=document.getElementById(ids[i]);
+    el.value=text[i];
+    el.classList.add('filled');
+  }
+  if(text.length>0){
+    var last=document.getElementById(ids[Math.min(text.length,5)]);
+    if(last)last.focus();
+  }
+  if(text.length===6)setTimeout(verifyOTP,150);
 }
 function startOTPTimer(){
   if(otpTimerInterval)clearInterval(otpTimerInterval);
@@ -595,20 +611,37 @@ async function sendOTPCode(email){
 }
 async function verifyOTP(){
   var code=['o1','o2','o3','o4','o5','o6'].map(function(id){return document.getElementById(id).value.trim();}).join('');
-  if(code.length<6)return sm('otpMsg','Please enter the full 6-digit code.','err');
-  sm('otpMsg','Verifying...','');
-  var now=new Date().toISOString();
-  var{data,error}=await sb.from('otp_codes').select('*').eq('email',otpEmail).eq('used',false).gte('expires_at',now).order('created_at',{ascending:false}).limit(5);
-  if(error||!data||!data.length)return sm('otpMsg','Code not found. Please request a new one.','err');
-  var match=data.find(function(r){return r.code===code;});
-  if(!match)return sm('otpMsg','Invalid code. Please try again.','err');
-  await sb.from('otp_codes').update({used:true}).eq('id',match.id);
-  if(otpTimerInterval)clearInterval(otpTimerInterval);
-  sessionStorage.setItem('otp_verified','true');
-  sm('otpMsg','✓ Verified!','ok');
-  if(pendingSession){
-    document.getElementById('otpScreen').style.display='none';
-    startDash(pendingSession.user);
+  if(code.length<6)return sm('otpMsg','Please enter all 6 digits.','err');
+  var btn=document.getElementById('otpVerifyBtn');
+  if(btn){btn.textContent='Verifying...';btn.disabled=true;}
+  sm('otpMsg','','');
+  try{
+    // Get all recent unused codes for this email
+    var{data,error}=await sb.from('otp_codes').select('*').eq('email',otpEmail).eq('used',false).order('created_at',{ascending:false}).limit(10);
+    if(error)throw new Error(error.message);
+    if(!data||!data.length){
+      if(btn){btn.textContent='Verify →';btn.disabled=false;}
+      return sm('otpMsg','No code found. Please request a new one.','err');
+    }
+    var now=new Date();
+    var match=data.find(function(r){return r.code===code&&new Date(r.expires_at)>now;});
+    if(!match){
+      var expired=data.find(function(r){return r.code===code;});
+      if(btn){btn.textContent='Verify →';btn.disabled=false;}
+      if(expired)return sm('otpMsg','Code expired. Please request a new one.','err');
+      return sm('otpMsg','Wrong code. Please try again.','err');
+    }
+    await sb.from('otp_codes').update({used:true}).eq('id',match.id);
+    if(otpTimerInterval)clearInterval(otpTimerInterval);
+    sessionStorage.setItem('otp_verified','true');
+    sm('otpMsg','✓ Verified!','ok');
+    setTimeout(function(){
+      document.getElementById('otpScreen').style.display='none';
+      if(pendingSession)startDash(pendingSession.user);
+    },600);
+  }catch(err){
+    if(btn){btn.textContent='Verify →';btn.disabled=false;}
+    sm('otpMsg','Error: '+err.message,'err');
   }
 }
 async function resendOTP(){
