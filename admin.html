@@ -459,7 +459,10 @@ async function selectClient(email){
   document.querySelectorAll('.cl-btn').forEach(function(b){b.classList.toggle('on',b.querySelector('.cl-email')?.textContent===email||b.textContent===email);});
   var area=document.getElementById('chatArea');
   area.innerHTML=
-    '<div class="chat-hdr">'+email+'</div>'+
+    '<div class="chat-hdr" style="display:flex;align-items:center;justify-content:space-between;">'+
+      '<span>💬 '+email+'</span>'+
+      '<span id="clientReadStatus" style="font-size:11px;color:var(--text3);"></span>'+
+    '</div>'+
     '<div class="chat-msgs" id="chatMsgs"><div style="text-align:center;padding:2rem;font-size:13px;color:var(--text3);">Loading...</div></div>'+
     '<div class="qs-section"><div class="qs-lbl">Quick send</div><div class="qs-btns">'+
       '<button class="qs-btn" onclick="qs(\'Project is now in progress ✓\')">▶ Started</button>'+
@@ -468,17 +471,40 @@ async function selectClient(email){
       '<button class="qs-btn" onclick="qs(\'Invoice sent — please complete payment when ready\')">💳 Invoice sent</button>'+
       '<button class="qs-btn" onclick="qs(\'Thank you for your payment! Starting right away.\')">🙏 Payment received</button>'+
     '</div></div>'+
-    '<div class="chat-input"><input type="text" class="cin" id="adminIn" placeholder="Message client..." onkeydown="if(event.key===\'Enter\')adminSend()"><button class="csend" onclick="adminSend()">Send</button></div>';
+    '<div class="chat-input">'+
+      '<input type="text" class="cin" id="adminIn" placeholder="Message client..." onkeydown="handleAdminTyping(event)">'+
+      '<button class="csend" onclick="adminSend()">Send</button>'+
+    '</div>';
   const{data}=await sb.from('messages').select('*').eq('client_email',email).order('created_at',{ascending:true});
   renderMsgs(data||[]);loadSharedFiles(email);
+  // Update admin presence last_seen
+  await sb.from('admin_presence').update({last_seen:new Date().toISOString(),is_typing:false,typing_for:''}).eq('id',1);
   var lastId=data&&data.length?data[data.length-1].id:0;
+  var typingTimer=null;
   chatSub=setInterval(async function(){
     if(!activeClient)return;
     const{data:fresh}=await sb.from('messages').select('*').eq('client_email',activeClient).order('created_at',{ascending:true});
     if(!fresh||!fresh.length)return;
     var latest=fresh[fresh.length-1];
     if(latest.id!==lastId){lastId=latest.id;renderMsgs(fresh);}
+    // Update presence heartbeat
+    await sb.from('admin_presence').update({last_seen:new Date().toISOString()}).eq('id',1);
+    // Show read status
+    var myMsgs=fresh.filter(function(m){return m.sender==='admin';});
+    var lastMyMsg=myMsgs[myMsgs.length-1];
+    var rs=document.getElementById('clientReadStatus');
+    if(rs&&lastMyMsg){rs.textContent=lastMyMsg.is_read?'✓✓ Seen':'✓ Delivered';rs.style.color=lastMyMsg.is_read?'#22c55e':'var(--text3)';}
   },3000);
+}
+function handleAdminTyping(e){
+  if(e.key==='Enter'){adminSend();return;}
+  if(activeClient){
+    sb.from('admin_presence').update({is_typing:true,typing_for:activeClient,last_seen:new Date().toISOString()}).eq('id',1);
+    clearTimeout(window._typingTimer);
+    window._typingTimer=setTimeout(function(){
+      sb.from('admin_presence').update({is_typing:false,typing_for:''}).eq('id',1);
+    },2000);
+  }
 }
 function qs(msg){var i=document.getElementById('adminIn');if(!i)return;i.value=msg;adminSend();}
 function renderMsgs(data){
@@ -486,14 +512,16 @@ function renderMsgs(data){
   if(!data.length){c.innerHTML='<div style="text-align:center;padding:2rem;font-size:13px;color:var(--text3);">No messages yet</div>';return;}
   c.innerHTML=data.map(function(m){
     var isAdm=m.sender==='admin',t=new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    return '<div class="mrow '+(isAdm?'adm':'cli')+'">'+(isAdm?'':'<div class="msnd">Client</div>')+'<div class="mb">'+m.message+'</div><div class="mtime">'+t+'</div></div>';
+    var tick=isAdm?'<span style="font-size:10px;margin-left:4px;color:'+(m.is_read?'#22c55e':'var(--text3)')+';">'+(m.is_read?'✓✓':'✓')+'</span>':'';
+    return '<div class="mrow '+(isAdm?'adm':'cli')+'">'+(isAdm?'':'<div class="msnd">Client</div>')+'<div class="mb">'+m.message+'</div><div class="mtime">'+t+tick+'</div></div>';
   }).join('');
   c.scrollTop=c.scrollHeight;
 }
 async function adminSend(){
   if(!activeClient)return;
   var inp=document.getElementById('adminIn'),m=inp.value.trim();if(!m)return;inp.value='';
-  await sb.from('messages').insert({client_email:activeClient,sender:'admin',message:m});
+  await sb.from('messages').insert({client_email:activeClient,sender:'admin',message:m,is_read:false});
+  await sb.from('admin_presence').update({is_typing:false,typing_for:'',last_seen:new Date().toISOString()}).eq('id',1);
   await sendNotif(activeClient,'message','💬 New message from Amir',m);
 }
 async function loadSharedFiles(email){
