@@ -211,14 +211,76 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   </div>
 
   <div class="atabs">
-    <div class="atab on" onclick="swTab('projects')">Projects</div>
+    <div class="atab on" onclick="swTab('overview')">Overview</div>
+    <div class="atab" onclick="swTab('projects')">Projects</div>
     <div class="atab" onclick="swTab('invoices')">Invoices</div>
     <div class="atab" onclick="swTab('chat');clearBadge()">Messages <span class="mbadge" id="msgBadge">0</span></div>
     <div class="atab" onclick="swTab('clients')">Clients</div>
   </div>
 
-  <!-- PROJECTS -->
-  <div class="tc on" id="tc-projects">
+  <!-- OVERVIEW DASHBOARD -->
+  <div class="tc on" id="tc-overview">
+    <div class="pad">
+      <!-- KPI ROW -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:2rem;">
+        <div class="stat-card" style="border-left:2px solid var(--accent);">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;">Total Revenue</div>
+          <div style="font-size:1.8rem;font-weight:700;color:var(--accent);" id="ovRevTotal">$0</div>
+          <div style="font-size:11px;color:var(--green);margin-top:.2rem;" id="ovRevPaid">$0 collected</div>
+        </div>
+        <div class="stat-card" style="border-left:2px solid var(--green);">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;">Active Projects</div>
+          <div style="font-size:1.8rem;font-weight:700;color:var(--green);" id="ovActive">0</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:.2rem;" id="ovTotal">0 total</div>
+        </div>
+        <div class="stat-card" style="border-left:2px solid var(--blue);">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;">Total Clients</div>
+          <div style="font-size:1.8rem;font-weight:700;color:var(--blue);" id="ovClients">0</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:.2rem;" id="ovNewClients">0 this month</div>
+        </div>
+        <div class="stat-card" style="border-left:2px solid #f59e0b;">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;">Pending Invoices</div>
+          <div style="font-size:1.8rem;font-weight:700;color:#f59e0b;" id="ovPending">0</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:.2rem;" id="ovPendingAmt">$0 outstanding</div>
+        </div>
+      </div>
+
+      <!-- TWO COLUMNS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+        <!-- RECENT PROJECTS -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+            <div class="slbl" style="margin:0;">Recent Projects</div>
+            <span onclick="swTab('projects')" style="font-size:12px;color:var(--accent);cursor:pointer;">View all →</span>
+          </div>
+          <div id="ovProjects" style="display:flex;flex-direction:column;gap:.5rem;"></div>
+        </div>
+
+        <!-- RECENT ACTIVITY -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+            <div class="slbl" style="margin:0;">Recent Messages</div>
+            <span onclick="swTab('chat')" style="font-size:12px;color:var(--accent);cursor:pointer;">View all →</span>
+          </div>
+          <div id="ovMessages" style="display:flex;flex-direction:column;gap:.5rem;"></div>
+        </div>
+
+      </div>
+
+      <!-- UNPAID INVOICES -->
+      <div style="margin-top:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+          <div class="slbl" style="margin:0;">Unpaid Invoices</div>
+          <span onclick="swTab('invoices')" style="font-size:12px;color:var(--accent);cursor:pointer;">View all →</span>
+        </div>
+        <div id="ovUnpaid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECTS TAB -->
+  <div class="tc" id="tc-projects">
     <div class="three-col">
       <div class="col-l">
         <div class="slbl">Add project</div>
@@ -316,6 +378,26 @@ const SBU='https://pwrukagppviyyxdlurxs.supabase.co',SBK='sb_publishable_0qAX6jX
 const sb=supabase.createClient(SBU,SBK,{auth:{storage:localStorage,persistSession:true,autoRefreshToken:true,storageKey:'avision-admin-auth'}});
 let activeClient=null,chatSub=null;
 
+function togAdminEmoji(){
+  var p=document.getElementById('adminEmojiPicker');
+  if(!p)return;
+  if(p.style.display==='block'){p.style.display='none';return;}
+  var grid=document.getElementById('adminEmojiGrid');
+  if(grid&&!grid.children.length){
+    (window._adminEmojis||[]).forEach(function(e){
+      var btn=document.createElement('button');
+      btn.textContent=e;
+      btn.style.cssText='background:none;border:none;font-size:20px;cursor:pointer;padding:4px;border-radius:4px;';
+      btn.onclick=function(){
+        var inp=document.getElementById('adminIn');
+        if(inp){inp.value+=e;inp.focus();}
+        p.style.display='none';
+      };
+      grid.appendChild(btn);
+    });
+  }
+  p.style.display='block';
+}
 function toast(msg,type){
   var t=document.getElementById('toast'),d=document.createElement('div');d.className='ti';
   var c=type==='ok'?'#22c55e':type==='err'?'#ef4444':'#c9a84c';
@@ -327,14 +409,67 @@ function toast(msg,type){
 function amsg(id,txt,type){var e=document.getElementById(id);e.textContent=txt;e.className='amsg '+(type||'');}
 
 function swTab(t){
-  document.querySelectorAll('.atab').forEach(function(el,i){el.classList.toggle('on',['projects','invoices','chat','clients'][i]===t);});
+  document.querySelectorAll('.atab').forEach(function(el,i){el.classList.toggle('on',['overview','projects','invoices','chat','clients'][i]===t);});
   document.querySelectorAll('.tc').forEach(function(el){el.classList.remove('on');});
   document.getElementById('tc-'+t).classList.add('on');
+  if(t==='overview')loadOverview();
   if(t==='invoices')loadInvoices();
   if(t==='chat')loadClients();
   if(t==='clients')loadAllClients();
 }
-function clearBadge(){var b=document.getElementById('msgBadge');b.style.display='none';localStorage.setItem('adminLastMsgId',Date.now());}
+function clearBadge(){var b=document.getElementById('msgBadge');b.style.display='none';}
+
+async function loadOverview(){
+  var sym={USD:'$',SAR:'﷼',EUR:'€',GBP:'£'};
+  var projR=await sb.from('projects').select('*').order('created_at',{ascending:false});
+  var invR=await sb.from('invoices').select('*').order('created_at',{ascending:false});
+  var cliR=await sb.from('clients').select('*').order('created_at',{ascending:false});
+  var msgR=await sb.from('messages').select('*').eq('sender','client').order('created_at',{ascending:false}).limit(5);
+  var proj=projR.data||[],inv=invR.data||[],clients=cliR.data||[],msgs=msgR.data||[];
+  var total=inv.reduce(function(a,i){return a+parseFloat(i.amount||0);},0);
+  var paid=inv.filter(function(i){return i.status==='paid';}).reduce(function(a,i){return a+parseFloat(i.amount||0);},0);
+  var unpaidAmt=inv.filter(function(i){return i.status!=='paid';}).reduce(function(a,i){return a+parseFloat(i.amount||0);},0);
+  var unpaidCount=inv.filter(function(i){return i.status!=='paid';}).length;
+  var active=proj.filter(function(p){return p.status==='inprogress';}).length;
+  var now=new Date();
+  var thisMonth=clients.filter(function(c){var d=new Date(c.created_at);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
+  document.getElementById('ovRevTotal').textContent='$'+total.toLocaleString();
+  document.getElementById('ovRevPaid').textContent='$'+paid.toLocaleString()+' collected';
+  document.getElementById('ovActive').textContent=active;
+  document.getElementById('ovTotal').textContent=proj.length+' total';
+  document.getElementById('ovClients').textContent=clients.length;
+  document.getElementById('ovNewClients').textContent=thisMonth+' this month';
+  document.getElementById('ovPending').textContent=unpaidCount;
+  document.getElementById('ovPendingAmt').textContent='$'+unpaidAmt.toLocaleString()+' outstanding';
+  var sc={inprogress:'#22c55e',review:'#c9a84c',done:'#3b82f6',pending:'#555'};
+  var sl={inprogress:'In progress',review:'In review',done:'Done',pending:'Pending'};
+  document.getElementById('ovProjects').innerHTML=proj.slice(0,5).map(function(p){
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.4rem;">'+
+      '<div><div style="font-size:13px;font-weight:500;">'+p.title+'</div><div style="font-size:11px;color:var(--text3);margin-top:1px;">'+p.client_email+'</div></div>'+
+      '<span style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;background:'+sc[p.status]+'22;color:'+sc[p.status]+';white-space:nowrap;">'+sl[p.status]+'</span>'+
+    '</div>';
+  }).join('')||'<div style="font-size:13px;color:var(--text3);">No projects yet</div>';
+  document.getElementById('ovMessages').innerHTML=msgs.slice(0,5).map(function(m){
+    var t=new Date(m.created_at),diff=Math.floor((Date.now()-t)/60000);
+    var ts=diff<1?'Just now':diff<60?diff+'m ago':diff<1440?Math.floor(diff/60)+'h ago':t.toLocaleDateString();
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:.75rem 1rem;cursor:pointer;margin-bottom:.4rem;" onclick="swTab(\'chat\')">'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:12px;font-weight:500;color:var(--accent);">'+m.client_email+'</span><span style="font-size:10px;color:var(--text3);">'+ts+'</span></div>'+
+      '<div style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+m.message+'</div>'+
+    '</div>';
+  }).join('')||'<div style="font-size:13px;color:var(--text3);">No messages yet</div>';
+  var unpaid=inv.filter(function(i){return i.status!=='paid';});
+  var ovu=document.getElementById('ovUnpaid');
+  if(!unpaid.length){ovu.innerHTML='<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem;text-align:center;font-size:13px;color:var(--green);">✓ All invoices paid</div>';return;}
+  ovu.innerHTML='<table class="pt"><thead><tr><th>Project</th><th>Client</th><th>Amount</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>'+
+    unpaid.slice(0,5).map(function(i){
+      var s=sym[i.currency]||'$';
+      return '<tr><td style="font-weight:500;">'+i.project_title+'</td><td style="font-size:12px;color:var(--text2);">'+i.client_email+'</td>'+
+        '<td style="font-weight:600;color:var(--accent);">'+s+parseFloat(i.amount).toLocaleString()+'</td>'+
+        '<td style="font-size:12px;color:var(--text3);">'+(i.due_date||'—')+'</td>'+
+        '<td><select class="sel" onchange="updateInvStatus('+i.id+',this.value)"><option value="unpaid" '+(i.status==='unpaid'?'selected':'')+'>Unpaid</option><option value="pending" '+(i.status==='pending'?'selected':'')+'>Pending</option><option value="paid" '+(i.status==='paid'?'selected':'')+'>Paid</option></select></td>'+
+        '<td><button class="btn-sm" onclick="swTab(\'invoices\')">Manage</button></td></tr>';
+    }).join('')+'</tbody></table>';
+}
 
 async function sendNotif(email,type,title,msg){
   try{await sb.from('notifications').insert({client_email:email,type,title,message:msg});}catch(e){}
@@ -374,12 +509,6 @@ async function updateStatus(id,s){
   await sb.from('projects').update({status:s}).eq('id',id);
   if(data){var labels={pending:'Pending',inprogress:'In progress',review:'Ready for review',done:'Delivered ✓'};await sendNotif(data.client_email,'project','📁 Project update','"'+data.title+'" is now '+labels[s]);}
   loadProjects();
-  // Update admin presence immediately on login + every 60s
-async function updatePresence(){
-  await sb.from('admin_presence').update({last_seen:new Date().toISOString()}).eq('id',1);
-}
-updatePresence();
-setInterval(updatePresence, 60000);
 }
 async function updateDeliveryUrl(id,url){await sb.from('projects').update({delivery_url:url||null}).eq('id',id);}
 async function deleteProject(id){if(!confirm('Delete?'))return;await sb.from('projects').delete().eq('id',id);loadProjects();}
@@ -477,9 +606,14 @@ async function selectClient(email){
       '<button class="qs-btn" onclick="qs(\'Invoice sent — please complete payment when ready\')">💳 Invoice sent</button>'+
       '<button class="qs-btn" onclick="qs(\'Thank you for your payment! Starting right away.\')">🙏 Payment received</button>'+
     '</div></div>'+
-    '<div class="chat-input">'+
+    '<div class="chat-input" style="position:relative;">'+
+      '<button onclick="togAdminEmoji()" style="display:flex;align-items:center;justify-content:center;width:42px;background:transparent;border:none;border-right:1px solid var(--border);cursor:pointer;font-size:18px;flex-shrink:0;">😊</button>'+
       '<input type="text" class="cin" id="adminIn" placeholder="Message client..." onkeydown="handleAdminTyping(event)">'+
       '<button class="csend" onclick="adminSend()">Send</button>'+
+      '<div id="adminEmojiPicker" style="display:none;position:absolute;bottom:56px;left:0;right:0;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:.75rem;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.5);max-height:180px;overflow-y:auto;">'+
+        '<div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">Pick emoji</div>'+
+        '<div id="adminEmojiGrid" style="display:flex;flex-wrap:wrap;gap:4px;"></div>'+
+      '</div>'+
     '</div>';
   const{data}=await sb.from('messages').select('*').eq('client_email',email).order('created_at',{ascending:true});
   renderMsgs(data||[]);loadSharedFiles(email);
@@ -563,16 +697,32 @@ sb.auth.onAuthStateChange(function(ev,session){
     document.getElementById('lPage').style.display='none';
     document.getElementById('aDash').style.display='flex';
     loadProjects();
-    var lastMsgId=parseInt(localStorage.getItem('adminLastMsgId')||'0');
-    setInterval(async function(){
-      const{data}=await sb.from('messages').select('id,sender,client_email').order('created_at',{ascending:false}).limit(1);
-      if(!data||!data.length)return;
-      var latest=data[0];
-      if(latest.id>lastMsgId&&latest.sender==='client'){
-        var b=document.getElementById('msgBadge');b.textContent=(parseInt(b.textContent)||0)+1;b.style.display='inline';
-        toast('New message from client','');lastMsgId=latest.id;localStorage.setItem('adminLastMsgId',lastMsgId);
-      }
-    },5000);
+    loadOverview();
+
+    // ── REALTIME: instant new message detection ──
+    sb.channel('admin-messages')
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},function(payload){
+        var m=payload.new;
+        if(m.sender==='client'){
+          var b=document.getElementById('msgBadge');
+          b.textContent=(parseInt(b.textContent)||0)+1;b.style.display='inline';
+          toast('⚡ New message from client','');
+          // If this client is open, refresh chat
+          if(activeClient===m.client_email){
+            sb.from('messages').select('*').eq('client_email',activeClient).order('created_at',{ascending:true}).then(function(r){renderMsgs(r.data||[]);});
+          }
+        }
+      })
+      .subscribe();
+
+    // EMOJI PICKER INIT
+    var EMOJIS=['😊','😂','🔥','❤️','👍','🙏','😍','🎉','✅','💯','😎','🤩','🚀','⚡','💪','👏','🎬','📹','✨','💫','😅','🤔','👀','💡','🎯','💎','🌟','😁','🙌','👌','💬','📱','🎥','🏆','⭐','💰','📅','🔄','📁','🎊','🤝','👋','🥳'];
+    window._adminEmojis=EMOJIS;
+    document.addEventListener('click',function(e){
+      var ep=document.getElementById('adminEmojiPicker');
+      if(ep&&ep.style.display==='block'&&!e.target.closest('.chat-input'))ep.style.display='none';
+    });
+
   }else if(!session){document.getElementById('aDash').style.display='none';document.getElementById('lPage').style.display='flex';}
 });
 </script>
