@@ -642,14 +642,17 @@ function aotpMove(inp,nextId){
 }
 function aotpBack(e,inp,prevId){if(e.key==='Backspace'&&!inp.value&&prevId)document.getElementById(prevId).focus();}
 async function adminVerifyOTP(){
-  var code=['a1','a2','a3','a4','a5','a6'].map(function(id){return document.getElementById(id).value;}).join('');
+  var code=['a1','a2','a3','a4','a5','a6'].map(function(id){return document.getElementById(id).value.trim();}).join('');
   if(code.length<6)return amsg('aotpMsg','Please enter the full 6-digit code.','err');
   amsg('aotpMsg','Verifying...','');
-  var{data,error}=await sb.from('otp_codes').select('*').eq('email',ADMIN).eq('code',code).eq('used',false).order('created_at',{ascending:false}).limit(1);
-  if(error||!data||!data.length)return amsg('aotpMsg','Invalid code. Please try again.','err');
-  if(new Date(data[0].expires_at)<new Date())return amsg('aotpMsg','Code expired. Request a new one.','err');
-  await sb.from('otp_codes').update({used:true}).eq('id',data[0].id);
+  var now=new Date().toISOString();
+  var{data,error}=await sb.from('otp_codes').select('*').eq('email',ADMIN).eq('used',false).gte('expires_at',now).order('created_at',{ascending:false}).limit(5);
+  if(error||!data||!data.length)return amsg('aotpMsg','Code not found. Please request a new one.','err');
+  var match=data.find(function(r){return r.code===code;});
+  if(!match)return amsg('aotpMsg','Invalid code. Please try again.','err');
+  await sb.from('otp_codes').update({used:true}).eq('id',match.id);
   if(aotpTimerInterval)clearInterval(aotpTimerInterval);
+  sessionStorage.setItem('admin_otp_verified','true');
   amsg('aotpMsg','✓ Verified!','ok');
   setTimeout(function(){
     document.getElementById('adminOtpScreen').style.display='none';
@@ -681,6 +684,7 @@ async function adminLogin(){
 }
 async function adminLogout(){
   if(chatSub){clearInterval(chatSub);chatSub=null;}
+  sessionStorage.removeItem('admin_otp_verified');
   await sb.auth.signOut();
   document.getElementById('aDash').style.display='none';
   document.getElementById('lPage').style.display='flex';
@@ -1121,11 +1125,16 @@ function startAdmin(){
 }
 
 sb.auth.getSession().then(function(r){
-  if(r.data&&r.data.session&&r.data.session.user.email===ADMIN)startAdmin();
+  if(r.data&&r.data.session&&r.data.session.user.email===ADMIN){
+    if(sessionStorage.getItem('admin_otp_verified')==='true'){
+      startAdmin();
+    } else {
+      sb.auth.signOut();
+    }
+  }
 });
 sb.auth.onAuthStateChange(function(ev,session){
-  // Only auto-start on TOKEN_REFRESHED (returning user), not SIGNED_IN (needs OTP)
-  if(session&&session.user.email===ADMIN&&ev==='TOKEN_REFRESHED')startAdmin();
+  if(session&&session.user.email===ADMIN&&ev==='TOKEN_REFRESHED'&&sessionStorage.getItem('admin_otp_verified')==='true')startAdmin();
   else if(!session){adminStarted=false;document.getElementById('aDash').style.display='none';document.getElementById('lPage').style.display='flex';}
 });
 </script>
