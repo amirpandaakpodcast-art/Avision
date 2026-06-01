@@ -583,22 +583,13 @@ function startOTPTimer(){
   otpTimerInterval=setInterval(update,1000);
 }
 async function sendOTPCode(email){
-  // Generate 6-digit code
   var code=Math.floor(100000+Math.random()*900000).toString();
   var expires=new Date(Date.now()+5*60*1000).toISOString();
-  // Save to DB
   await sb.from('otp_codes').insert({email:email,code:code,expires_at:expires,used:false});
-  // Send via edge function
-  await fetch('https://pwrukagppviyyxdlurxs.supabase.co/functions/v1/notify-admin',{
+  await fetch('https://pwrukagppviyyxdlurxs.supabase.co/functions/v1/send-otp',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV'},
-    body:JSON.stringify({
-      client_email:email,
-      type:'OTP',
-      content:'Your Avision verification code is: '+code+'\n\nThis code expires in 5 minutes.\n\nIf you did not request this, please ignore this email.',
-      send_to_client:true,
-      subject:'Your verification code — '+code
-    })
+    body:JSON.stringify({email:email,code:code})
   }).catch(function(){});
   return code;
 }
