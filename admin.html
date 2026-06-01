@@ -277,14 +277,14 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
         <div class="otp-title">Verify your identity</div>
         <div class="otp-sub">6-digit code sent to<br><span>contact@amiravision.com</span></div>
         <div class="otp-inputs">
-          <input class="otp-inp" id="a1" type="text" maxlength="1" oninput="aotpMove(this,'a2')" onkeydown="aotpBack(event,this,'')">
-          <input class="otp-inp" id="a2" type="text" maxlength="1" oninput="aotpMove(this,'a3')" onkeydown="aotpBack(event,this,'a1')">
-          <input class="otp-inp" id="a3" type="text" maxlength="1" oninput="aotpMove(this,'a4')" onkeydown="aotpBack(event,this,'a2')">
-          <input class="otp-inp" id="a4" type="text" maxlength="1" oninput="aotpMove(this,'a5')" onkeydown="aotpBack(event,this,'a3')">
-          <input class="otp-inp" id="a5" type="text" maxlength="1" oninput="aotpMove(this,'a6')" onkeydown="aotpBack(event,this,'a4')">
-          <input class="otp-inp" id="a6" type="text" maxlength="1" oninput="aotpMove(this,'')" onkeydown="aotpBack(event,this,'a5')">
+          <input class="otp-inp" id="a1" type="text" maxlength="1" inputmode="numeric" oninput="aotpMove(this,'a2')" onkeydown="aotpKey(event,this,'')" onpaste="aotpPaste(event)">
+          <input class="otp-inp" id="a2" type="text" maxlength="1" inputmode="numeric" oninput="aotpMove(this,'a3')" onkeydown="aotpKey(event,this,'a1')">
+          <input class="otp-inp" id="a3" type="text" maxlength="1" inputmode="numeric" oninput="aotpMove(this,'a4')" onkeydown="aotpKey(event,this,'a2')">
+          <input class="otp-inp" id="a4" type="text" maxlength="1" inputmode="numeric" oninput="aotpMove(this,'a5')" onkeydown="aotpKey(event,this,'a3')">
+          <input class="otp-inp" id="a5" type="text" maxlength="1" inputmode="numeric" oninput="aotpMove(this,'a6')" onkeydown="aotpKey(event,this,'a4')">
+          <input class="otp-inp" id="a6" type="text" maxlength="1" inputmode="numeric" oninput="aotpMove(this,'')" onkeydown="aotpKey(event,this,'a5')">
         </div>
-        <button class="btn-primary" onclick="adminVerifyOTP()">Verify →</button>
+        <button class="btn-primary" id="aotpVerifyBtn" onclick="adminVerifyOTP()">Verify →</button>
         <div class="amsg" id="aotpMsg"></div>
         <div class="otp-timer">Expires in <span id="aotpTimer">05:00</span></div>
         <div class="otp-resend" onclick="adminResendOTP()">Resend code</div>
@@ -638,26 +638,51 @@ function aotpMove(inp,nextId){
   if(inp.value)inp.classList.add('filled');else inp.classList.remove('filled');
   if(inp.value&&nextId)document.getElementById(nextId).focus();
   var code=['a1','a2','a3','a4','a5','a6'].map(function(id){return document.getElementById(id).value;}).join('');
-  if(code.length===6)adminVerifyOTP();
+  if(code.length===6)setTimeout(adminVerifyOTP,150);
+}
+function aotpKey(e,inp,prevId){
+  if(e.key==='Backspace'&&!inp.value&&prevId)document.getElementById(prevId).focus();
+  if(e.key==='Enter')adminVerifyOTP();
 }
 function aotpBack(e,inp,prevId){if(e.key==='Backspace'&&!inp.value&&prevId)document.getElementById(prevId).focus();}
+function aotpPaste(e){
+  e.preventDefault();
+  var text=(e.clipboardData||window.clipboardData).getData('text').replace(/[^0-9]/g,'').substring(0,6);
+  var ids=['a1','a2','a3','a4','a5','a6'];
+  for(var i=0;i<text.length;i++){var el=document.getElementById(ids[i]);el.value=text[i];el.classList.add('filled');}
+  if(text.length>0){var last=document.getElementById(ids[Math.min(text.length,5)]);if(last)last.focus();}
+  if(text.length===6)setTimeout(adminVerifyOTP,150);
+}
 async function adminVerifyOTP(){
   var code=['a1','a2','a3','a4','a5','a6'].map(function(id){return document.getElementById(id).value.trim();}).join('');
-  if(code.length<6)return amsg('aotpMsg','Please enter the full 6-digit code.','err');
-  amsg('aotpMsg','Verifying...','');
-  var now=new Date().toISOString();
-  var{data,error}=await sb.from('otp_codes').select('*').eq('email',ADMIN).eq('used',false).gte('expires_at',now).order('created_at',{ascending:false}).limit(5);
-  if(error||!data||!data.length)return amsg('aotpMsg','Code not found. Please request a new one.','err');
-  var match=data.find(function(r){return r.code===code;});
-  if(!match)return amsg('aotpMsg','Invalid code. Please try again.','err');
-  await sb.from('otp_codes').update({used:true}).eq('id',match.id);
-  if(aotpTimerInterval)clearInterval(aotpTimerInterval);
-  sessionStorage.setItem('admin_otp_verified','true');
-  amsg('aotpMsg','✓ Verified!','ok');
-  setTimeout(function(){
-    document.getElementById('adminOtpScreen').style.display='none';
-    startAdmin();
-  },500);
+  if(code.length<6)return amsg('aotpMsg','Please enter all 6 digits.','err');
+  var btn=document.getElementById('aotpVerifyBtn');
+  if(btn){btn.textContent='Verifying...';btn.disabled=true;}
+  amsg('aotpMsg','','');
+  try{
+    var{data,error}=await sb.from('otp_codes').select('*').eq('email',ADMIN).eq('used',false).order('created_at',{ascending:false}).limit(10);
+    if(error)throw new Error(error.message);
+    if(!data||!data.length){
+      if(btn){btn.textContent='Verify →';btn.disabled=false;}
+      return amsg('aotpMsg','No code found. Request a new one.','err');
+    }
+    var now=new Date();
+    var match=data.find(function(r){return r.code===code&&new Date(r.expires_at)>now;});
+    if(!match){
+      if(btn){btn.textContent='Verify →';btn.disabled=false;}
+      var expired=data.find(function(r){return r.code===code;});
+      if(expired)return amsg('aotpMsg','Code expired. Request a new one.','err');
+      return amsg('aotpMsg','Wrong code. Try again.','err');
+    }
+    await sb.from('otp_codes').update({used:true}).eq('id',match.id);
+    if(aotpTimerInterval)clearInterval(aotpTimerInterval);
+    sessionStorage.setItem('admin_otp_verified','true');
+    amsg('aotpMsg','✓ Verified!','ok');
+    setTimeout(function(){document.getElementById('adminOtpScreen').style.display='none';startAdmin();},500);
+  }catch(err){
+    if(btn){btn.textContent='Verify →';btn.disabled=false;}
+    amsg('aotpMsg','Error: '+err.message,'err');
+  }
 }
 async function adminResendOTP(){
   amsg('aotpMsg','Sending...','');
