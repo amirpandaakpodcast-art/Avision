@@ -234,7 +234,22 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .modal h3{font-size:16px;font-weight:600;margin-bottom:1.25rem;}
 .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;transition:color .2s;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;}
 .modal-close:hover{color:var(--text);background:var(--surface2);}
-@media(max-width:600px){
+/* OTP SCREEN */
+.otp-screen{display:none;text-align:center;}
+.otp-icon{font-size:2.5rem;margin-bottom:.75rem;}
+.otp-title{font-size:16px;font-weight:600;margin-bottom:.25rem;}
+.otp-sub{font-size:13px;color:var(--text2);margin-bottom:1.5rem;line-height:1.6;}
+.otp-sub span{color:var(--accent);font-weight:500;}
+.otp-inputs{display:flex;gap:.5rem;justify-content:center;margin-bottom:1.25rem;}
+.otp-inp{width:44px;height:52px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;text-align:center;font-size:1.3rem;font-weight:700;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border .2s;}
+.otp-inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,168,76,.08);}
+.otp-inp.filled{border-color:var(--accent);background:var(--accent2);}
+.otp-timer{font-size:12px;color:var(--text3);margin-bottom:1rem;}
+.otp-timer span{color:var(--accent);font-weight:600;}
+.otp-resend{font-size:12px;color:var(--text3);cursor:pointer;margin-top:.5rem;transition:color .2s;}
+.otp-resend:hover{color:var(--text);}
+.otp-back{font-size:12px;color:var(--text3);cursor:pointer;margin-top:.75rem;display:block;transition:color .2s;}
+.otp-back:hover{color:var(--text);}
   .topbar{padding:0 1rem;}
   .main{padding:1.5rem 1rem 3rem;}
   .stats-row{grid-template-columns:repeat(3,1fr);}
@@ -270,6 +285,26 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <span>Client Portal</span>
     </div>
     <div class="auth-card">
+      <!-- OTP SCREEN -->
+      <div class="otp-screen" id="otpScreen">
+        <div class="otp-icon">🔐</div>
+        <div class="otp-title">Verify your identity</div>
+        <div class="otp-sub">We sent a 6-digit code to<br><span id="otpEmailDisp">your email</span></div>
+        <div class="otp-inputs">
+          <input class="otp-inp" id="o1" type="text" maxlength="1" oninput="otpMove(this,'o2')" onkeydown="otpBack(event,this,'')">
+          <input class="otp-inp" id="o2" type="text" maxlength="1" oninput="otpMove(this,'o3')" onkeydown="otpBack(event,this,'o1')">
+          <input class="otp-inp" id="o3" type="text" maxlength="1" oninput="otpMove(this,'o4')" onkeydown="otpBack(event,this,'o2')">
+          <input class="otp-inp" id="o4" type="text" maxlength="1" oninput="otpMove(this,'o5')" onkeydown="otpBack(event,this,'o3')">
+          <input class="otp-inp" id="o5" type="text" maxlength="1" oninput="otpMove(this,'o6')" onkeydown="otpBack(event,this,'o4')">
+          <input class="otp-inp" id="o6" type="text" maxlength="1" oninput="otpMove(this,'')" onkeydown="otpBack(event,this,'o5')">
+        </div>
+        <button class="btn-primary" onclick="verifyOTP()">Verify →</button>
+        <div class="amsg" id="otpMsg"></div>
+        <div class="otp-timer">Code expires in <span id="otpTimer">05:00</span></div>
+        <div class="otp-resend" onclick="resendOTP()">Didn't receive it? Resend code</div>
+        <span class="otp-back" onclick="backToLogin()">← Back to sign in</span>
+      </div>
+
       <div class="auth-tabs">
         <div class="auth-tab on" onclick="swTab('l')">Sign in</div>
         <div class="auth-tab" onclick="swTab('s')">Create account</div>
@@ -500,11 +535,115 @@ async function doReset(){
   if(error)return sm('rM',error.message,'err');
   sm('rM','✓ Reset link sent! Check your email.','ok');
 }
+// OTP SYSTEM
+var otpEmail='',otpTimerInterval=null,pendingSession=null;
+
+function showOTPScreen(email){
+  otpEmail=email;
+  document.getElementById('otpEmailDisp').textContent=email;
+  document.querySelectorAll('.auth-tabs,.auth-tab').forEach(function(el){el.style.display='none';});
+  document.getElementById('lForm').style.display='none';
+  document.getElementById('sForm').style.display='none';
+  document.getElementById('otpScreen').style.display='block';
+  ['o1','o2','o3','o4','o5','o6'].forEach(function(id){document.getElementById(id).value='';document.getElementById(id).classList.remove('filled');});
+  setTimeout(function(){document.getElementById('o1').focus();},100);
+  startOTPTimer();
+}
+function backToLogin(){
+  document.getElementById('otpScreen').style.display='none';
+  document.querySelectorAll('.auth-tabs,.auth-tab').forEach(function(el){el.style.display='';});
+  document.getElementById('lForm').style.display='block';
+  if(otpTimerInterval)clearInterval(otpTimerInterval);
+  // Sign out if session was created
+  if(pendingSession){sb.auth.signOut();pendingSession=null;}
+}
+function otpMove(inp,nextId){
+  inp.value=inp.value.replace(/[^0-9]/g,'');
+  if(inp.value)inp.classList.add('filled');
+  else inp.classList.remove('filled');
+  if(inp.value&&nextId)document.getElementById(nextId).focus();
+  // Auto verify when all filled
+  var code=['o1','o2','o3','o4','o5','o6'].map(function(id){return document.getElementById(id).value;}).join('');
+  if(code.length===6)verifyOTP();
+}
+function otpBack(e,inp,prevId){
+  if(e.key==='Backspace'&&!inp.value&&prevId){document.getElementById(prevId).focus();}
+}
+function startOTPTimer(){
+  if(otpTimerInterval)clearInterval(otpTimerInterval);
+  var secs=300;
+  function update(){
+    var m=Math.floor(secs/60),s=secs%60;
+    var el=document.getElementById('otpTimer');
+    if(el)el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    if(secs<=0){clearInterval(otpTimerInterval);if(el)el.textContent='Expired';}
+    secs--;
+  }
+  update();
+  otpTimerInterval=setInterval(update,1000);
+}
+async function sendOTPCode(email){
+  // Generate 6-digit code
+  var code=Math.floor(100000+Math.random()*900000).toString();
+  var expires=new Date(Date.now()+5*60*1000).toISOString();
+  // Save to DB
+  await sb.from('otp_codes').insert({email:email,code:code,expires_at:expires,used:false});
+  // Send via edge function
+  await fetch('https://pwrukagppviyyxdlurxs.supabase.co/functions/v1/notify-admin',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV'},
+    body:JSON.stringify({
+      client_email:email,
+      type:'OTP',
+      content:'Your Avision verification code is: '+code+'\n\nThis code expires in 5 minutes.\n\nIf you did not request this, please ignore this email.',
+      send_to_client:true,
+      subject:'Your verification code — '+code
+    })
+  }).catch(function(){});
+  return code;
+}
+async function verifyOTP(){
+  var code=['o1','o2','o3','o4','o5','o6'].map(function(id){return document.getElementById(id).value;}).join('');
+  if(code.length<6)return sm('otpMsg','Please enter the full 6-digit code.','err');
+  sm('otpMsg','Verifying...','');
+  // Check DB
+  var{data,error}=await sb.from('otp_codes').select('*').eq('email',otpEmail).eq('code',code).eq('used',false).order('created_at',{ascending:false}).limit(1);
+  if(error||!data||!data.length)return sm('otpMsg','Invalid code. Please try again.','err');
+  var otp=data[0];
+  if(new Date(otp.expires_at)<new Date())return sm('otpMsg','Code expired. Please request a new one.','err');
+  // Mark used
+  await sb.from('otp_codes').update({used:true}).eq('id',otp.id);
+  if(otpTimerInterval)clearInterval(otpTimerInterval);
+  sm('otpMsg','✓ Verified!','ok');
+  // Complete sign in - pendingSession already set
+  if(pendingSession){
+    document.getElementById('otpScreen').style.display='none';
+    startDash(pendingSession.user);
+  }
+}
+async function resendOTP(){
+  sm('otpMsg','Sending new code...','');
+  ['o1','o2','o3','o4','o5','o6'].forEach(function(id){document.getElementById(id).value='';document.getElementById(id).classList.remove('filled');});
+  await sendOTPCode(otpEmail);
+  startOTPTimer();
+  sm('otpMsg','New code sent!','ok');
+  setTimeout(function(){sm('otpMsg','','');},3000);
+}
+
 function doLogin(){
   var e=document.getElementById('lE').value,p=document.getElementById('lP').value;
   if(!e||!p)return sm('lM','Please fill all fields.','err');
   sm('lM','Signing in...','');
-  sb.auth.signInWithPassword({email:e,password:p}).then(function(r){if(r.error)sm('lM',r.error.message,'err');});
+  sb.auth.signInWithPassword({email:e,password:p}).then(async function(r){
+    if(r.error)return sm('lM',r.error.message,'err');
+    // Store session but don't show dashboard yet
+    pendingSession=r.data.session?r.data:{session:{user:r.data.user}};
+    pendingSession=r.data;
+    sm('lM','Sending verification code...','');
+    await sendOTPCode(e);
+    sm('lM','','');
+    showOTPScreen(e);
+  });
 }
 function doSignup(){
   var n=document.getElementById('sN').value,e=document.getElementById('sE').value;
@@ -876,7 +1015,9 @@ async function doResetSave(){
 }
 sb.auth.getSession().then(function(r){if(r.data&&r.data.session)startDash(r.data.session.user);});
 sb.auth.onAuthStateChange(function(ev,session){
-  if(session&&(ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED'||ev==='USER_UPDATED'))startDash(session.user);
+  // Only auto-login on TOKEN_REFRESHED (returning user) not SIGNED_IN (that goes through OTP)
+  if(session&&ev==='TOKEN_REFRESHED')startDash(session.user);
+  else if(session&&ev==='USER_UPDATED')startDash(session.user);
   else if(!session){me=null;document.getElementById('dash').style.display='none';document.getElementById('authPage').style.display='flex';}
 });
 </script>
