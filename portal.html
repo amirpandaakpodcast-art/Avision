@@ -682,7 +682,7 @@ function checkPresence(){
     var p=r.data[0];
     // Online status — online if last_seen within 3 mins
     var lastSeen=new Date(p.last_seen);
-    var isOnline=(Date.now()-lastSeen.getTime())<3*60*1000;
+    var isOnline=(Date.now()-lastSeen.getTime())<5*60*1000;
     var dot=document.getElementById('onlineDot');
     var txt=document.getElementById('onlineTxt');
     if(dot&&txt){
