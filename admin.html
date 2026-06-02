@@ -988,7 +988,7 @@ async function selectClient(email){
   // Load messages
   const{data}=await sb.from('messages').select('*').eq('client_email',email).order('created_at',{ascending:true});
   renderMsgs(data||[]);
-  // Mark as read
+  // Mark ALL client messages as read when admin opens chat
   await sb.from('messages').update({is_read:true}).eq('client_email',email).eq('sender','client').eq('is_read',false);
   // Update admin presence
   await sb.from('admin_presence').update({last_seen:new Date().toISOString(),is_typing:false,typing_for:''}).eq('id',1);
@@ -1233,11 +1233,25 @@ function startAdmin(){
         playSound();
         if(activeClient===m.client_email){
           sb.from('messages').select('*').eq('client_email',activeClient).order('created_at',{ascending:true}).then(function(r){renderMsgs(r.data||[]);});
+          // Mark client message as read since admin chat is open
+          sb.from('messages').update({is_read:true}).eq('id',m.id);
         }
         loadClients();
       }
     })
-    .subscribe();
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages'},function(payload){
+      // Refresh chat if this is the active client - shows ✓✓ tick updates
+      var m=payload.new;
+      if(activeClient&&m.client_email===activeClient){
+        sb.from('messages').select('*').eq('client_email',activeClient).order('created_at',{ascending:true}).then(function(r){renderMsgs(r.data||[]);});
+        // Update read status indicator
+        var rs=document.getElementById('clientReadStatus');
+        if(rs&&m.sender==='admin'&&m.is_read){rs.textContent='✓✓ Seen';rs.style.color='#22c55e';}
+      }
+    })
+    .subscribe(function(status){
+      if(status==='SUBSCRIBED')console.log('✅ Admin Realtime connected');
+    });
   // PRESENCE
   async function updatePresence(){
     try{await sb.from('admin_presence').update({last_seen:new Date().toISOString()}).eq('id',1);}catch(e){}
