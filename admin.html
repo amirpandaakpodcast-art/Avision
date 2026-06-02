@@ -871,6 +871,44 @@ function renderProjects(data){
 }
 
 // INVOICES
+const SEND_EMAIL_FN='https://pwrukagppviyyxdlurxs.supabase.co/functions/v1/send-email';
+
+async function sendEmail(to,subject,html){
+  try{
+    await fetch(SEND_EMAIL_FN,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV'},
+      body:JSON.stringify({to,subject,html})
+    });
+  }catch(e){}
+}
+
+function invoiceEmailHTML(title,sym,amount,currency,due,notes,status,portalUrl){
+  var statusColor=status==='paid'?'#22c55e':status==='pending'?'#c9a84c':'#ef4444';
+  return '<div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;background:#0a0a0a;color:#ededed;border-radius:16px;overflow:hidden;">'+
+    '<div style="background:#c9a84c;padding:1.5rem 2rem;display:flex;align-items:center;gap:.75rem;">'+
+      '<div style="font-size:1.4rem;font-weight:800;color:#000;letter-spacing:.05em;">AVISION</div>'+
+      '<div style="font-size:13px;color:rgba(0,0,0,.6);margin-left:auto;">amiravision.com</div>'+
+    '</div>'+
+    '<div style="padding:2rem;">'+
+      '<p style="font-size:15px;font-weight:600;margin-bottom:.5rem;">💳 New Invoice</p>'+
+      '<p style="font-size:13px;color:#a1a1a1;margin-bottom:1.5rem;">You have a new invoice from Amir — Avision</p>'+
+      '<div style="background:#111;border:1px solid #222;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;">'+
+        '<div style="font-size:13px;color:#a1a1a1;margin-bottom:.25rem;">Project</div>'+
+        '<div style="font-size:16px;font-weight:600;margin-bottom:1rem;">'+title+'</div>'+
+        (notes?'<div style="font-size:12px;color:#a1a1a1;margin-bottom:1rem;">'+notes+'</div>':'')+
+        '<div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #222;padding-top:1rem;">'+
+          '<div><div style="font-size:12px;color:#a1a1a1;">Amount</div><div style="font-size:1.8rem;font-weight:800;color:#c9a84c;">'+sym+parseFloat(amount).toLocaleString()+' <span style="font-size:14px;">'+currency+'</span></div></div>'+
+          (due?'<div style="text-align:right;"><div style="font-size:12px;color:#a1a1a1;">Due date</div><div style="font-size:14px;font-weight:600;">'+due+'</div></div>':'')+
+        '</div>'+
+      '</div>'+
+      '<a href="'+portalUrl+'" style="display:block;background:#c9a84c;color:#000;text-decoration:none;text-align:center;padding:14px;border-radius:10px;font-weight:700;font-size:15px;margin-bottom:1rem;">Pay Now →</a>'+
+      '<p style="font-size:12px;color:#555;text-align:center;">Log in to your Avision Portal to view and pay this invoice securely.</p>'+
+    '</div>'+
+    '<div style="padding:1rem 2rem;border-top:1px solid #1a1a1a;text-align:center;font-size:11px;color:#555;">Avision LLC · amiravision.com · contact@amiravision.com</div>'+
+  '</div>';
+}
+
 async function addInvoice(){
   var email=document.getElementById('invEmail').value.trim(),title=document.getElementById('invTitle').value.trim();
   var amount=document.getElementById('invAmount').value,currency=document.getElementById('invCurrency').value;
@@ -879,16 +917,46 @@ async function addInvoice(){
   amsg('invMsg','Creating...','');
   const{error}=await sb.from('invoices').insert({client_email:email,project_title:title,amount:parseFloat(amount),currency,due_date:due||null,notes,status:'unpaid'});
   if(error)return amsg('invMsg',error.message,'err');
-  amsg('invMsg','Invoice created','ok');toast('Invoice created','ok');
+  amsg('invMsg','Invoice created & email sent ✓','ok');
+  toast('Invoice created','ok');
   var sym={USD:'$',SAR:'﷼',EUR:'€',GBP:'£'}[currency]||'$';
+  // Send notification in portal
   await sendNotif(email,'invoice','💳 New invoice','Invoice for "'+title+'" — '+sym+parseFloat(amount).toLocaleString()+(due?' · Due '+due:''));
+  // Send email to client
+  var portalUrl='https://amiravision.com/portal.html';
+  sendEmail(email,'💳 New Invoice from Avision — '+sym+parseFloat(amount).toLocaleString(),invoiceEmailHTML(title,sym,amount,currency,due,notes,'unpaid',portalUrl));
   ['invEmail','invTitle','invAmount','invDue','invNotes'].forEach(function(id){document.getElementById(id).value='';});
   loadInvoices();loadOverview();
 }
+
 async function updateInvStatus(id,s){
-  const{data}=await sb.from('invoices').select('client_email,project_title,amount,currency').eq('id',id).single();
+  const{data}=await sb.from('invoices').select('client_email,project_title,amount,currency,due_date,notes').eq('id',id).single();
   await sb.from('invoices').update({status:s}).eq('id',id);
-  if(data){var sym={USD:'$',SAR:'﷼',EUR:'€',GBP:'£'}[data.currency]||'$';var labels={unpaid:'Unpaid',pending:'Pending',paid:'Paid ✓'};await sendNotif(data.client_email,'invoice','💳 Invoice update','Invoice for "'+data.project_title+'" is now '+labels[s]);}
+  if(data){
+    var sym={USD:'$',SAR:'﷼',EUR:'€',GBP:'£'}[data.currency]||'$';
+    var labels={unpaid:'Unpaid',pending:'Pending',paid:'Paid ✓'};
+    await sendNotif(data.client_email,'invoice','💳 Invoice update','Invoice for "'+data.project_title+'" is now '+labels[s]);
+    // If marked as paid — send confirmation email to client + notify admin
+    if(s==='paid'){
+      var paidHtml='<div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;background:#0a0a0a;color:#ededed;border-radius:16px;overflow:hidden;">'+
+        '<div style="background:#22c55e;padding:1.5rem 2rem;"><div style="font-size:1.4rem;font-weight:800;color:#000;">AVISION</div></div>'+
+        '<div style="padding:2rem;">'+
+          '<p style="font-size:22px;font-weight:700;margin-bottom:.5rem;">✅ Payment Confirmed!</p>'+
+          '<p style="color:#a1a1a1;font-size:13px;margin-bottom:1.5rem;">Thank you for your payment. Your project is now in progress.</p>'+
+          '<div style="background:#111;border:1px solid #222;border-radius:12px;padding:1.25rem;">'+
+            '<div style="font-size:13px;color:#a1a1a1;">Project</div>'+
+            '<div style="font-size:16px;font-weight:600;margin-bottom:.5rem;">'+data.project_title+'</div>'+
+            '<div style="font-size:2rem;font-weight:800;color:#22c55e;">'+sym+parseFloat(data.amount).toLocaleString()+' '+data.currency+'</div>'+
+          '</div>'+
+        '</div>'+
+        '<div style="padding:1rem 2rem;border-top:1px solid #1a1a1a;text-align:center;font-size:11px;color:#555;">Avision LLC · amiravision.com</div>'+
+      '</div>';
+      sendEmail(data.client_email,'✅ Payment Confirmed — Avision',paidHtml);
+      // Notify admin
+      sendEmail(ADMIN,'💰 Payment received: '+sym+parseFloat(data.amount).toLocaleString(),'<p>'+data.client_email+' paid '+sym+parseFloat(data.amount).toLocaleString()+' for "'+data.project_title+'"</p>');
+      toast('Payment confirmed — emails sent ✓','ok');
+    }
+  }
   loadInvoices();loadOverview();
 }
 async function deleteInvoice(id){if(!confirm('Delete?'))return;await sb.from('invoices').delete().eq('id',id);loadInvoices();loadOverview();}
@@ -931,7 +999,7 @@ function renderInvoices(data){
 // CHAT
 async function loadClients(){
   const{data:msgs}=await sb.from('messages').select('client_email').order('created_at',{ascending:false});
-  const{data:allCli}=await sb.from('clients').select('email,full_name').order('created_at',{ascending:false});
+  const{data:allCli}=await sb.from('clients').select('email,full_name').order('created_at',{ascending:false}).limit(500);
   var fromMsgs=[...new Set((msgs||[]).map(function(m){return m.client_email;}))];
   var fromCli=(allCli||[]).map(function(c){return c.email;});
   var unique=[...new Set([...fromMsgs,...fromCli])];
@@ -1080,7 +1148,7 @@ document.addEventListener('click',function(e){
 
 // CLIENTS TAB
 async function loadAllClients(){
-  const{data}=await sb.from('clients').select('*').order('created_at',{ascending:false});
+  const{data}=await sb.from('clients').select('*').order('created_at',{ascending:false}).limit(500);
   allClients=data||[];
   var now=new Date();
   document.getElementById('cliTotal').textContent=allClients.length;
@@ -1166,7 +1234,7 @@ function calNav(dir){calDate=new Date(calDate.getFullYear(),calDate.getMonth()+d
 async function loadOverview(){
   var projR=await sb.from('projects').select('*').order('created_at',{ascending:false});
   var invR=await sb.from('invoices').select('*').order('created_at',{ascending:false});
-  var cliR=await sb.from('clients').select('*').order('created_at',{ascending:false});
+  var cliR=await sb.from('clients').select('*').order('created_at',{ascending:false}).limit(500);
   var msgR=await sb.from('messages').select('*').eq('sender','client').order('created_at',{ascending:false}).limit(5);
   var proj=projR.data||[],inv=invR.data||[],clients=cliR.data||[],msgs=msgR.data||[];
   var total=inv.reduce(function(a,i){return a+parseFloat(i.amount||0);},0);
