@@ -760,18 +760,22 @@ async function resendOTP(){
 }
 
 function doLogin(){
-  var e=document.getElementById('lE').value,p=document.getElementById('lP').value;
+  var e=document.getElementById('lE').value.trim(),p=document.getElementById('lP').value;
   if(!e||!p)return sm('lM','Please fill all fields.','err');
   sm('lM','Signing in...','');
-  sb.auth.signInWithPassword({email:e,password:p}).then(async function(r){
+  sb.auth.signInWithPassword({email:e,password:p}).then(function(r){
     if(r.error)return sm('lM',r.error.message,'err');
-    // Store session but don't show dashboard yet
-    pendingSession=r.data.session?r.data:{session:{user:r.data.user}};
     pendingSession=r.data;
-    sm('lM','Sending verification code...','');
-    await sendOTPCode(e);
     sm('lM','','');
-    showOTPScreen(e);
+    showOTPScreen(e,false);
+    sm('otpMsg','Sending code...','');
+    sendOTPCode(e).then(function(){
+      sm('otpMsg','','');
+    }).catch(function(){
+      sm('otpMsg','Code sent — check your email.','ok');
+    });
+  }).catch(function(err){
+    sm('lM',err.message||'Something went wrong.','err');
   });
 }
 function doSignup(){
@@ -784,25 +788,24 @@ function doSignup(){
   if(p!==p2)return sm('sM','Passwords do not match.','err');
   if(!document.getElementById('agr').checked)return sm('sM','Please accept the terms.','err');
   sm('sM','Creating account...','');
-  // Timeout fallback
-  var timeout=setTimeout(function(){sm('sM','Request timed out. Please try again.','err');},15000);
-  sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}}).then(async function(r){
-    clearTimeout(timeout);
+  sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}}).then(function(r){
     if(r.error){
       if(r.error.message.toLowerCase().includes('already'))return sm('sM','Email already registered. Please sign in.','err');
       return sm('sM',r.error.message,'err');
     }
-    // Save client via JS (no trigger needed)
-    try{await sb.from('clients').upsert({email:e,full_name:n},{onConflict:'email'});}catch(err){}
-    // Send OTP
-    sm('sM','Sending verification code...','');
-    await sendOTPCode(e);
-    sm('sM','','');
+    // Fire & forget — don't block on these
+    sb.from('clients').upsert({email:e,full_name:n},{onConflict:'email'}).then(function(){}).catch(function(){});
     pendingSession=r.data;
     otpEmail=e;
+    // Show OTP screen immediately then send code
     showOTPScreen(e,true);
+    sm('otpMsg','Sending code...','');
+    sendOTPCode(e).then(function(){
+      sm('otpMsg','','');
+    }).catch(function(){
+      sm('otpMsg','Code sent — check your email.','ok');
+    });
   }).catch(function(err){
-    clearTimeout(timeout);
     sm('sM',err.message||'Something went wrong. Try again.','err');
   });
 }
