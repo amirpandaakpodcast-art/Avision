@@ -1250,11 +1250,19 @@ function startAdmin(){
     })
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'clients'},function(payload){
       var c=payload.new;
-      toast('🆕 New client signed up: '+(c.full_name||c.email),'ok');
+      toast('🆕 New client: '+(c.full_name||c.email),'ok');
       playSound();
+      // Refresh all relevant data
       loadOverview();
       loadAllClients();
       loadClients();
+      // Update clients count directly
+      sb.from('clients').select('id',{count:'exact'}).then(function(r){
+        var el=document.getElementById('ovClients');
+        if(el&&r.count!==null)el.textContent=r.count;
+        var el2=document.getElementById('cliTotal');
+        if(el2&&r.count!==null)el2.textContent=r.count;
+      });
     })
     .subscribe(function(status){
       if(status==='SUBSCRIBED')console.log('✅ Admin Realtime connected');
@@ -1265,6 +1273,18 @@ function startAdmin(){
   }
   updatePresence();
   setInterval(updatePresence,30000);
+
+  // AUTO-REFRESH stats every 15s
+  setInterval(function(){
+    var activeTab=localStorage.getItem('adminTab')||'overview';
+    if(activeTab==='overview')loadOverview();
+    if(activeTab==='clients')loadAllClients();
+    // Always refresh clients badge
+    sb.from('clients').select('id',{count:'exact'}).then(function(r){
+      var el=document.getElementById('ovClients');
+      if(el&&r.count!==null)el.textContent=r.count;
+    });
+  },15000);
 }
 
 sb.auth.getSession().then(function(r){
