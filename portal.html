@@ -369,6 +369,54 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   </div>
 </div>
 
+<!-- TERMS ACCEPTANCE POPUP -->
+<div id="termsPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9997;backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:540px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6);">
+    <!-- Header -->
+    <div style="background:var(--accent);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:.75rem;">
+      <div style="width:36px;height:36px;background:rgba(0,0,0,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">📋</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#000;">Welcome to Avision Portal</div>
+        <div style="font-size:12px;color:rgba(0,0,0,.6);">Please review and accept our terms before continuing</div>
+      </div>
+    </div>
+    <!-- Terms content -->
+    <div style="padding:1.25rem 1.5rem;max-height:320px;overflow-y:auto;border-bottom:1px solid var(--border);">
+      <div style="font-size:13px;color:var(--text2);line-height:1.8;">
+        <p style="margin-bottom:1rem;">By using the <strong style="color:var(--text);">Avision Client Portal</strong>, you agree to the following:</p>
+        <div style="display:flex;flex-direction:column;gap:.75rem;">
+          <div style="background:var(--surface2);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--accent);">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:.2rem;">📄 Terms of Service</div>
+            <div style="font-size:12px;color:var(--text3);">All work is subject to Avision's terms. Revisions, timelines, and deliverables follow the agreed project scope. <a href="/terms.html" target="_blank" style="color:var(--accent);text-decoration:none;">Read full terms →</a></div>
+          </div>
+          <div style="background:var(--surface2);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--blue);">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:.2rem;">🔒 Privacy Policy</div>
+            <div style="font-size:12px;color:var(--text3);">Your data is stored securely and never shared with third parties. <a href="/privacy.html" target="_blank" style="color:var(--accent);text-decoration:none;">Read privacy policy →</a></div>
+          </div>
+          <div style="background:var(--surface2);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--green);">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:.2rem;">💰 Refund Policy</div>
+            <div style="font-size:12px;color:var(--text3);">50% deposit is non-refundable. Final payment due upon delivery. Disputes must be raised within 14 days. <a href="/refund.html" target="_blank" style="color:var(--accent);text-decoration:none;">Read refund policy →</a></div>
+          </div>
+          <div style="background:var(--surface2);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--red);">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:.2rem;">🚫 Chargeback Policy</div>
+            <div style="font-size:12px;color:var(--text3);">Fraudulent chargebacks will result in account termination and legal action. All payments are final upon delivery approval.</div>
+          </div>
+        </div>
+        <p style="margin-top:1rem;font-size:11px;color:var(--text3);">© 2026 Avision LLC · NAICS 512110 / 512191</p>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div style="padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:.5rem;cursor:pointer;" onclick="this.querySelector('input').click()">
+        <input type="checkbox" id="termsCheck" style="accent-color:var(--accent);width:16px;height:16px;cursor:pointer;">
+        <label for="termsCheck" style="font-size:12px;color:var(--text2);cursor:pointer;">I have read and agree to all terms & policies</label>
+      </div>
+      <button onclick="acceptTerms()" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:filter .2s;white-space:nowrap;">Accept & Continue →</button>
+    </div>
+    <div id="termsMsg" style="padding:0 1.5rem .75rem;font-size:12px;color:var(--red);display:none;">Please check the box to confirm you've read and agree to the terms.</div>
+  </div>
+</div>
+
 <div class="dash" id="dash">
   <div class="topbar">
     <div class="tb-left">
@@ -559,12 +607,35 @@ async function doReset(){
   if(error)return sm('rM',error.message,'err');
   sm('rM','✓ Reset link sent! Check your email.','ok');
 }
-// OTP SYSTEM
+// TERMS ACCEPTANCE
+function acceptTerms(){
+  if(!document.getElementById('termsCheck').checked){
+    document.getElementById('termsMsg').style.display='block';
+    return;
+  }
+  document.getElementById('termsMsg').style.display='none';
+  document.getElementById('termsPopup').style.display='none';
+  // Save acceptance
+  if(me){
+    localStorage.setItem('terms_accepted_'+me.id,'true');
+    sb.from('clients').update({terms_accepted:true}).eq('email',me.email).catch(function(){});
+  }
+  toast('Welcome to Avision Portal! 🎉','ok');
+}
+
+function checkTermsAccepted(user){
+  var accepted=localStorage.getItem('terms_accepted_'+user.id);
+  if(!accepted){
+    document.getElementById('termsPopup').style.display='flex';
+  }
+}
 var otpEmail='',otpTimerInterval=null,pendingSession=null;
 
-function showOTPScreen(email){
+function showOTPScreen(email,isSignup){
   otpEmail=email;
   document.getElementById('otpEmailDisp').textContent=email;
+  document.getElementById('otpScreen').querySelector('.otp-title').textContent=isSignup?'Verify your email':'Verify your identity';
+  document.getElementById('otpScreen').querySelector('.otp-sub').innerHTML=(isSignup?'Your account is ready! Enter the code sent to<br>':'We sent a 6-digit code to<br>')+'<span id="otpEmailDisp2">'+email+'</span>';
   document.querySelectorAll('.auth-tabs,.auth-tab').forEach(function(el){el.style.display='none';});
   document.getElementById('lForm').style.display='none';
   document.getElementById('sForm').style.display='none';
@@ -700,10 +771,18 @@ function doSignup(){
   if(p!==p2)return sm('sM','Passwords do not match.','err');
   if(!document.getElementById('agr').checked)return sm('sM','Please accept the terms.','err');
   sm('sM','Creating account...','');
-  sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}}).then(function(r){
+  sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}}).then(async function(r){
     if(r.error)return sm('sM',r.error.message,'err');
+    // Save client info
     sb.from('clients').upsert({email:e,full_name:n},{onConflict:'email'});
-    sm('sM','✓ Check your email to confirm your account.','ok');
+    // Send OTP instead of email link
+    sm('sM','Sending verification code...','');
+    await sendOTPCode(e);
+    sm('sM','','');
+    // Store pending session for after OTP
+    pendingSession=r.data;
+    otpEmail=e;
+    showOTPScreen(e,true);
   });
 }
 function doLogout(){
@@ -1036,6 +1115,8 @@ function startDash(user){
   document.getElementById('profEmailTxt').textContent=user.email;
   document.getElementById('profAv').textContent=(name?name.charAt(0):user.email.charAt(0)).toUpperCase();
   loadProjects(user);loadFiles();loadMsgs();loadInvoices();
+  // Check terms acceptance
+  checkTermsAccepted(user);
   sb.from('notifications').select('*').eq('client_email',user.email).order('created_at',{ascending:false}).then(function(r){
     notifs=r.data||[];var u=notifs.filter(function(n){return !n.is_read;});
     if(u.length)showDot();
