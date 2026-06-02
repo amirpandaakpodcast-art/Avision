@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>Client Portal — Avision</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a0a0a'/><text y='72' x='50' text-anchor='middle' font-family='Georgia,serif' font-size='68' font-weight='bold' fill='%23c9a84c'>A</text></svg>">
+<link rel="icon" type="image/png" href="https://www.amiravision.com/logos/White.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -773,13 +775,14 @@ function doSignup(){
   sm('sM','Creating account...','');
   sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}}).then(async function(r){
     if(r.error)return sm('sM',r.error.message,'err');
-    // Save client info
-    sb.from('clients').upsert({email:e,full_name:n},{onConflict:'email'});
-    // Send OTP instead of email link
+    // Save to clients table immediately
+    await sb.from('clients').insert({email:e,full_name:n}).then(function(res){
+      if(res.error)sb.from('clients').update({full_name:n}).eq('email',e);
+    });
+    // Send OTP
     sm('sM','Sending verification code...','');
     await sendOTPCode(e);
     sm('sM','','');
-    // Store pending session for after OTP
     pendingSession=r.data;
     otpEmail=e;
     showOTPScreen(e,true);
