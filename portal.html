@@ -898,10 +898,12 @@ function loadMsgs(){
 function renderMsgs(data){
   var c=document.getElementById('cMsgs');if(!c)return;
   if(!data.length){c.innerHTML='<div class="chat-empty">No messages yet — start a conversation.</div>';return;}
-  // Mark admin messages as read
-  var unread=data.filter(function(m){return m.sender==='admin'&&!m.is_read;});
-  if(unread.length){
-    unread.forEach(function(m){sb.from('messages').update({is_read:true}).eq('id',m.id);});
+  // Mark all admin messages as read immediately
+  var unreadAdmin=data.filter(function(m){return m.sender==='admin'&&!m.is_read;});
+  if(unreadAdmin.length){
+    unreadAdmin.forEach(function(m){
+      sb.from('messages').update({is_read:true}).eq('id',m.id);
+    });
   }
   c.innerHTML=data.map(function(m){
     var mine=m.sender==='client',t=new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
@@ -1039,13 +1041,14 @@ function startDash(user){
     if(u.length)showDot();
   });
 
-  // ── REALTIME: instant messages ──
+  // ── REALTIME: instant messages + read receipts ──
   if(poll){poll.unsubscribe();poll=null;}
   poll=sb.channel('messages:'+user.email)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'client_email=eq.'+user.email},
       function(payload){
         var m=payload.new;
         if(m.sender==='admin'){
+          // Mark as read immediately
           sb.from('messages').update({is_read:true}).eq('id',m.id);
           toast('New message from Amir ⚡','');
         }
@@ -1053,7 +1056,10 @@ function startDash(user){
       }
     )
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages',filter:'client_email=eq.'+user.email},
-      function(){sb.from('messages').select('*').eq('client_email',user.email).order('created_at',{ascending:true}).then(function(r){renderMsgs(r.data||[]);});}
+      function(){
+        // Refresh messages to update read ticks
+        sb.from('messages').select('*').eq('client_email',user.email).order('created_at',{ascending:true}).then(function(r){renderMsgs(r.data||[]);});
+      }
     )
     .subscribe();
 
