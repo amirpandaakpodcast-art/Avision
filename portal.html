@@ -292,31 +292,56 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   .tab-row{flex-direction:column;}
   .inv-table{display:block;overflow-x:auto;white-space:nowrap;}
 }
-.chat-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
-.chat-msgs{height:320px;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:.75rem;scroll-behavior:smooth;}
+/* CHAT — Modern Style */
+.tab-chat{height:calc(100vh - 56px);}
+.tab-chat.on{display:flex;flex-direction:column;}
+.chat-container{display:flex;flex-direction:column;flex:1;overflow:hidden;background:var(--bg);}
+.chat-hdr2{padding:.85rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);flex-shrink:0;}
+.chat-hdr2-left{display:flex;align-items:center;gap:.65rem;}
+.chat-hdr2-av{width:34px;height:34px;border-radius:50%;background:var(--accent2);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--accent);flex-shrink:0;position:relative;}
+.chat-hdr2-name{font-size:14px;font-weight:600;}
+.chat-hdr2-status{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;margin-top:1px;}
+.chat-msgs{flex:1;overflow-y:auto;padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.5rem;scroll-behavior:smooth;min-height:0;}
 .chat-msgs::-webkit-scrollbar{width:3px;}
 .chat-msgs::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.chat-date-sep{text-align:center;margin:.5rem 0;font-size:11px;color:var(--text3);display:flex;align-items:center;gap:.5rem;}
+.chat-date-sep::before,.chat-date-sep::after{content:'';flex:1;height:1px;background:var(--border);}
 .mrow{display:flex;flex-direction:column;animation:msgIn .2s ease;}
-@keyframes msgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+@keyframes msgIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
 .mrow.me{align-items:flex-end;}
 .mrow.them{align-items:flex-start;}
-.mbub{max-width:72%;padding:9px 13px;font-size:13px;line-height:1.6;border-radius:10px;}
-.mrow.me .mbub{background:var(--accent);color:#000;border-radius:10px 10px 2px 10px;}
-.mrow.them .mbub{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:10px 10px 10px 2px;}
-.mtime{font-size:10px;color:var(--text3);margin-top:3px;}
+.mbub{max-width:72%;padding:10px 14px;font-size:13px;line-height:1.6;word-break:break-word;}
+.mrow.me .mbub{background:var(--accent);color:#000;border-radius:16px 16px 4px 16px;font-weight:500;}
+.mrow.them .mbub{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:16px 16px 16px 4px;}
+.mtime{font-size:10px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:3px;}
 .msnd{font-size:11px;font-weight:600;color:var(--accent);margin-bottom:3px;}
-.chat-empty{text-align:center;padding:3rem;font-size:13px;color:var(--text3);}
-.qr-section{padding:.75rem 1.25rem;border-top:1px solid var(--border);background:var(--surface2);}
-.qr-lbl{font-size:11px;font-weight:600;color:var(--text3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em;}
-.qr-btns{display:flex;gap:.4rem;flex-wrap:wrap;}
-.qr-btn{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;}
+.chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;color:var(--text3);padding:2rem;}
+.chat-empty-icon{font-size:2.5rem;opacity:.3;}
+.chat-empty-text{font-size:13px;text-align:center;}
+/* TYPING */
+.typing-wrap{padding:.5rem 1.25rem;flex-shrink:0;display:none;}
+.typing-bubble{background:var(--surface2);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:10px 14px;display:inline-flex;align-items:center;gap:5px;}
+/* QUICK REPLIES */
+.qr-section{padding:.6rem 1rem;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.qr-lbl{font-size:10px;font-weight:600;color:var(--text3);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em;}
+.qr-btns{display:flex;gap:.35rem;flex-wrap:wrap;}
+.qr-btn{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;white-space:nowrap;}
 .qr-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent3);}
-.chat-input{display:flex;border-top:1px solid var(--border);}
-.cin{flex:1;background:var(--surface);border:none;padding:13px 16px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;}
-.cin:focus{background:var(--surface2);}
+/* INPUT */
+.chat-input-wrap{border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;padding:.75rem 1rem;}
+.chat-input-row{display:flex;align-items:center;gap:.5rem;background:var(--surface2);border:1px solid var(--border2);border-radius:24px;padding:4px 4px 4px 12px;transition:border .2s;}
+.chat-input-row:focus-within{border-color:var(--accent);}
+.cin{flex:1;background:transparent;border:none;padding:6px 0;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;min-width:0;}
 .cin::placeholder{color:var(--text3);}
-.csend{background:var(--accent);color:#000;border:none;padding:13px 18px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:filter .2s;}
+.chat-btn{background:none;border:none;color:var(--text3);cursor:pointer;padding:6px;border-radius:50%;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chat-btn:hover{color:var(--accent);background:var(--accent3);}
+.csend{background:var(--accent);color:#000;border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:filter .2s;flex-shrink:0;}
 .csend:hover{filter:brightness(1.1);}
+@media(max-width:768px){
+  .tab-chat{height:calc(100vh - 52px - 64px);}
+  .mbub{max-width:85%;}
+  .qr-section{display:none;}
+}
 /* TYPING DOTS */
 .typing-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);display:inline-block;animation:typingBounce 1.2s infinite;}
 .typing-dot:nth-child(2){animation-delay:.2s;}
@@ -668,53 +693,65 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 
     <!-- MESSAGES TAB -->
     <div class="tab-content tab-chat" id="tab-messages">
-        <!-- CHAT HEADER with online status -->
-        <div style="padding:.75rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2);">
-          <div style="display:flex;align-items:center;gap:.6rem;">
-            <div style="width:30px;height:30px;border-radius:50%;background:var(--accent2);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--accent);">A</div>
+      <div class="chat-container">
+        <!-- HEADER -->
+        <div class="chat-hdr2">
+          <div class="chat-hdr2-left">
+            <div class="chat-hdr2-av">A</div>
             <div>
-              <div style="font-size:13px;font-weight:500;">Amir — Avision</div>
-              <div style="display:flex;align-items:center;gap:4px;margin-top:1px;" id="onlineStatus">
+              <div class="chat-hdr2-name">Amir — Avision</div>
+              <div class="chat-hdr2-status">
                 <span style="width:6px;height:6px;border-radius:50%;background:var(--text3);display:inline-block;" id="onlineDot"></span>
-                <span style="font-size:11px;color:var(--text3);" id="onlineTxt">Offline</span>
+                <span id="onlineTxt">Offline</span>
               </div>
             </div>
           </div>
         </div>
-        <div class="chat-msgs" id="cMsgs"><div class="chat-empty">No messages yet — start a conversation.</div></div>
-        <!-- TYPING INDICATOR -->
-        <div id="typingBar" style="display:none;padding:8px 1.25rem;background:var(--surface);border-top:1px solid var(--border);">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <div style="display:flex;gap:3px;align-items:center;">
-              <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
-            </div>
-            <span style="font-size:11px;color:var(--text3);">Amir is typing...</span>
+        <!-- MESSAGES -->
+        <div class="chat-msgs" id="cMsgs">
+          <div class="chat-empty">
+            <div class="chat-empty-icon">💬</div>
+            <div class="chat-empty-text">No messages yet<br><span style="font-size:12px;color:var(--text3);">Send a message to start the conversation</span></div>
           </div>
         </div>
+        <!-- TYPING -->
+        <div class="typing-wrap" id="typingBar">
+          <div class="typing-bubble">
+            <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+            <span style="font-size:11px;color:var(--text3);margin-left:4px;">Amir is typing</span>
+          </div>
+        </div>
+        <!-- QUICK REPLIES -->
         <div class="qr-section">
           <div class="qr-lbl">Quick replies</div>
           <div class="qr-btns">
-            <button class="qr-btn" onclick="qr('When is the delivery date?')">📅 Delivery date?</button>
+            <button class="qr-btn" onclick="qr('When is the delivery date?')">📅 Delivery?</button>
             <button class="qr-btn" onclick="qr('I approve this version ✓')">✅ Approve</button>
-            <button class="qr-btn" onclick="qr('I need a revision on this')">🔄 Need revision</button>
+            <button class="qr-btn" onclick="qr('I need a revision on this')">🔄 Revision</button>
             <button class="qr-btn" onclick="qr('Please send me the final file')">📁 Final file</button>
-            <button class="qr-btn" onclick="qr('How is the project going?')">💬 Status update?</button>
+            <button class="qr-btn" onclick="qr('How is the project going?')">💬 Status?</button>
           </div>
         </div>
-        <div class="chat-input" style="position:relative;">
-          <label for="chatFile" style="display:flex;align-items:center;justify-content:center;width:46px;cursor:pointer;border-right:1px solid var(--border);color:var(--text3);transition:color .2s;background:var(--surface);flex-shrink:0;" title="Attach file" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd"/></svg>
-            <input type="file" id="chatFile" style="display:none;" onchange="sendChatFile(this.files[0])">
-          </label>
-          <button onclick="togEmoji()" style="display:flex;align-items:center;justify-content:center;width:42px;background:var(--surface);border:none;border-right:1px solid var(--border);cursor:pointer;font-size:18px;flex-shrink:0;" title="Emoji">😊</button>
-          <input type="text" class="cin" id="cIn" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()">
-          <button class="csend" onclick="sendMsg()">Send</button>
+        <!-- INPUT -->
+        <div class="chat-input-wrap">
+          <div class="chat-input-row">
+            <label for="chatFile" class="chat-btn" title="Attach">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd"/></svg>
+              <input type="file" id="chatFile" style="display:none;" onchange="sendChatFile(this.files[0])">
+            </label>
+            <button class="chat-btn" onclick="togEmoji()" title="Emoji">😊</button>
+            <input type="text" class="cin" id="cIn" placeholder="Message Amir..." onkeydown="if(event.key==='Enter')sendMsg()">
+            <button class="csend" onclick="sendMsg()">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
+            </button>
+          </div>
           <!-- EMOJI PICKER -->
-          <div id="emojiPicker" style="display:none;position:absolute;bottom:56px;left:0;right:0;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:.75rem;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.5);max-height:200px;overflow-y:auto;">
-            <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">Smileys</div>
+          <div id="emojiPicker" style="display:none;position:absolute;bottom:80px;left:1rem;right:1rem;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:.75rem;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.5);max-height:200px;overflow-y:auto;">
+            <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">Emoji</div>
             <div id="emojiGrid" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
           </div>
         </div>
+      </div>
     </div><!-- end messages tab -->
   </div><!-- end sb-main -->
 
@@ -1275,7 +1312,7 @@ function checkPresence(){
     var typingBar=document.getElementById('typingBar');
     if(typingBar){
       var isTyping=p.is_typing&&p.typing_for===me.email&&isOnline;
-      typingBar.style.display=isTyping?'block':'none';
+      typingBar.style.display=isTyping?'flex':'none';
     }
   });
 }
