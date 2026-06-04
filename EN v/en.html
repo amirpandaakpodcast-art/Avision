@@ -7,16 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --black:#0d0d0d;--charcoal:#1e1e1e;--charcoal2:#282828;
-  --green:#5c7e28;--gl:#7aab32;--yellow:#f8e16f;--yd:#e8cc4a;
-  --white:#f0ede6;--muted:#888078;
-  --border:rgba(248,225,111,0.1);--borderl:rgba(248,225,111,0.18)
-}
+:root{--black:#0d0d0d;--charcoal:#1e1e1e;--charcoal2:#282828;--green:#5c7e28;--gl:#7aab32;--yellow:#f8e16f;--yd:#e8cc4a;--white:#f0ede6;--muted:#888078;--border:rgba(248,225,111,0.1);--borderl:rgba(248,225,111,0.18)}
 html{scroll-behavior:smooth}
 body{background:var(--black);color:var(--white);font-family:'Barlow Condensed',sans-serif;overflow-x:hidden;direction:ltr}
-
-/* ── NAV ── */
 nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:flex;justify-content:space-between;align-items:center;background:rgba(13,13,13,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
 .nav-logo{display:flex;align-items:center;gap:.65rem;text-decoration:none}
 .nav-logo-text{font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;font-weight:700;color:var(--yellow);letter-spacing:.04em}
@@ -25,8 +18,6 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .nav-links a:hover{color:var(--yellow)}
 .nav-cta{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;border:1px solid var(--yellow);color:var(--yellow);padding:.4rem 1.1rem;text-decoration:none;transition:all .3s;font-weight:600}
 .nav-cta:hover{background:var(--yellow);color:var(--black)}
-
-/* ── HERO ── */
 .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 3rem 5rem;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 35%,rgba(92,126,40,.18) 0%,transparent 55%),radial-gradient(ellipse at 80% 75%,rgba(248,225,111,.05) 0%,transparent 50%),var(--black)}
 .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(248,225,111,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(248,225,111,.035) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%)}
@@ -39,7 +30,6 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .hero-headline{font-family:'Barlow Condensed',sans-serif;line-height:1.05;font-weight:900;color:var(--white);position:relative;z-index:1;text-align:left;max-width:800px}
 .hero-headline span{display:inline-block;padding-bottom:15px}
 .hero-headline .accent{color:var(--yellow)}
-.hero-hl-line{display:block;font-size:clamp(2rem,7.5vw,4.8rem);font-weight:900;line-height:1.15}
 .hero-sub{margin-top:1.6rem;max-width:480px;font-size:.95rem;font-weight:300;color:var(--muted);line-height:2;text-align:left}
 .hero-actions{margin-top:2.2rem;display:flex;align-items:center;gap:1.8rem}
 .btn-p{font-family:'Barlow Condensed',sans-serif;font-size:.88rem;background:var(--yellow);color:var(--black);padding:.8rem 1.8rem;text-decoration:none;font-weight:700;transition:all .3s;display:inline-flex;align-items:center;gap:.4rem}
@@ -49,100 +39,31 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .scroll-wrap{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.6rem;color:var(--muted);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;font-family:'Space Mono',monospace}
 .scroll-line{width:1px;height:2.8rem;background:linear-gradient(to bottom,var(--yellow),transparent);animation:sa 1.8s ease infinite}
 @keyframes sa{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
-
-/* ── MARQUEE ── */
 .mq-section{padding:1.3rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;background:var(--charcoal2)}
 .mq-track{display:flex;gap:3rem;white-space:nowrap;animation:mq 28s linear infinite}
 .mq-item{font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:1.4rem}
 .mq-dot{color:var(--yellow);font-size:.45rem}
 @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-/* ── SECTIONS ── */
 .section{padding:6.5rem 3rem}
 .stag{font-size:.68rem;font-weight:700;letter-spacing:.22em;color:var(--gl);text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;justify-content:flex-end;gap:.7rem}
 .stag::after{content:'';width:1.8rem;height:1px;background:var(--gl)}
-.stitle{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,4vw,3.8rem);line-height:1.05;font-weight:900;color:var(--white);text-align:left}
+/* ✅ FIXED: English font size increased to compensate for Barlow Condensed narrow weight */
+.stitle{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2.2rem,4.5vw,4rem);line-height:1.05;font-weight:900;color:var(--white);text-align:left}
 .stitle .y{color:var(--yellow)}
 .divider{width:100%;height:1px;background:var(--border)}
-
-/* ── WORK TABS ── */
 .work-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:3.5rem;justify-content:flex-end}
 .wtab{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:600;color:var(--muted);padding:.75rem 1.6rem;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;transition:all .3s}
 .wtab.active{color:var(--yellow);border-bottom-color:var(--yellow)}
 .wtab:hover:not(.active){color:var(--white)}
 .wpanel{display:none}.wpanel.active{display:block}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   UNIFIED VIDEO CARD SYSTEM  (vc-*)
-   Shared by BOTH "Corporate Ads" (Companies) AND "Brand Ads" (Brands).
-
-   Fix 1 — Controls: iframes use /embed/ID?controls=1 URLs.
-            The cover wrapper has NO pointer-events:none overlay on the
-            iframe layer — only the cover img blocks clicks until played.
-   Fix 2 — Centering: .vc-grid is a flex-wrap row, centred with margin:auto.
-   Fix 3 — Aspect ratio: .vc-thumb owns aspect-ratio:9/16; iframe + cover
-            fill via position:absolute;inset:0 → zero black bars.
-   Fix 4 — Card parity: .vc-body padding/bg/alignment is identical for both.
-   ═══════════════════════════════════════════════════════════════════════ */
-
-/* FIX 2 — Centering wrapper */
-.vc-grid{
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  flex-wrap: wrap;
-  gap: 24px;
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;     /* satisfies the requirement; text inside cards overrides */
-}
-
-/* Each card: compact fixed width — max 320px so cards look elegant, not stretched */
-.vc-card{
-  background: var(--charcoal);
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform .4s;
-  display: flex;
-  flex-direction: column;
-  /* FIX 1: compact elegant size — shrink-to-320px, no full-width stretch */
-  flex: 0 0 320px;
-  max-width: 320px;
-  width: 320px;
-}
-.vc-card:hover{ transform: translateY(-8px); }
-
-/* FIX 3 — 9:16 container; no black bars */
-.vc-thumb{
-  position: relative;
-  width: 100%;
-  aspect-ratio: 9 / 16;      /* container owns the ratio */
-  overflow: hidden;
-  flex-shrink: 0;
-  background: #000;
-}
-
-/* FIX 1 — iframe fills thumb, NO blocking overlay on top */
-.vc-thumb iframe,
-.vc-thumb .vc-cover{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-.vc-thumb .vc-cover{
-  object-fit: cover;      /* no letterbox gaps */
-  cursor: pointer;
-  z-index: 22;
-}
-.vc-thumb iframe{
-  z-index: 21;
-  /* NO pointer-events:none here — controls must remain clickable after play */
-}
-
-/* Decorative overlays — all pointer-events:none so they never block iframe */
-.vc-bg-overlay{ position:absolute; inset:0; z-index:1; pointer-events:none; }
+.vc-grid{display:flex;justify-content:center;align-items:stretch;flex-wrap:wrap;gap:24px;width:100%;margin:0 auto;text-align:center}
+.vc-card{background:var(--charcoal);overflow:hidden;cursor:pointer;transition:transform .4s;display:flex;flex-direction:column;flex:0 0 320px;max-width:320px;width:320px}
+.vc-card:hover{transform:translateY(-8px)}
+.vc-thumb{position:relative;width:100%;aspect-ratio:9/16;overflow:hidden;flex-shrink:0;background:#000}
+.vc-thumb iframe,.vc-thumb .vc-cover{position:absolute;inset:0;width:100%;height:100%;border:none}
+.vc-thumb .vc-cover{object-fit:cover;cursor:pointer;z-index:22}
+.vc-thumb iframe{z-index:21}
+.vc-bg-overlay{position:absolute;inset:0;z-index:1;pointer-events:none}
 .avt1{background:linear-gradient(175deg,#0d1a08 0%,#1a2a10 40%,#111 100%)}
 .avt2{background:linear-gradient(175deg,#0a1420 0%,#101e30 40%,#0a0a0a 100%)}
 .avt3{background:linear-gradient(175deg,#1e1500 0%,#2a1e08 40%,#100a00 100%)}
@@ -153,33 +74,17 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .vc-grad{position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(to top,rgba(0,0,0,.65) 0%,transparent 45%)}
 .vc-corner{position:absolute;top:0;right:0;width:3px;height:100%;background:var(--green);transform:scaleY(0);transform-origin:top;transition:transform .45s;z-index:5;pointer-events:none}
 .vc-card:hover .vc-corner{transform:scaleY(1)}
-
-/* Hover play button */
 .vc-play-wrap{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;pointer-events:none}
 .vc-play-btn{width:50px;height:50px;border:1px solid rgba(248,225,111,.55);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.55);transition:all .4s}
 .vc-play-btn svg{fill:var(--yellow);width:16px;margin-left:-2px}
 .vc-card:hover .vc-play-btn{opacity:1;transform:scale(1)}
-
-/* Format badge */
 .vc-badge{position:absolute;bottom:1rem;right:1rem;z-index:12;pointer-events:none;background:rgba(13,13,13,.75);border:1px solid var(--border);padding:.25rem .65rem;font-size:.6rem;font-family:'Space Mono',monospace;color:var(--gl);letter-spacing:.15em;text-transform:uppercase}
-
-/* FIX 4 — Info box: identical for Corporate Ads and Brand Ads */
-.vc-body{
-  padding: 1.3rem 1.4rem 1.6rem;
-  text-align: left;                /* LTR portfolio: left-align text */
-  border-top: 1px solid var(--border);
-  background: var(--charcoal);     /* same bg as card shell */
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
+.vc-body{padding:1.3rem 1.4rem 1.6rem;text-align:left;border-top:1px solid var(--border);background:var(--charcoal);flex:1;display:flex;flex-direction:column}
 .vc-cat{font-size:.62rem;font-weight:700;letter-spacing:.18em;color:var(--gl);text-transform:uppercase;margin-bottom:.5rem;font-family:'Space Mono',monospace}
 .vc-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.45rem;line-height:1.35}
 .vc-desc{font-size:.76rem;font-weight:300;color:var(--muted);line-height:1.85;margin-bottom:.6rem}
 .vc-dir{font-size:.68rem;color:rgba(92,126,40,.75);font-weight:600;display:block;margin-bottom:.35rem}
 .vc-meta{font-size:.62rem;color:rgba(136,128,120,.55);font-family:'Space Mono',monospace;margin-top:auto}
-
-/* ── CONTENT CREATOR — horizontal (Showcase Ads, 16:9) ── */
 .yt-grid{display:flex;flex-direction:column;gap:1.5rem}
 .yt-card{display:grid;grid-template-columns:1.4fr 1fr;background:var(--charcoal);overflow:hidden;cursor:pointer;transition:all .4s;direction:ltr;position:relative}
 .yt-card:hover{background:#1c2414}
@@ -194,20 +99,15 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .yt-bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--green);transform:scaleX(0);transform-origin:left;transition:transform .4s;pointer-events:none}
 .yt-card:hover .yt-bar{transform:scaleX(1)}
 .yt-body{padding:2rem;display:flex;flex-direction:column;justify-content:center;text-align:left;border-left:1px solid var(--border)}
-/* shared text helpers */
 .ccat{font-size:.62rem;font-weight:700;letter-spacing:.18em;color:var(--gl);text-transform:uppercase;margin-bottom:.5rem;font-family:'Space Mono',monospace}
 .ctitle{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.45rem;line-height:1.35}
 .cdesc{font-size:.76rem;font-weight:300;color:var(--muted);line-height:1.85;margin-bottom:.6rem}
 .cdir{font-size:.68rem;color:rgba(92,126,40,.75);font-weight:600;display:block;margin-bottom:.35rem}
 .cmeta{font-size:.62rem;color:rgba(136,128,120,.55);font-family:'Space Mono',monospace}
-
-/* ── ABOUT ── */
 .about-wrap{max-width:820px;margin:0 auto;text-align:left}
 .about-wrap p{font-size:.98rem;font-weight:300;line-height:2;color:rgba(240,237,230,.72);margin-bottom:1.4rem}
 .about-wrap p em{color:var(--yellow);font-style:normal;font-weight:600}
 .about-name{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:900;color:var(--white);margin-bottom:1.4rem}
-
-/* ── CLIENTS ── */
 .clients-section{padding:5rem 3rem;background:var(--charcoal2)}
 .clients-grid{margin-top:3.5rem;display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border)}
 .client-cell{background:var(--charcoal2);padding:2rem 1.5rem;display:flex;align-items:center;justify-content:center;transition:background .3s;cursor:pointer;position:relative;overflow:hidden}
@@ -218,8 +118,6 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .client-cell:hover .client-placeholder{color:rgba(248,225,111,.5)}
 .client-logo-mark{width:42px;height:42px;display:flex;align-items:center;justify-content:center;margin:0 auto .5rem;opacity:.25;transition:opacity .3s}
 .client-cell:hover .client-logo-mark{opacity:.6}
-
-/* ── CONTACT ── */
 .contact-section{padding:7rem 3rem;position:relative;overflow:hidden;text-align:center}
 .contact-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(92,126,40,.1) 0%,transparent 60%)}
 .contact-inner{max-width:680px;margin:0 auto}
@@ -232,133 +130,85 @@ nav{position:fixed;top:0;right:0;left:0;z-index:200;padding:1rem 3rem;display:fl
 .slink{display:flex;align-items:center;gap:.5rem;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;padding:.45rem .9rem;border:1px solid var(--border);transition:all .3s}
 .slink:hover{color:var(--yellow);border-color:rgba(248,225,111,.35);background:rgba(248,225,111,.04)}
 .slink svg{width:14px;height:14px;fill:currentColor;flex-shrink:0}
-
-/* ── FOOTER ── */
 footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justify-content:space-between;align-items:center;direction:ltr}
 .f-logo{display:flex;align-items:center;gap:.55rem;text-decoration:none}
 .f-logo-text{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;color:var(--yellow)}
 .f-copy{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace}
-
-/* ── REVEAL ── */
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
 .reveal.visible{opacity:1;transform:none}
 .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
-
-/* ══════════════════════════════════════════════════════════════════════
-   RESPONSIVE  ·  900px tablet  ·  768px mobile  ·  400px small
-   ══════════════════════════════════════════════════════════════════════ */
-
-@media (max-width: 900px) {
-  nav                      { padding: 1rem 1.5rem; }
-  .nav-links               { display: none; }
-  .hero                    { padding: 0 1.5rem 4rem; }
-  .hero-counter            { display: none; }
-  .hero-wm                 { display: none; }
-  .section                 { padding: 4.5rem 1.5rem; }
-  .clients-section         { padding: 4rem 1.5rem; }
-
-  /* vc-grid: compact cards, 2 per row max at tablet — still centered */
-  .vc-card{
-    flex: 0 0 280px;
-    max-width: 280px;
-    width: 280px;
-  }
-
-  /* yt-cards: stack */
-  .yt-card                 { grid-template-columns: 1fr; }
-  .yt-thumb                { aspect-ratio: 16 / 9; }
-
-  .clients-grid            { grid-template-columns: repeat(3, 1fr); }
-  footer                   { flex-direction: column; gap: 1rem; text-align: center; }
+/* ✅ FIXED: English hero headline - increased for Barlow Condensed narrow font */
+.hero-hl-line{display:block;font-size:clamp(2.5rem,8vw,5.5rem);font-weight:900;line-height:1.15}
+@media (max-width:900px){
+  nav{padding:1rem 1.5rem}
+  .nav-links{display:none}
+  .hero{padding:0 1.5rem 4rem}
+  .hero-counter{display:none}
+  .hero-wm{display:none}
+  .section{padding:4.5rem 1.5rem}
+  .clients-section{padding:4rem 1.5rem}
+  .vc-card{flex:0 0 280px;max-width:280px;width:280px}
+  .yt-card{grid-template-columns:1fr}
+  .yt-thumb{aspect-ratio:16/9}
+  .clients-grid{grid-template-columns:repeat(3,1fr)}
+  footer{flex-direction:column;gap:1rem;text-align:center}
 }
-
-@media (max-width: 768px) {
-
-  /* NAV */
+@media (max-width:768px){
   nav{padding:.75rem 1rem;flex-wrap:wrap;gap:.5rem;justify-content:space-between}
-  .nav-logo-text           { font-size: 1.05rem; }
-  .nav-cta                 { font-size: .72rem; padding: .35rem .85rem; }
-
-  /* HERO */
+  .nav-logo-text{font-size:1.05rem}
+  .nav-cta{font-size:.72rem;padding:.35rem .85rem}
   .hero{padding:5rem 1.2rem 3.5rem;min-height:100svh}
-  .hero-tag                { font-size: .65rem; margin-bottom: 1rem; }
-  .hero-hl-line            { font-size: clamp(1.75rem, 9vw, 3rem); }
-  .hero-sub                { font-size: .88rem; max-width: 100%; margin-top: 1.2rem; }
-  .hero-actions            { flex-direction: column; align-items: flex-start; gap: 1rem; margin-top: 1.8rem; }
-  .btn-p                   { font-size: .82rem; padding: .72rem 1.4rem; }
-  .btn-g                   { font-size: .78rem; }
-  .scroll-wrap             { display: none; }
-
-  /* SECTIONS */
-  .section                 { padding: 3.5rem 1.2rem; }
-  .clients-section         { padding: 3rem 1.2rem; }
-  .contact-section         { padding: 4rem 1.2rem; }
-  .stitle                  { font-size: clamp(1.6rem, 6vw, 2.5rem); }
-
-  /* TABS */
-  .work-tabs               { flex-wrap: wrap; justify-content: flex-start; gap: .4rem; margin-bottom: 2rem; }
-  .wtab                    { font-size: .74rem; padding: .6rem 1rem; }
-
-  /* FIX 1+2+3 on mobile: single-column, full-width, centred */
-  .vc-grid                 { gap: 1.2rem; }
-  .vc-card{
-    flex: 0 0 100%;
-    max-width: 400px;   /* cap on wide phones, still centered by flex justify-content */
-    width: 100%;
-  }
-
-  /* YT cards */
-  .yt-card                 { grid-template-columns: 1fr; direction: ltr; }
-  .yt-thumb                { aspect-ratio: 16 / 9; width: 100%; }
-  .yt-body                 { padding: 1.2rem; border-left: none; border-top: 1px solid var(--border); }
-
-  /* CLIENTS */
-  .clients-grid            { grid-template-columns: repeat(2, 1fr); }
-  .client-cell             { padding: 1.4rem 1rem; }
-  .client-logo-mark        { width: 36px; height: 36px; }
-
-  /* CONTACT */
-  .contact-inner           { padding: 0 .5rem; }
-  .cemail                  { font-size: clamp(.9rem, 3.5vw, 1.4rem); word-break: break-all; }
-  .ctag                    { font-size: .88rem; }
-  .social-links            { gap: .75rem; }
-  .slink                   { font-size: .72rem; padding: .4rem .7rem; }
-
-  /* FOOTER */
-  footer                   { padding: 1.5rem 1.2rem; flex-direction: column; gap: .8rem; text-align: center; }
-
-  /* FIX 5 — Logo fixes (preserved from previous sessions) */
-  #logo-samsung            { width: 100px !important; }
-  #logo-sony,
-  #logo-logitech           { filter: invert(1) brightness(2) !important; }
+  .hero-tag{font-size:.65rem;margin-bottom:1rem}
+  /* ✅ FIXED mobile English hero */
+  .hero-hl-line{font-size:clamp(2rem,10vw,3.2rem)}
+  .hero-sub{font-size:.88rem;max-width:100%;margin-top:1.2rem}
+  .hero-actions{flex-direction:column;align-items:flex-start;gap:1rem;margin-top:1.8rem}
+  .btn-p{font-size:.82rem;padding:.72rem 1.4rem}
+  .btn-g{font-size:.78rem}
+  .scroll-wrap{display:none}
+  .section{padding:3.5rem 1.2rem}
+  .clients-section{padding:3rem 1.2rem}
+  .contact-section{padding:4rem 1.2rem}
+  /* ✅ FIXED mobile English stitle */
+  .stitle{font-size:clamp(1.8rem,7vw,2.8rem)}
+  .work-tabs{flex-wrap:wrap;justify-content:flex-start;gap:.4rem;margin-bottom:2rem}
+  .wtab{font-size:.74rem;padding:.6rem 1rem}
+  .vc-grid{gap:1.2rem}
+  .vc-card{flex:0 0 100%;max-width:400px;width:100%}
+  .yt-card{grid-template-columns:1fr;direction:ltr}
+  .yt-thumb{aspect-ratio:16/9;width:100%}
+  .yt-body{padding:1.2rem;border-left:none;border-top:1px solid var(--border)}
+  .clients-grid{grid-template-columns:repeat(2,1fr)}
+  .client-cell{padding:1.4rem 1rem}
+  .client-logo-mark{width:36px;height:36px}
+  .contact-inner{padding:0 .5rem}
+  .cemail{font-size:clamp(.9rem,3.5vw,1.4rem);word-break:break-all}
+  .ctag{font-size:.88rem}
+  .social-links{gap:.75rem}
+  .slink{font-size:.72rem;padding:.4rem .7rem}
+  footer{padding:1.5rem 1.2rem;flex-direction:column;gap:.8rem;text-align:center}
+  #logo-samsung{width:100px !important}
+  #logo-sony,#logo-logitech{filter:invert(1) brightness(2) !important}
 }
-
-@media (max-width: 400px) {
-  .hero-hl-line            { font-size: clamp(1.5rem, 10vw, 2.2rem); }
-  .stitle                  { font-size: clamp(1.4rem, 7vw, 2rem); }
-  .clients-grid            { grid-template-columns: repeat(2, 1fr); }
-  .work-tabs               { gap: .25rem; }
-  .wtab                    { font-size: .68rem; padding: .5rem .75rem; }
-  .vc-card                 { max-width: 100%; width: 100%; flex: 0 0 100%; }
+@media (max-width:400px){
+  .hero-hl-line{font-size:clamp(1.8rem,10vw,2.8rem)}
+  .stitle{font-size:clamp(1.6rem,7vw,2.4rem)}
+  .clients-grid{grid-template-columns:repeat(2,1fr)}
+  .work-tabs{gap:.25rem}
+  .wtab{font-size:.68rem;padding:.5rem .75rem}
+  .vc-card{max-width:100%;width:100%;flex:0 0 100%}
 }
 </style>
-</head>
-<body>
+</head><body>
 <script>
-  // Auto-redirect: if user's language IS Arabic, send to Arabic
   const lang = navigator.language || navigator.userLanguage;
   const isArabic = lang.startsWith('ar');
-  
   if (isArabic && !sessionStorage.getItem('lang-chosen')) {
     sessionStorage.setItem('lang-chosen', 'ar');
     window.location.replace('/');
   }
 </script>
-<svg id="logosvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="display:none">
-  <image href="../logos/White.png" width="100" height="100"/>
-</svg>
 
-<!-- NAV -->
 <nav>
   <a href="#home" class="nav-logo">
     <img src="../logos/White.png" alt="logo" style="width:35px;height:35px;object-fit:contain;display:inline-block;vertical-align:middle;">
@@ -375,40 +225,29 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
   <a href="#contact" class="nav-cta">Let's Talk</a>
 </nav>
 
-<!-- HERO -->
 <section class="hero" id="home">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
   <img src="../logos/White.png" alt="" class="hero-wm" aria-hidden="true" onerror="this.style.display='none'">
-
   <div class="hero-counter">
     <div><div class="cnum">+250</div><div class="clbl">Projects</div></div>
     <div><div class="cnum">+6</div><div class="clbl">Years</div></div>
     <div><div class="cnum">+40</div><div class="clbl">Clients</div></div>
   </div>
-
   <div class="hero-tag">Cinematic Editor — Amir Avision</div>
-
   <h1 class="hero-headline" style="line-height:1.15;text-align:left;direction:ltr;">
     <span class="hero-hl-line" style="color:#f5f5f5;">EDITING</span>
     <span class="hero-hl-line accent">IS NOT JUST A TOOL,</span>
     <span class="hero-hl-line" style="color:#f5f5f5;">EDITING IS VISION</span>
   </h1>
-
   <p class="hero-sub">I craft visual experiences that go beyond the screen — every cut is intentional, every moment told with purpose.</p>
-
   <div class="hero-actions">
     <a href="#work" class="btn-p">View My Work ←</a>
     <a href="#about" class="btn-g">← Discover My Style</a>
   </div>
-
-  <div class="scroll-wrap">
-    <span>scroll</span>
-    <div class="scroll-line"></div>
-  </div>
+  <div class="scroll-wrap"><span>scroll</span><div class="scroll-line"></div></div>
 </section>
 
-<!-- MARQUEE -->
 <div class="mq-section">
   <div class="mq-track" id="mqt">
     <div class="mq-item">Cinematic Editing<span class="mq-dot">✦</span></div>
@@ -430,41 +269,26 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
   </div>
 </div>
 
-<!-- WORK -->
 <section class="section" id="work">
   <div class="stag">Selected Work</div>
   <h2 class="stitle" style="margin-bottom:2.5rem">Stories <span class="y">I've Told</span></h2>
-
   <div class="work-tabs reveal">
     <button class="wtab active" onclick="switchTab('ads',this)">Corporate Ads</button>
     <button class="wtab" onclick="switchTab('yt',this)">Showcase Ads</button>
     <button class="wtab" onclick="switchTab('reels',this)">Brand Ads</button>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       PANEL: Corporate Ads  (Companies — 9:16 verticals)
-       ══════════════════════════════════════════════════════════ -->
   <div class="wpanel active" id="panel-ads">
     <div class="vc-grid reveal">
-
-      <!-- Samsung -->
       <div class="vc-card">
         <div class="vc-thumb">
-          <div class="vc-bg-overlay avt1"></div>
-          <div class="vc-grid-ov"></div>
-          <div class="vc-grad"></div>
-          <!-- cover removed from flow when played; iframe stays interactive -->
-          <img class="vc-cover" id="cover-C1" src="../image/PC1.png" alt="Video Cover"
-               onclick="vcPlay('C1')">
-          <!-- FIX 1: /embed/ URL with controls=1 -->
-          <iframe id="video-C1"
-            src="https://www.youtube.com/embed/RD8bM5kMij0?enablejsapi=1&rel=0&modestbranding=1&controls=1&showinfo=0"
-            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          <div class="vc-bg-overlay avt1"></div><div class="vc-grid-ov"></div><div class="vc-grad"></div>
+          <img class="vc-cover" id="cover-C1" src="../image/PC1.png" alt="Video Cover" onclick="vcPlay('C1')">
+          <iframe id="video-C1" src="https://www.youtube.com/embed/RD8bM5kMij0?enablejsapi=1&rel=0&modestbranding=1&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
           <div class="vc-corner"></div>
           <div class="vc-play-wrap"><div class="vc-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
           <div class="vc-badge">9:16 — 30s</div>
         </div>
-        <!-- FIX 4: identical .vc-body for both panels -->
         <div class="vc-body">
           <div class="vc-cat">Commercial Ad ✦ 2026</div>
           <div class="vc-title">Samsung Ad — Galaxy S26 Ultra</div>
@@ -473,18 +297,11 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
           <div class="vc-meta">Hero Ad · Vertical</div>
         </div>
       </div>
-
-      <!-- Sony -->
       <div class="vc-card">
         <div class="vc-thumb">
-          <div class="vc-bg-overlay avt2"></div>
-          <div class="vc-grid-ov"></div>
-          <div class="vc-grad"></div>
-          <img class="vc-cover" id="cover-C2" src="../image/PC2.png" alt="Video Cover"
-               onclick="vcPlay('C2')">
-          <iframe id="video-C2"
-            src="https://www.youtube.com/embed/MhriLwbwE-g?enablejsapi=1&rel=0&modestbranding=1&controls=1&showinfo=0"
-            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          <div class="vc-bg-overlay avt2"></div><div class="vc-grid-ov"></div><div class="vc-grad"></div>
+          <img class="vc-cover" id="cover-C2" src="../image/PC2.png" alt="Video Cover" onclick="vcPlay('C2')">
+          <iframe id="video-C2" src="https://www.youtube.com/embed/MhriLwbwE-g?enablejsapi=1&rel=0&modestbranding=1&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
           <div class="vc-corner"></div>
           <div class="vc-play-wrap"><div class="vc-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
           <div class="vc-badge">9:16 — 60s</div>
@@ -492,23 +309,16 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
         <div class="vc-body">
           <div class="vc-cat">Commercial Ad ✦ 2026</div>
           <div class="vc-title">Sony Ad — INZONE Products</div>
-          <div class="vc-desc">A Sony ad for INZONE products, focused on showcasing performance power and response speed to help professional gamers deliver their best in tournaments.</div>
-          <span class="vc-dir">Direction: Calm pacing and clean editing to highlight INZONE performance and responsiveness.</span>
+          <div class="vc-desc">A Sony ad for INZONE products, focused on showcasing performance power and response speed to help professional gamers deliver their best.</div>
+          <span class="vc-dir">Direction: Calm pacing and clean editing to highlight INZONE performance.</span>
           <div class="vc-meta">Hero Ad · Vertical</div>
         </div>
       </div>
-
-      <!-- Logitech -->
       <div class="vc-card">
         <div class="vc-thumb">
-          <div class="vc-bg-overlay avt3"></div>
-          <div class="vc-grid-ov"></div>
-          <div class="vc-grad"></div>
-          <img class="vc-cover" id="cover-C3" src="../image/PC3.png" alt="Video Cover"
-               onclick="vcPlay('C3')">
-          <iframe id="video-C3"
-            src="https://www.youtube.com/embed/RlC5j9GDuY8?enablejsapi=1&rel=0&modestbranding=1&controls=1&showinfo=0"
-            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          <div class="vc-bg-overlay avt3"></div><div class="vc-grid-ov"></div><div class="vc-grad"></div>
+          <img class="vc-cover" id="cover-C3" src="../image/PC3.png" alt="Video Cover" onclick="vcPlay('C3')">
+          <iframe id="video-C3" src="https://www.youtube.com/embed/RlC5j9GDuY8?enablejsapi=1&rel=0&modestbranding=1&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
           <div class="vc-corner"></div>
           <div class="vc-play-wrap"><div class="vc-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
           <div class="vc-badge">9:16 — 90s</div>
@@ -516,42 +326,31 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
         <div class="vc-body">
           <div class="vc-cat">Commercial Ad ✦ 2026</div>
           <div class="vc-title">Logitech Ad — G Pro X2 Super Strike Mouse</div>
-          <div class="vc-desc">A Logitech ad for the G Pro X2 Super Strike, highlighting the response speed and precision that help professional gamers perform at their best in tournaments.</div>
-          <span class="vc-dir">Direction: Calm pacing and clean editing to highlight the G Pro X2 Super Strike's performance.</span>
+          <div class="vc-desc">A Logitech ad for the G Pro X2 Super Strike, highlighting the response speed and precision for professional gamers.</div>
+          <span class="vc-dir">Direction: Calm pacing and clean editing to highlight performance.</span>
           <div class="vc-meta">Hero Ad · Vertical</div>
         </div>
       </div>
-
     </div>
-  </div><!-- /panel-ads -->
+  </div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       PANEL: Showcase Ads  (Content Creators — 16:9 horizontal)
-       ══════════════════════════════════════════════════════════ -->
   <div class="wpanel" id="panel-yt">
     <div class="yt-grid reveal">
-
       <div class="yt-card">
         <div class="yt-body">
           <div class="ccat">Ad · Falcons</div>
           <div class="ctitle">Promotional Ad — Falcons Content 2026</div>
-          <div class="cdesc">A project for @teamfalconsgg titled: What's Coming? We focused on showcasing all of Falcons' upcoming series in an engaging style, with a powerful rhythm that holds the viewer's attention.</div>
+          <div class="cdesc">A project for @teamfalconsgg titled: What's Coming? Focused on showcasing all of Falcons' upcoming series with a powerful rhythm.</div>
           <span class="cdir">Editing Style: Narrative storytelling + Motion Graphics</span>
           <div class="cmeta">2026 · Social Media</div>
         </div>
         <div class="yt-thumb ytt1" style="position:relative;">
-          <img src="../image/PB1.png" id="cover-B1" onclick="vcPlay('B1')"
-               style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:22;cursor:pointer;border:none;" alt="Video Cover">
-          <iframe id="video-B1"
-            src="https://www.youtube.com/embed/5sCeAPXd63A?enablejsapi=1&rel=0&modestbranding=1&controls=1&showinfo=0"
-            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
-            style="position:absolute;inset:0;width:100%;height:100%;z-index:21;border:none;"></iframe>
-          <div class="yt-grid-ov"></div>
-          <div class="yt-bar"></div>
+          <img src="../image/PB1.png" id="cover-B1" onclick="vcPlay('B1')" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:22;cursor:pointer;border:none;" alt="Video Cover">
+          <iframe id="video-B1" src="https://www.youtube.com/embed/5sCeAPXd63A?enablejsapi=1&rel=0&modestbranding=1&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;z-index:21;border:none;"></iframe>
+          <div class="yt-grid-ov"></div><div class="yt-bar"></div>
           <div class="yt-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
         </div>
       </div>
-
       <div class="yt-card">
         <div class="yt-body">
           <div class="ccat">Brand Refresh · King Saud University</div>
@@ -561,18 +360,12 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
           <div class="cmeta">2026 · Social Media</div>
         </div>
         <div class="yt-thumb ytt2" style="position:relative;">
-          <img src="../image/PB2.png" id="cover-B22" onclick="vcPlay('B22')"
-               style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:22;cursor:pointer;border:none;" alt="Video Cover">
-          <iframe id="video-B22"
-            src="https://www.youtube.com/embed/XBjj1pJ92CE?enablejsapi=1&rel=0&modestbranding=1&controls=1&showinfo=0"
-            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
-            style="position:absolute;inset:0;width:100%;height:100%;z-index:21;border:none;"></iframe>
-          <div class="yt-grid-ov"></div>
-          <div class="yt-bar"></div>
+          <img src="../image/PB2.png" id="cover-B22" onclick="vcPlay('B22')" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:22;cursor:pointer;border:none;" alt="Video Cover">
+          <iframe id="video-B22" src="https://www.youtube.com/embed/XBjj1pJ92CE?enablejsapi=1&rel=0&modestbranding=1&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;z-index:21;border:none;"></iframe>
+          <div class="yt-grid-ov"></div><div class="yt-bar"></div>
           <div class="yt-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
         </div>
       </div>
-
       <div class="yt-card">
         <div class="yt-body">
           <div class="ccat">Ad · Falcons Aziz</div>
@@ -582,39 +375,22 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
           <div class="cmeta">2025 · Social Media</div>
         </div>
         <div class="yt-thumb ytt3" style="position:relative;">
-          <img src="../image/PB3.png" id="cover-B3" onclick="vcPlay('B3')"
-               style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:22;cursor:pointer;border:none;" alt="Video Cover">
-          <iframe id="video-B3"
-            src="https://www.youtube.com/embed/4dtDE6SEHWw?enablejsapi=1&rel=0&modestbranding=1&controls=1&showinfo=0"
-            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
-            style="position:absolute;inset:0;width:100%;height:100%;z-index:21;border:none;"></iframe>
-          <div class="yt-grid-ov"></div>
-          <div class="yt-bar"></div>
+          <img src="../image/PB3.png" id="cover-B3" onclick="vcPlay('B3')" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:22;cursor:pointer;border:none;" alt="Video Cover">
+          <iframe id="video-B3" src="https://www.youtube.com/embed/4dtDE6SEHWw?enablejsapi=1&rel=0&modestbranding=1&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;z-index:21;border:none;"></iframe>
+          <div class="yt-grid-ov"></div><div class="yt-bar"></div>
           <div class="yt-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
         </div>
       </div>
-
     </div>
-  </div><!-- /panel-yt -->
+  </div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       PANEL: Brand Ads  (Brands — 9:16 verticals)
-       FIX 4: identical .vc-card / .vc-body to Corporate Ads panel
-       ══════════════════════════════════════════════════════════ -->
   <div class="wpanel" id="panel-reels">
     <div class="vc-grid reveal">
-
-      <!-- MLZLZ + OKAMI -->
       <div class="vc-card">
         <div class="vc-thumb">
-          <div class="vc-bg-overlay rt1"></div>
-          <div class="vc-grid-ov"></div>
-          <div class="vc-grad"></div>
-          <img class="vc-cover" id="cover-A2" src="../image/PA1.png" alt="Video Cover"
-               onclick="vcPlay('A2')">
-          <iframe id="video-A2"
-            src="https://www.youtube.com/embed/DibDmd18p9s?enablejsapi=1&rel=0&modestbranding=1&controls=1&showinfo=0"
-            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          <div class="vc-bg-overlay rt1"></div><div class="vc-grid-ov"></div><div class="vc-grad"></div>
+          <img class="vc-cover" id="cover-A2" src="../image/PA1.png" alt="Video Cover" onclick="vcPlay('A2')">
+          <iframe id="video-A2" src="https://www.youtube.com/embed/DibDmd18p9s?enablejsapi=1&rel=0&modestbranding=1&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
           <div class="vc-corner"></div>
           <div class="vc-play-wrap"><div class="vc-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
           <div class="vc-badge">9:16 — 32s</div>
@@ -627,18 +403,11 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
           <div class="vc-meta">32s · 9:16 · Vertical</div>
         </div>
       </div>
-
-      <!-- Mohamed Adnan + COD Mobile -->
       <div class="vc-card">
         <div class="vc-thumb">
-          <div class="vc-bg-overlay rt2"></div>
-          <div class="vc-grid-ov"></div>
-          <div class="vc-grad"></div>
-          <img class="vc-cover" id="cover-A1" src="../image/PA2.png" alt="Video Cover"
-               onclick="vcPlay('A1')">
-          <iframe id="video-A1"
-            src="https://www.youtube.com/embed/WAIhv2D0huU?enablejsapi=1&rel=0&modestbranding=1&controls=1&showinfo=0"
-            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          <div class="vc-bg-overlay rt2"></div><div class="vc-grid-ov"></div><div class="vc-grad"></div>
+          <img class="vc-cover" id="cover-A1" src="../image/PA2.png" alt="Video Cover" onclick="vcPlay('A1')">
+          <iframe id="video-A1" src="https://www.youtube.com/embed/WAIhv2D0huU?enablejsapi=1&rel=0&modestbranding=1&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
           <div class="vc-corner"></div>
           <div class="vc-play-wrap"><div class="vc-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
           <div class="vc-badge">9:16 — 38s</div>
@@ -651,18 +420,11 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
           <div class="vc-meta">38s · 9:16 · Vertical</div>
         </div>
       </div>
-
-      <!-- O MATCHA -->
       <div class="vc-card">
         <div class="vc-thumb">
-          <div class="vc-bg-overlay rt3"></div>
-          <div class="vc-grid-ov"></div>
-          <div class="vc-grad"></div>
-          <img class="vc-cover" id="cover-A3" src="../image/PA3.png" alt="Video Cover"
-               onclick="vcPlay('A3')">
-          <iframe id="video-A3"
-            src="https://www.youtube.com/embed/Vqgxm7FOd0w?enablejsapi=1&rel=0&modestbranding=1&controls=1&showinfo=0"
-            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          <div class="vc-bg-overlay rt3"></div><div class="vc-grid-ov"></div><div class="vc-grad"></div>
+          <img class="vc-cover" id="cover-A3" src="../image/PA3.png" alt="Video Cover" onclick="vcPlay('A3')">
+          <iframe id="video-A3" src="https://www.youtube.com/embed/Vqgxm7FOd0w?enablejsapi=1&rel=0&modestbranding=1&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
           <div class="vc-corner"></div>
           <div class="vc-play-wrap"><div class="vc-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
           <div class="vc-badge">9:16 — 30s</div>
@@ -671,22 +433,19 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
           <div class="vc-cat">Brand Ad ✦ Social Media</div>
           <div class="vc-title">Brand Ad | O MATCHA</div>
           <div class="vc-desc">Brand ad for O MATCHA in collaboration with content creator mad v.</div>
-          <span class="vc-dir">Direction: Fast-paced and energetic editing to deliver the right feel for the product.</span>
+          <span class="vc-dir">Direction: Fast-paced and energetic editing to deliver the right feel.</span>
           <div class="vc-meta">30s · 9:16 · Vertical</div>
         </div>
       </div>
-
     </div>
-  </div><!-- /panel-reels -->
-
+  </div>
 </section>
 
 <div class="divider"></div>
 
-<!-- ABOUT -->
 <section class="section" id="about">
   <div class="stag">About</div>
-  <h2 class="stitle" style="margin-bottom:2.5rem;line-height:1.25;font-size:clamp(1.8rem,4vw,3rem);font-weight:900;">
+  <h2 class="stitle" style="margin-bottom:2.5rem;line-height:1.25;">
     Advertising is a <span class="y">growth strategy</span>..<br>turning attention into impact
   </h2>
   <div class="about-wrap reveal">
@@ -698,125 +457,44 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
 
 <div class="divider"></div>
 
-<!-- CLIENTS -->
 <div class="clients-section" id="clients">
   <div class="stag" style="justify-content:flex-end">Trusted Partners</div>
   <h2 class="stitle" style="margin-bottom:.5rem">I've Edited Ads <span class="y">For:</span></h2>
   <p style="text-align:left;color:var(--muted);font-size:.85rem;font-weight:300;margin-bottom:0;margin-top:.5rem">Brands, content creators &amp; companies across various industries</p>
-
   <div class="clients-grid reveal">
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img id="logo-samsung" src="../logos/SAM.png" alt="Samsung" style="width:180px;height:auto;object-fit:contain;display:block;margin:0 auto;">
-      </div>
-      <div class="client-placeholder">SAMSUNG</div>
-    </div></div>
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img src="../logos/Toyota_logo_(Red).svg.png" alt="Toyota" style="width:65px;height:auto;object-fit:contain;display:block;margin:0 auto;">
-      </div>
-      <div class="client-placeholder">TOYOTA</div>
-    </div></div>
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img id="logo-sony" src="../logos/sony-logo.png" alt="Sony" style="width:130px;height:auto;object-fit:contain;filter:brightness(0) invert(1);">
-      </div>
-      <div class="client-placeholder">SONY</div>
-    </div></div>
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img src="../logos/TS.jpg" alt="Team Saudi" style="width:50px;height:auto;object-fit:contain;display:block;margin:0 auto;">
-      </div>
-      <div class="client-placeholder">Team Saudi</div>
-    </div></div>
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img src="../logos/falcons logo.png" alt="Team Falcons" style="width:45px;height:auto;object-fit:contain;display:block;margin:0 auto;">
-      </div>
-      <div class="client-placeholder">Team Falcons</div>
-    </div></div>
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img id="logo-logitech" src="../logos/logitech-logo.png" alt="Logitech" style="width:130px;height:auto;object-fit:contain;filter:brightness(0) invert(1);">
-      </div>
-      <div class="client-placeholder">logitech</div>
-    </div></div>
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img src="../logos/MA logo.jpg" alt="Mohamad Adnan" style="width:50px;height:auto;object-fit:contain;display:block;margin:0 auto;">
-      </div>
-      <div class="client-placeholder">Mohamad Adnan</div>
-    </div></div>
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img src="../logos/okami.png" alt="Okami" style="width:68px;height:auto;object-fit:contain;display:block;margin:0 auto;">
-      </div>
-      <div class="client-placeholder">OKAMI</div>
-    </div></div>
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img src="../logos/KSU logo.png" alt="King Saud University" style="width:100px;height:auto;object-fit:contain;display:block;margin:0 auto;">
-      </div>
-      <div class="client-placeholder">King Saud University</div>
-    </div></div>
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img src="../logos/mlazlaz logo.png" alt="MLZLZ" style="width:170px;height:auto;object-fit:contain;display:block;margin:0 auto;">
-      </div>
-      <div class="client-placeholder">MLZLZ</div>
-    </div></div>
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img src="../logos/PL logo.jpg" alt="PRIME eLeague" style="width:50px;height:auto;object-fit:contain;display:block;margin:0 auto;">
-      </div>
-      <div class="client-placeholder">PRIME eLeague</div>
-    </div></div>
-    <div class="client-cell"><div>
-      <div class="client-logo-mark">
-        <img src="../logos/COD M logo.png" alt="Call of Duty Mobile" style="width:85px;height:auto;object-fit:contain;display:block;margin:0 auto;">
-      </div>
-      <div class="client-placeholder">Call of Duty Mobile</div>
-    </div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img id="logo-samsung" src="../logos/SAM.png" alt="Samsung" style="width:180px;height:auto;object-fit:contain;display:block;margin:0 auto;"></div><div class="client-placeholder">SAMSUNG</div></div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img src="../logos/Toyota_logo_(Red).svg.png" alt="Toyota" style="width:65px;height:auto;object-fit:contain;display:block;margin:0 auto;"></div><div class="client-placeholder">TOYOTA</div></div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img id="logo-sony" src="../logos/sony-logo.png" alt="Sony" style="width:130px;height:auto;object-fit:contain;filter:brightness(0) invert(1);"></div><div class="client-placeholder">SONY</div></div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img src="../logos/TS.jpg" alt="Team Saudi" style="width:50px;height:auto;object-fit:contain;display:block;margin:0 auto;"></div><div class="client-placeholder">Team Saudi</div></div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img src="../logos/falcons logo.png" alt="Team Falcons" style="width:45px;height:auto;object-fit:contain;display:block;margin:0 auto;"></div><div class="client-placeholder">Team Falcons</div></div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img id="logo-logitech" src="../logos/logitech-logo.png" alt="Logitech" style="width:130px;height:auto;object-fit:contain;filter:brightness(0) invert(1);"></div><div class="client-placeholder">logitech</div></div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img src="../logos/MA logo.jpg" alt="Mohamad Adnan" style="width:50px;height:auto;object-fit:contain;display:block;margin:0 auto;"></div><div class="client-placeholder">Mohamad Adnan</div></div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img src="../logos/okami.png" alt="Okami" style="width:68px;height:auto;object-fit:contain;display:block;margin:0 auto;"></div><div class="client-placeholder">OKAMI</div></div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img src="../logos/KSU logo.png" alt="King Saud University" style="width:100px;height:auto;object-fit:contain;display:block;margin:0 auto;"></div><div class="client-placeholder">King Saud University</div></div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img src="../logos/mlazlaz logo.png" alt="MLZLZ" style="width:170px;height:auto;object-fit:contain;display:block;margin:0 auto;"></div><div class="client-placeholder">MLZLZ</div></div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img src="../logos/PL logo.jpg" alt="PRIME eLeague" style="width:50px;height:auto;object-fit:contain;display:block;margin:0 auto;"></div><div class="client-placeholder">PRIME eLeague</div></div></div>
+    <div class="client-cell"><div><div class="client-logo-mark"><img src="../logos/COD M logo.png" alt="Call of Duty Mobile" style="width:85px;height:auto;object-fit:contain;display:block;margin:0 auto;"></div><div class="client-placeholder">Call of Duty Mobile</div></div></div>
   </div>
-
   <p style="text-align:center;color:rgba(136,128,120,.4);font-size:.68rem;font-family:'Space Mono',monospace;margin-top:2rem;letter-spacing:.15em;text-transform:uppercase">Brands · Content Creators · Companies Across All Industries</p>
 </div>
 
-<!-- CONTACT -->
 <section class="contact-section" id="contact">
   <div class="contact-bg"></div>
   <div class="contact-inner reveal">
     <div class="contact-stag">Get In Touch</div>
-    <h2 class="stitle" style="font-size:clamp(2.4rem,6vw,5rem);line-height:1.05;margin-bottom:0">Let's Make Something<br><span class="y">Unforgettable.</span></h2>
+    <h2 class="stitle" style="font-size:clamp(2.8rem,6.5vw,5.5rem);line-height:1.05;margin-bottom:0">Let's Make Something<br><span class="y">Unforgettable.</span></h2>
     <p class="ctag">Turn your vision into a stunning advertising reality. Reach out to me.</p>
     <a href="mailto:contact@amiravision.com" class="cemail">contact@amiravision.com</a>
-    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=contact@amiravision.com"
-       target="_blank" class="btn-p"
-       style="position:relative;z-index:999;display:inline-flex;cursor:pointer;transition:transform .3s ease;">
-      Start Your Project ←
-    </a>
+    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=contact@amiravision.com" target="_blank" class="btn-p" style="position:relative;z-index:999;display:inline-flex;cursor:pointer;">Start Your Project ←</a>
     <div class="social-links">
-      <a href="https://www.youtube.com/@Avision-avo" target="_blank" class="slink" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#a1a1a1;z-index:9999;position:relative;">
-        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-        <span style="font-size:14px;">YouTube</span>
-      </a>
-      <a href="https://www.instagram.com/avision.avo" target="_blank" class="slink" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#a1a1a1;z-index:9999;position:relative;">
-        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-        <span style="font-size:14px;">Instagram</span>
-      </a>
-      <a href="https://x.com/a7k47452519" target="_blank" class="slink" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#a1a1a1;z-index:9999;position:relative;">
-        <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        <span style="font-size:14px;">X</span>
-      </a>
-      <a href="https://www.tiktok.com/@avision.av" target="_blank" class="slink" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#a1a1a1;z-index:9999;position:relative;">
-        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.88c.18 0 .35.02.53.05V9.1a5.74 5.74 0 0 0-3.42 1.15A5.77 5.77 0 0 0 5 15.17a5.77 5.77 0 0 0 5.77 5.77 5.77 5.77 0 0 0 5.77-5.77V8.46a8.29 8.29 0 0 0 5.24 1.83V6.69z"/></svg>
-        <span style="font-size:14px;">TikTok</span>
-      </a>
+      <a href="https://www.youtube.com/@Avision-avo" target="_blank" class="slink" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#a1a1a1;"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg><span style="font-size:14px;">YouTube</span></a>
+      <a href="https://www.instagram.com/avision.avo" target="_blank" class="slink" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#a1a1a1;"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg><span style="font-size:14px;">Instagram</span></a>
+      <a href="https://x.com/a7k47452519" target="_blank" class="slink" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#a1a1a1;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span style="font-size:14px;">X</span></a>
+      <a href="https://www.tiktok.com/@avision.av" target="_blank" class="slink" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#a1a1a1;"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.88c.18 0 .35.02.53.05V9.1a5.74 5.74 0 0 0-3.42 1.15A5.77 5.77 0 0 0 5 15.17a5.77 5.77 0 0 0 5.77 5.77 5.77 5.77 0 0 0 5.77-5.77V8.46a8.29 8.29 0 0 0 5.24 1.83V6.69z"/></svg><span style="font-size:14px;">TikTok</span></a>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <a href="#home" class="nav-logo">
     <img src="../logos/White.png" alt="logo" style="width:35px;height:35px;object-fit:contain;display:inline-block;vertical-align:middle;">
@@ -826,67 +504,65 @@ footer{border-top:1px solid var(--border);padding:1.8rem 3rem;display:flex;justi
 </footer>
 
 <script>
-/* Single unified play handler for all cards */
-function vcPlay(id) {
-  var cover  = document.getElementById('cover-' + id);
-  var iframe = document.getElementById('video-' + id);
-  if (cover) {
-    cover.style.display = 'none';
-    /* Do NOT set pointerEvents:none on the parent — that would block iframe controls */
-  }
-  if (iframe) {
-    iframe.contentWindow.postMessage(
-      '{"event":"command","func":"playVideo","args":""}', '*'
-    );
-  }
+function vcPlay(id){
+  var cover=document.getElementById('cover-'+id);
+  var iframe=document.getElementById('video-'+id);
+  if(cover)cover.style.display='none';
+  if(iframe)iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}','*');
 }
-
-/* Tab switcher */
-function switchTab(id, btn) {
-  document.querySelectorAll('.wpanel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.wtab').forEach(b  => b.classList.remove('active'));
-  document.getElementById('panel-' + id).classList.add('active');
+function switchTab(id,btn){
+  document.querySelectorAll('.wpanel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.wtab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
   btn.classList.add('active');
-  document.querySelectorAll('#panel-' + id + ' .reveal').forEach(el => {
+  document.querySelectorAll('#panel-'+id+' .reveal').forEach(el=>{
     el.classList.remove('visible');
-    setTimeout(() => el.classList.add('visible'), 60);
+    setTimeout(()=>el.classList.add('visible'),60);
   });
 }
-
-/* Intersection observer for .reveal */
-const obs = new IntersectionObserver(
-  e => e.forEach(i => { if (i.isIntersecting) i.target.classList.add('visible'); }),
-  { threshold: .08 }
-);
-document.querySelectorAll('.reveal').forEach(r => obs.observe(r));
-
-/* Marquee duplication */
-const mq = document.getElementById('mqt');
-mq.innerHTML += mq.innerHTML;
+const obs=new IntersectionObserver(e=>e.forEach(i=>{if(i.isIntersecting)i.target.classList.add('visible')}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(r=>obs.observe(r));
+const mq=document.getElementById('mqt');
+mq.innerHTML+=mq.innerHTML;
 </script>
-  <!-- Legal Footer -->
-<div style="text-align:center; padding: 2rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.07); margin-top: 2rem;">
-  <div style="display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap; margin-bottom:0.75rem;">
-    <a href="/terms.html" style="color:rgba(255,255,255,0.35); font-size:12px; text-decoration:none; letter-spacing:0.03em;">Terms of Service</a>
-    <a href="/privacy.html" style="color:rgba(255,255,255,0.35); font-size:12px; text-decoration:none; letter-spacing:0.03em;">Privacy Policy</a>
-    <a href="/refund.html" style="color:rgba(255,255,255,0.35); font-size:12px; text-decoration:none; letter-spacing:0.03em;">Refund Policy</a>
-    <a href="/legal.html" style="color:rgba(255,255,255,0.35); font-size:12px; text-decoration:none; letter-spacing:0.03em;">Legal Notice</a>
-    <a href="mailto:contact@amirAmir Avision.com" style="color:rgba(255,255,255,0.35); font-size:12px; text-decoration:none; letter-spacing:0.03em;">Contact</a>
+<div style="text-align:center;padding:2rem 1.5rem;border-top:1px solid rgba(255,255,255,0.07);margin-top:2rem;">
+  <div style="display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:0.75rem;">
+    <a href="/terms.html" style="color:rgba(255,255,255,0.35);font-size:12px;text-decoration:none;">Terms of Service</a>
+    <a href="/privacy.html" style="color:rgba(255,255,255,0.35);font-size:12px;text-decoration:none;">Privacy Policy</a>
+    <a href="/refund.html" style="color:rgba(255,255,255,0.35);font-size:12px;text-decoration:none;">Refund Policy</a>
+    <a href="/legal.html" style="color:rgba(255,255,255,0.35);font-size:12px;text-decoration:none;">Legal Notice</a>
+    <a href="mailto:contact@amiravision.com" style="color:rgba(255,255,255,0.35);font-size:12px;text-decoration:none;">Contact</a>
   </div>
-  <p style="color:rgba(255,255,255,0.2); font-size:11px; margin:0;">© 2026 Amir Avision LLC · NAICS 512110 / 512191 · Video Production & Post-Production Services</p>
+  <p style="color:rgba(255,255,255,0.2);font-size:11px;margin:0;">© 2026 Amir Avision LLC · NAICS 512110 / 512191 · Video Production & Post-Production Services</p>
 </div>
-  <!--Start of Tawk.to Script-->
 <script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6a1bd42e81b0b81c38f886c6/1jpub9md0';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
+var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();
+(function(){var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];s1.async=true;s1.src='https://embed.tawk.to/6a1bd42e81b0b81c38f886c6/1jpub9md0';s1.charset='UTF-8';s1.setAttribute('crossorigin','*');s0.parentNode.insertBefore(s1,s0);})();
 </script>
-<!--End of Tawk.to Script-->
+
+<script>
+/* ============================================
+   AVISION — Content Protection
+   ============================================ */
+document.addEventListener("contextmenu",function(e){e.preventDefault();return false;});
+document.addEventListener("keydown",function(e){
+  if(e.key==="F12"||(e.ctrlKey&&e.shiftKey&&["i","I","j","J","c","C"].includes(e.key))||(e.ctrlKey&&["u","U","s","S"].includes(e.key))){
+    e.preventDefault();return false;
+  }
+});
+document.addEventListener("DOMContentLoaded",function(){
+  document.querySelectorAll("img").forEach(function(img){
+    img.setAttribute("draggable","false");
+    img.addEventListener("dragstart",function(e){e.preventDefault();});
+  });
+  [".hero-headline",".stitle",".about-name",".nav-logo-text",".ctitle",".vc-title"].forEach(function(sel){
+    document.querySelectorAll(sel).forEach(function(el){
+      el.style.userSelect="none";
+      el.style.webkitUserSelect="none";
+    });
+  });
+});
+</script>
+
 </body>
 </html>
