@@ -918,7 +918,7 @@ function invoiceEmailHTML(title,sym,amount,currency,due,notes,status,portalUrl){
       '<a href="'+portalUrl+'" style="display:block;background:#c9a84c;color:#000;text-decoration:none;text-align:center;padding:14px;border-radius:10px;font-weight:700;font-size:15px;margin-bottom:1rem;">Pay Now →</a>'+
       '<p style="font-size:12px;color:#555;text-align:center;">Log in to your Avision Portal to view and pay this invoice securely.</p>'+
     '</div>'+
-    '<div style="padding:1rem 2rem;border-top:1px solid #1a1a1a;text-align:center;font-size:11px;color:#555;">Avision LLC · amiravision.com · contact@amiravision.com</div>'+
+    '<div style="padding:1rem 2rem;border-top:1px solid #1a1a1a;text-align:center;font-size:11px;color:#555;">Amir Avision LLC · amiravision.com · contact@amiravision.com</div>'+
   '</div>';
 }
 
@@ -964,7 +964,7 @@ async function updateInvStatus(id,s){
             '<div style="font-size:2rem;font-weight:800;color:#22c55e;">'+sym+parseFloat(data.amount).toLocaleString()+' '+data.currency+'</div>'+
           '</div>'+
         '</div>'+
-        '<div style="padding:1rem 2rem;border-top:1px solid #1a1a1a;text-align:center;font-size:11px;color:#555;">Avision LLC · amiravision.com</div>'+
+        '<div style="padding:1rem 2rem;border-top:1px solid #1a1a1a;text-align:center;font-size:11px;color:#555;">Amir Avision LLC · amiravision.com</div>'+
       '</div>';
       sendEmail(data.client_email,'✅ Payment Confirmed — Avision',paidHtml);
       // Notify admin
