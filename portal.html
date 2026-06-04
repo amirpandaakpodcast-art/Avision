@@ -726,7 +726,15 @@ function doSignup(){
   if(!document.getElementById('agr').checked)return sm('sM','Please accept the terms.','err');
   sm('sM','Creating account...','');
   sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}}).then(function(r){
-    if(r.error){if(r.error.message.toLowerCase().includes('already'))return sm('sM','Email already registered. Please sign in.','err');return sm('sM',r.error.message,'err');}
+    if(r.error){
+      if(r.error.message.toLowerCase().includes('already'))
+        return sm('sM','This email is already registered. Please sign in.','err');
+      return sm('sM',r.error.message,'err');
+    }
+    // Supabase returns user with empty identities if email already exists
+    if(r.data&&r.data.user&&r.data.user.identities&&r.data.user.identities.length===0){
+      return sm('sM','This email is already registered. Please sign in.','err');
+    }
     sb.from('clients').upsert({email:e,full_name:n},{onConflict:'email'}).then(function(){}).catch(function(){});
     pendingSession=r.data;otpEmail=e;
     showOTPScreen(e,true);sm('otpMsg','Sending code...','');
