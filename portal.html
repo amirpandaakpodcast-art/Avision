@@ -730,7 +730,7 @@ function doSignup(){
   var n=document.getElementById('sN').value.trim(),e=document.getElementById('sE').value.trim();
   var p=document.getElementById('sP').value,p2=document.getElementById('sP2').value;
   if(!n||!e||!p||!p2)return sm('sM','Please fill all fields.','err');
-  if(p.length<6)return sm('sM','Password min. 6 characters.','err');
+  if(p.length<8)return sm('sM','Password min. 8 characters.','err'); if(!/[A-Z]/.test(p))return sm('sM','Password must contain at least 1 capital letter.','err'); if(!/[!@#$%^&*()_+\-=\[\]{}|,.<>?]/.test(p))return sm('sM','Password must contain at least 1 special character (@ ! # ...).','err');
   if(p!==p2)return sm('sM','Passwords do not match.','err');
   if(!document.getElementById('agr').checked)return sm('sM','Please accept the terms.','err');
   sm('sM','Creating account...','');
