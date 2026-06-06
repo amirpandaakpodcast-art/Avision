@@ -275,7 +275,8 @@ function showReset(){document.getElementById('resetForm').style.display='block';
 function hideReset(){document.getElementById('resetForm').style.display='none';}
 function sm(id,txt,type){var e=document.getElementById(id);if(!e)return;e.textContent=txt;e.className='amsg '+(type||'');}
 async function doReset(){var e=document.getElementById('rE').value;if(!e)return sm('rM','Please enter your email.','err');sm('rM','Sending...','');const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:'https://www.amiravision.com/portal.html'});if(error)return sm('rM',error.message,'err');sm('rM','✓ Reset link sent! Check your email.','ok');}
-function doLogin(){var e=document.getElementById('lE').value.trim(),p=document.getElementById('lP').value;if(!e||!p)return sm('lM','Please fill all fields.','err');sm('lM','Signing in...','');sb.auth.signInWithPassword({email:e,password:p}).then(function(r){if(r.error)return sm('lM',r.error.message,'err');sm('lM','','');}).catch(function(err){sm('lM',err.message||'Something went wrong.','err');});}
+function showDash(user){document.getElementById('dash').style.display='block';document.getElementById('authPage').style.display='none';me=user;}
+function doLogin(){var e=document.getElementById('lE').value.trim(),p=document.getElementById('lP').value;if(!e||!p)return sm('lM','Please fill all fields.','err');sm('lM','Signing in...','');sb.auth.signInWithPassword({email:e,password:p}).then(function(r){if(r.error)return sm('lM',r.error.message,'err');showDash(r.data.session.user);}).catch(function(err){sm('lM',err.message||'Something went wrong.','err');});}
 function doSignup(){var n=document.getElementById('sN').value.trim(),e=document.getElementById('sE').value.trim();var p=document.getElementById('sP').value,p2=document.getElementById('sP2').value;if(!n||!e||!p||!p2)return sm('sM','Please fill all fields.','err');if(p.length<8)return sm('sM','Password min. 8 characters.','err');if(!/[A-Z]/.test(p))return sm('sM','Password must contain at least 1 capital letter.','err');if(!/[!@#$%^&*()_+\-=\[\]{}|,.<>?]/.test(p))return sm('sM','Password must contain at least 1 special character.','err');if(p!==p2)return sm('sM','Passwords do not match.','err');if(!document.getElementById('agr').checked)return sm('sM','Please accept the terms.','err');sm('sM','Creating account...','');sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}}).then(function(r){if(r.error)return sm('sM',r.error.message,'err');sm('sM','✓ Account created!','ok');}).catch(function(err){sm('sM',err.message||'Error','err');});}
 function doLogout(){sb.auth.signOut().then(function(){document.getElementById('dash').style.display='none';document.getElementById('authPage').style.display='flex';me=null;});}
 function openCp(){document.getElementById('cpModal').classList.add('show');}
@@ -331,13 +332,24 @@ async function doResetSave(){
   setTimeout(function(){window.location.href='/portal.html';},2000);
 }
 
-// SESSION CHECK - FIX 4: _isRecovery guard protects recovery session
-sb.auth.getSession().then(function(r){
-  if(r.data&&r.data.session){
-    if(_isRecovery)return;
-    document.getElementById('dash').style.display='block';
-    document.getElementById('authPage').style.display='none';
-    me=r.data.session.user;
+// AUTH STATE CHANGE — handles login, recovery, and session restore
+sb.auth.onAuthStateChange(function(event, session){
+  if(event==='PASSWORD_RECOVERY'){
+    // Show reset form — session is active
+    _recoveryTokens=session?{access_token:session.access_token,refresh_token:session.refresh_token}:null;
+    var existing=document.getElementById('resetOverlay');
+    if(existing)return;
+    var o=document.createElement('div');o.id='resetOverlay';o.innerHTML='<div style="position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;"><div style="background:#111;border:1px solid #222;border-radius:12px;padding:1.75rem;width:100%;max-width:360px;"><h2 style="font-size:16px;font-weight:600;margin-bottom:1.25rem;color:#ededed;font-family:Inter,sans-serif;">Set new password</h2><div style="margin-bottom:1rem;"><label style="display:block;font-size:12px;color:#a1a1a1;margin-bottom:6px;font-family:Inter,sans-serif;">New password</label><input type="password" id="rpw1" placeholder="Min. 8 characters" style="width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;color:#ededed;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:1rem;"><label style="display:block;font-size:12px;color:#a1a1a1;margin-bottom:6px;font-family:Inter,sans-serif;">Confirm password</label><input type="password" id="rpw2" placeholder="Repeat password" style="width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;color:#ededed;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;"></div><button onclick="doResetSave()" style="width:100%;background:#c9a84c;color:#000;border:none;border-radius:6px;padding:10px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">Update password</button><div id="rpwMsg" style="font-size:12px;margin-top:.75rem;text-align:center;font-family:Inter,sans-serif;"></div></div></div>';
+    document.body.appendChild(o);
+    return;
+  }
+  if(event==='SIGNED_IN'&&session&&!_isRecovery){
+    showDash(session.user);
+  }
+  if(event==='SIGNED_OUT'){
+    document.getElementById('dash').style.display='none';
+    document.getElementById('authPage').style.display='flex';
+    me=null;
   }
 });
 function checkPasswordStrength(){
