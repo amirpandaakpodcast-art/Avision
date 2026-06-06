@@ -9,13 +9,21 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{--bg:#0a0a0a;--surface:#111;--surface2:#161616;--surface3:#1c1c1c;--border:#222;--border2:#2a2a2a;--text:#ededed;--text2:#a1a1a1;--text3:#555;--accent:#c9a84c;--accent2:rgba(201,168,76,.1);--accent3:rgba(201,168,76,.06);--red:#ef4444;--green:#22c55e;--blue:#3b82f6;--r:8px;}
+:root{
+  --bg:#0a0a0a;--surface:#111;--surface2:#161616;--surface3:#1c1c1c;
+  --border:#222;--border2:#2a2a2a;
+  --text:#ededed;--text2:#a1a1a1;--text3:#555;
+  --accent:#c9a84c;--accent2:rgba(201,168,76,.1);--accent3:rgba(201,168,76,.06);
+  --red:#ef4444;--green:#22c55e;--blue:#3b82f6;
+  --r:8px;
+}
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 #toast{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none;}
 .ti{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px;transform:translateX(110%);transition:transform .35s cubic-bezier(.22,1,.36,1);min-width:220px;box-shadow:0 4px 20px rgba(0,0,0,.4);}
 .ti.show{transform:translateX(0);}
 .tdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+/* AUTH */
 .auth-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem;background:var(--bg);}
 .auth-box{width:100%;max-width:380px;}
 .auth-logo{text-align:center;margin-bottom:2rem;}
@@ -44,8 +52,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .btn-primary{width:100%;background:var(--accent);color:#000;border:none;border-radius:6px;padding:10px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s;margin-top:.25rem;}
 .btn-primary:hover{filter:brightness(1.1);}
 .amsg{font-size:12px;margin-top:.75rem;min-height:16px;text-align:center;}
-.amsg.err{color:var(--red);}
-.amsg.ok{color:var(--green);}
+.amsg.err{color:var(--red);}.amsg.ok{color:var(--green);}
+/* OTP */
 .otp-screen{display:none;text-align:center;}
 .otp-icon{font-size:2.5rem;margin-bottom:.75rem;}
 .otp-title{font-size:16px;font-weight:600;margin-bottom:.25rem;}
@@ -61,17 +69,21 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .otp-resend:hover{color:var(--text);}
 .otp-back{font-size:12px;color:var(--text3);cursor:pointer;margin-top:.75rem;display:block;transition:color .2s;}
 .otp-back:hover{color:var(--text);}
+/* DASHBOARD */
 .dash{display:none;min-height:100vh;}
+/* TOPBAR */
 .topbar{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100;background:rgba(10,10,10,.95);backdrop-filter:blur(12px);}
 .tb-left{display:flex;align-items:center;gap:.75rem;}
 .tb-logo{height:22px;opacity:.85;}
 .tb-sep{width:1px;height:16px;background:var(--border2);}
 .tb-title{font-size:13px;color:var(--text2);}
 .tb-right{display:flex;align-items:center;gap:.5rem;}
+/* BELL */
 .bell-btn{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;transition:background .2s;color:var(--text2);}
 .bell-btn:hover{background:var(--surface2);}
 .bell-dot{display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);border:1.5px solid var(--bg);animation:bellPulse 2s infinite;}
 @keyframes bellPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.3);}}
+/* NOTIFICATIONS */
 .npop{display:none;position:fixed;top:56px;right:1rem;width:min(320px,calc(100vw - 2rem));background:var(--surface);border:1px solid var(--border2);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.7);animation:fadeIn .15s ease;z-index:999;overflow:hidden;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
 .npop-h{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2);}
@@ -95,6 +107,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .npop-f{padding:.6rem 1rem;border-top:1px solid var(--border);}
 .npop-f button{width:100%;background:transparent;border:1px solid var(--border);border-radius:6px;padding:7px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;}
 .npop-f button:hover{border-color:var(--accent);color:var(--accent);}
+/* PROFILE */
 .prof-btn{width:32px;height:32px;border-radius:50%;background:var(--accent2);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;font-weight:600;color:var(--accent);transition:all .2s;position:relative;}
 .prof-btn:hover{border-color:var(--accent);}
 .prof-pop{display:none;position:absolute;top:44px;right:0;width:240px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:fadeIn .15s ease;z-index:999;}
@@ -106,6 +119,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .prof-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;font-size:13px;color:var(--text2);cursor:pointer;transition:background .15s;}
 .prof-item:hover{background:var(--surface2);color:var(--text);}
 .prof-item svg{width:14px;height:14px;opacity:.7;}
+/* MAIN */
 .main{max-width:800px;margin:0 auto;padding:2rem 1.5rem 4rem;}
 .welcome-bar{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
 .welcome-bar h1{font-size:1.4rem;font-weight:600;margin-bottom:.2rem;}
@@ -118,6 +132,144 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .sect-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
 .sect-title{font-size:13px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.04em;}
 .empty-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:2rem;text-align:center;font-size:13px;color:var(--text3);}
+/* PROJECTS */
+.proj-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:.75rem;transition:border-color .2s;}
+.proj-card:hover{border-color:var(--border2);}
+.proj-top{padding:1rem 1.25rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;}
+.proj-title{font-size:14px;font-weight:500;margin-bottom:.2rem;}
+.proj-meta{font-size:12px;color:var(--text3);}
+.proj-right{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem;flex-shrink:0;}
+.proj-date{font-size:11px;color:var(--text3);}
+.proj-acts{display:flex;gap:.5rem;align-items:center;}
+.dl-btn{background:var(--accent);color:#000;text-decoration:none;padding:5px 12px;border-radius:5px;font-size:12px;font-weight:500;transition:filter .2s;}
+.dl-btn:hover{filter:brightness(1.1);}
+.sp-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;}
+.sp-ip{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2);}
+.sp-rv{background:rgba(201,168,76,.1);color:var(--accent);border:1px solid rgba(201,168,76,.2);}
+.sp-dn{background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.2);}
+.sp-pd{background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
+.proj-prog{padding:.75rem 1.25rem;border-top:1px solid var(--border);background:var(--surface2);}
+.prog-row{display:flex;justify-content:space-between;margin-bottom:.4rem;}
+.prog-lbl{font-size:11px;color:var(--text3);}
+.prog-pct{font-size:11px;font-weight:600;color:var(--accent);}
+.prog-track{background:var(--surface3);border-radius:4px;height:3px;}
+.prog-fill{height:3px;border-radius:4px;background:var(--accent);transition:width .8s cubic-bezier(.22,1,.36,1);}
+.proj-tl{padding:.75rem 1.25rem;border-top:1px solid var(--border);display:flex;align-items:center;overflow:hidden;}
+.tl-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;z-index:2;min-width:0;}
+.tl-dot{width:8px;height:8px;border-radius:50%;border:2px solid var(--border2);background:var(--bg);transition:all .3s;flex-shrink:0;}
+.tl-dot.done{background:var(--accent);border-color:var(--accent);}
+.tl-dot.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,168,76,.2);}
+.tl-lbl{font-size:9px;color:var(--text3);margin-top:5px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px;}
+.tl-lbl.done,.tl-lbl.active{color:var(--accent);}
+.tl-line{position:absolute;top:4px;left:calc(50% + 4px);right:calc(-50% + 4px);height:1px;background:var(--border2);z-index:1;}
+.tl-line.done{background:var(--accent);}
+/* FILES */
+.tab-row{display:flex;background:var(--surface2);border-radius:6px;padding:3px;gap:2px;margin-bottom:0;}
+.utab{flex:1;text-align:center;padding:6px 12px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border-radius:5px;transition:all .2s;}
+.utab.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.upload-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);border-top-left-radius:0;border-top-right-radius:0;}
+.dz{padding:2.5rem 1.5rem;text-align:center;cursor:pointer;border:2px dashed transparent;border-radius:var(--r);transition:all .2s;}
+.dz:hover,.dz.ov{background:var(--surface2);border-color:rgba(201,168,76,.2);}
+.dz-ico{font-size:2rem;margin-bottom:.75rem;opacity:.25;}
+.dz h3{font-size:14px;font-weight:500;margin-bottom:.25rem;}
+.dz p{font-size:12px;color:var(--text3);margin-bottom:1.25rem;}
+.btn-outline{background:transparent;border:1px solid var(--border2);border-radius:6px;padding:8px 18px;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+.prog-area{display:none;padding:.75rem 1.25rem;border-top:1px solid var(--border);}
+.prog-bar-track{background:var(--surface3);border-radius:4px;height:3px;}
+.prog-bar-fill{height:3px;border-radius:4px;background:var(--accent);width:0%;transition:width .4s;}
+.prog-txt{font-size:12px;color:var(--text2);margin-top:.5rem;}
+.files-list{border-top:1px solid var(--border);}
+.file-row{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.03);}
+.file-l{display:flex;align-items:center;gap:.6rem;}
+.file-name{font-size:13px;}
+.file-size{font-size:11px;color:var(--text3);margin-top:1px;}
+.file-date{font-size:11px;color:var(--text3);}
+.drive-inner{padding:1.25rem;}
+.drive-inner p{font-size:13px;color:var(--text2);margin-bottom:1.25rem;line-height:1.7;}
+.steps{margin-bottom:1.25rem;}
+.step{display:flex;gap:.75rem;margin-bottom:.75rem;}
+.step-n{width:20px;height:20px;border-radius:50%;background:var(--accent2);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--accent);flex-shrink:0;}
+.step-t{font-size:13px;color:var(--text2);line-height:1.6;margin-top:1px;}
+.drive-row{display:flex;gap:.5rem;}
+.drive-in{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border .2s;}
+.drive-in:focus{border-color:var(--accent);}
+.drive-in::placeholder{color:var(--text3);}
+.btn-accent{background:var(--accent);color:#000;border:none;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:filter .2s;white-space:nowrap;}
+.btn-accent:hover{filter:brightness(1.1);}
+.ln{font-size:12px;margin-top:.6rem;}
+.ln.ok{color:var(--green);}.ln.err{color:var(--red);}
+.links-sent{margin-top:.75rem;display:flex;flex-direction:column;gap:.4rem;}
+.ls-item{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:.5rem .75rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;}
+.ls-item a{color:var(--accent);font-size:12px;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;opacity:.85;}
+.ls-item span{font-size:11px;color:var(--text3);white-space:nowrap;}
+/* INVOICES */
+.inv-cards{display:flex;flex-direction:column;gap:.75rem;}
+.inv-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;transition:border-color .2s;}
+.inv-card:hover{border-color:var(--border2);}
+.inv-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:.9rem;}
+.inv-card-title{font-size:14px;font-weight:600;margin-bottom:.2rem;}
+.inv-card-sub{font-size:12px;color:var(--text3);}
+.inv-card-amount{text-align:right;flex-shrink:0;}
+.inv-card-price{font-size:1.4rem;font-weight:700;color:var(--text);line-height:1;}
+.inv-card-cur{font-size:12px;color:var(--text3);margin-top:2px;}
+.inv-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;}
+.inv-card-meta{display:flex;align-items:center;gap:.75rem;}
+.inv-card-due{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:4px;}
+.inv-badge{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;}
+.ib-paid{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2);}
+.ib-unpaid{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2);}
+.ib-pending{background:rgba(201,168,76,.1);color:var(--accent);border:1px solid rgba(201,168,76,.2);}
+.inv-card-actions{display:flex;gap:.4rem;align-items:center;}
+.pay-btn{background:var(--accent);color:#000;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:filter .2s;font-family:'Inter',sans-serif;}
+.pay-btn:hover{filter:brightness(1.1);}
+.pay-btn:disabled{opacity:.4;cursor:not-allowed;}
+.pdf-btn{background:transparent;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;}
+.pdf-btn:hover{border-color:var(--accent);color:var(--accent);}
+.inv-progress{margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--border);}
+.inv-progress-label{display:flex;justify-content:space-between;margin-bottom:.4rem;}
+.inv-progress-label span{font-size:11px;color:var(--text3);}
+.inv-progress-bar{background:var(--surface3);border-radius:4px;height:3px;}
+.inv-progress-fill{height:3px;border-radius:4px;transition:width .6s;}
+/* CHAT */
+.chat-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.chat-hdr{padding:.85rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2);}
+.chat-hdr-left{display:flex;align-items:center;gap:.65rem;}
+.chat-av{width:32px;height:32px;border-radius:50%;background:var(--accent2);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--accent);}
+.chat-name{font-size:13px;font-weight:500;}
+.chat-status{display:flex;align-items:center;gap:4px;margin-top:1px;}
+.chat-msgs{height:340px;overflow-y:auto;padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.6rem;scroll-behavior:smooth;}
+.chat-msgs::-webkit-scrollbar{width:3px;}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.mrow{display:flex;flex-direction:column;animation:msgIn .2s ease;}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.mrow.me{align-items:flex-end;}
+.mrow.them{align-items:flex-start;}
+.mbub{max-width:72%;padding:9px 13px;font-size:13px;line-height:1.6;word-break:break-word;}
+.mrow.me .mbub{background:var(--accent);color:#000;border-radius:12px 12px 3px 12px;}
+.mrow.them .mbub{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:12px 12px 12px 3px;}
+.mtime{font-size:10px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:3px;}
+.msnd{font-size:11px;font-weight:600;color:var(--accent);margin-bottom:3px;}
+.chat-empty{text-align:center;padding:3rem;font-size:13px;color:var(--text3);}
+.typing-bar{display:none;padding:8px 1.25rem;border-top:1px solid var(--border);background:var(--surface);}
+.typing-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);display:inline-block;animation:typingBounce 1.2s infinite;}
+.typing-dot:nth-child(2){animation-delay:.2s;}
+.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-4px);}}
+.qr-section{padding:.75rem 1.25rem;border-top:1px solid var(--border);background:var(--surface2);}
+.qr-lbl{font-size:11px;font-weight:600;color:var(--text3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em;}
+.qr-btns{display:flex;gap:.4rem;flex-wrap:wrap;}
+.qr-btn{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;}
+.qr-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent3);}
+.chat-input{display:flex;border-top:1px solid var(--border);position:relative;}
+.cin{flex:1;background:var(--surface);border:none;padding:12px 14px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;}
+.cin:focus{background:var(--surface2);}
+.cin::placeholder{color:var(--text3);}
+.chat-action-btn{display:flex;align-items:center;justify-content:center;background:var(--surface);border:none;border-right:1px solid var(--border);cursor:pointer;color:var(--text3);transition:color .2s;padding:0 12px;}
+.chat-action-btn:hover{color:var(--accent);}
+.csend{background:var(--accent);color:#000;border:none;padding:12px 18px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:filter .2s;}
+.csend:hover{filter:brightness(1.1);}
+/* MODAL */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9998;backdrop-filter:blur(4px);align-items:center;justify-content:center;}
 .modal-bg.show{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:1.75rem;width:100%;max-width:360px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5);}
@@ -126,9 +278,20 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .modal-close:hover{color:var(--text);background:var(--surface2);}
 .modal .fg input{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border .2s;width:100%;}
 .modal .fg input:focus{border-color:var(--accent);}
-@media(max-width:600px){.topbar{padding:0 1rem;}.main{padding:1.25rem 1rem 3rem;}.stats-row{grid-template-columns:repeat(3,1fr);gap:.5rem;}.stat-n{font-size:1.3rem;}}
+/* MOBILE */
+@media(max-width:600px){
+  .topbar{padding:0 1rem;}
+  .main{padding:1.25rem 1rem 3rem;}
+  .stats-row{grid-template-columns:repeat(3,1fr);gap:.5rem;}
+  .stat-n{font-size:1.3rem;}
+  .inv-card-top{flex-direction:column;}
+  .inv-card-amount{text-align:left;}
+  .drive-row{flex-direction:column;}
+  .mbub{max-width:85%;}
+  .chat-msgs{height:260px;}
+}
 </style>
-<!-- Google tag (gtag.js) -->
+  <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-0MLQ9N9M25"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -137,18 +300,27 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   gtag('config', 'G-0MLQ9N9M25');
 </script>
 </head>
+</head>
 <body>
 <div id="toast"></div>
+
+<!-- CHANGE PASSWORD MODAL -->
 <div class="modal-bg" id="cpModal">
   <div class="modal">
     <button class="modal-close" onclick="closeCp()">×</button>
     <h3>Change Password</h3>
-    <div class="fg"><label>New Password</label><div class="pw-wrap"><input type="password" id="np1" placeholder="Min. 6 characters"><button type="button" class="pw-eye" onclick="togPw('np1',this)">👁</button></div></div>
-    <div class="fg"><label>Confirm Password</label><div class="pw-wrap"><input type="password" id="np2" placeholder="Repeat password"><button type="button" class="pw-eye" onclick="togPw('np2',this)">👁</button></div></div>
+    <div class="fg"><label>New Password</label>
+      <div class="pw-wrap"><input type="password" id="np1" placeholder="Min. 6 characters"><button type="button" class="pw-eye" onclick="togPw('np1',this)">👁</button></div>
+    </div>
+    <div class="fg"><label>Confirm Password</label>
+      <div class="pw-wrap"><input type="password" id="np2" placeholder="Repeat password"><button type="button" class="pw-eye" onclick="togPw('np2',this)">👁</button></div>
+    </div>
     <button class="btn-primary" onclick="doChangePw()">Update Password</button>
     <div class="amsg" id="cpMsg"></div>
   </div>
 </div>
+
+<!-- AUTH PAGE -->
 <div class="auth-wrap" id="authPage">
   <div class="auth-box">
     <div class="auth-logo">
@@ -156,6 +328,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <span>Client Portal</span>
     </div>
     <div class="auth-card">
+      <!-- OTP SCREEN -->
       <div class="otp-screen" id="otpScreen">
         <div class="otp-icon">🔐</div>
         <div class="otp-title">Verify your identity</div>
@@ -180,29 +353,73 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       </div>
       <div id="lForm">
         <div class="fg"><label>Email</label><input type="email" id="lE" placeholder="you@example.com" autocomplete="email"></div>
-        <div class="fg"><label>Password</label><div class="pw-wrap"><input type="password" id="lP" placeholder="Your password" autocomplete="current-password"><button type="button" class="pw-eye" onclick="togPw('lP',this)">👁</button></div></div>
+        <div class="fg"><label>Password</label>
+          <div class="pw-wrap"><input type="password" id="lP" placeholder="Your password" autocomplete="current-password"><button type="button" class="pw-eye" onclick="togPw('lP',this)">👁</button></div>
+        </div>
         <div class="forgot-link"><span onclick="showReset()">Forgot password?</span></div>
         <button class="btn-primary" onclick="doLogin()">Sign in</button>
         <div class="amsg" id="lM"></div>
-        <div id="resetForm" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);"><p style="font-size:12px;color:var(--text2);margin-bottom:.75rem;">Enter your email to receive a reset link.</p><div class="fg"><label>Email</label><input type="email" id="rE" placeholder="you@example.com"></div><button class="btn-primary" onclick="doReset()">Send reset link</button><div class="amsg" id="rM"></div><div style="text-align:center;margin-top:.75rem;"><span onclick="hideReset()" style="font-size:12px;color:var(--text3);cursor:pointer;">← Back</span></div></div>
+        <div id="resetForm" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:.75rem;">Enter your email to receive a reset link.</p>
+          <div class="fg"><label>Email</label><input type="email" id="rE" placeholder="you@example.com"></div>
+          <button class="btn-primary" onclick="doReset()">Send reset link</button>
+          <div class="amsg" id="rM"></div>
+          <div style="text-align:center;margin-top:.75rem;"><span onclick="hideReset()" style="font-size:12px;color:var(--text3);cursor:pointer;">← Back</span></div>
+        </div>
       </div>
       <div id="sForm" style="display:none;">
         <div class="fg"><label>Full Name</label><input type="text" id="sN" placeholder="Your name" autocomplete="name"></div>
         <div class="fg"><label>Email</label><input type="email" id="sE" placeholder="you@example.com" autocomplete="email"></div>
-        <div class="fg"><label>Password</label><div class="pw-wrap"><input type="password" id="sP" placeholder="Min. 8 chars, 1 capital, 1 special" autocomplete="new-password" oninput="checkPasswordStrength()"><button type="button" class="pw-eye" onclick="togPw('sP',this)">👁</button></div></div>
-        <div id="pwReqs" style="margin-top:0.75rem;display:none;font-size:12px;">
-          <div style="margin-bottom:6px;"><span id="req8" style="color:#999;">❌</span> <span style="color:#999;">At least 8 characters</span></div>
-          <div style="margin-bottom:6px;"><span id="reqCap" style="color:#999;">❌</span> <span style="color:#999;">1 Capital letter (A-Z)</span></div>
-          <div style="margin-bottom:6px;"><span id="reqSpec" style="color:#999;">❌</span> <span style="color:#999;">1 Special character (@#!)</span></div>
+        <div class="fg"><label>Password</label>
+          <div class="pw-wrap"><input type="password" id="sP" placeholder="Min. 6 characters" autocomplete="new-password"><button type="button" class="pw-eye" onclick="togPw('sP',this)">👁</button></div>
         </div>
-        <div class="fg"><label>Confirm Password</label><div class="pw-wrap"><input type="password" id="sP2" placeholder="Repeat password" autocomplete="new-password"><button type="button" class="pw-eye" onclick="togPw('sP2',this)">👁</button></div></div>
-        <div class="agree"><input type="checkbox" id="agr"><label for="agr">I agree to Avision's <a href="/terms.html" target="_blank">Terms</a>, <a href="/privacy.html" target="_blank">Privacy</a>, and <a href="/refund.html" target="_blank">Refund Policy</a>.</label></div>
+        <div class="fg"><label>Confirm Password</label>
+          <div class="pw-wrap"><input type="password" id="sP2" placeholder="Repeat password" autocomplete="new-password"><button type="button" class="pw-eye" onclick="togPw('sP2',this)">👁</button></div>
+        </div>
+        <div class="agree">
+          <input type="checkbox" id="agr">
+          <label for="agr">I agree to Avision's <a href="/terms.html" target="_blank">Terms</a>, <a href="/privacy.html" target="_blank">Privacy</a>, and <a href="/refund.html" target="_blank">Refund Policy</a>.</label>
+        </div>
         <button class="btn-primary" onclick="doSignup()">Create account</button>
         <div class="amsg" id="sM"></div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- TERMS POPUP -->
+<div id="termsPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9997;backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:540px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6);">
+    <div style="background:var(--accent);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:.75rem;">
+      <div style="width:36px;height:36px;background:rgba(0,0,0,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">📋</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#000;">Welcome to Avision Portal</div>
+        <div style="font-size:12px;color:rgba(0,0,0,.6);">Please review and accept our terms before continuing</div>
+      </div>
+    </div>
+    <div style="padding:1.25rem 1.5rem;max-height:320px;overflow-y:auto;border-bottom:1px solid var(--border);">
+      <div style="font-size:13px;color:var(--text2);line-height:1.8;">
+        <p style="margin-bottom:1rem;">By using the <strong style="color:var(--text);">Avision Client Portal</strong>, you agree to the following:</p>
+        <div style="display:flex;flex-direction:column;gap:.75rem;">
+          <div style="background:var(--surface2);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--accent);"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:.2rem;">📄 Terms of Service</div><div style="font-size:12px;color:var(--text3);">All work is subject to Avision's terms. <a href="/terms.html" target="_blank" style="color:var(--accent);text-decoration:none;">Read →</a></div></div>
+          <div style="background:var(--surface2);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--blue);"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:.2rem;">🔒 Privacy Policy</div><div style="font-size:12px;color:var(--text3);">Your data is stored securely. <a href="/privacy.html" target="_blank" style="color:var(--accent);text-decoration:none;">Read →</a></div></div>
+          <div style="background:var(--surface2);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--green);"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:.2rem;">💰 Refund Policy</div><div style="font-size:12px;color:var(--text3);">50% deposit non-refundable. <a href="/refund.html" target="_blank" style="color:var(--accent);text-decoration:none;">Read →</a></div></div>
+          <div style="background:var(--surface2);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--red);"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:.2rem;">🚫 Chargeback Policy</div><div style="font-size:12px;color:var(--text3);">Fraudulent chargebacks result in account termination.</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:1.25rem 1.5rem;background:var(--surface2);">
+      <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer;margin-bottom:1rem;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:.75rem 1rem;">
+        <input type="checkbox" id="termsCheck" style="accent-color:var(--accent);width:18px;height:18px;cursor:pointer;flex-shrink:0;">
+        <span style="font-size:13px;color:var(--text2);line-height:1.5;">I have read and agree to all terms, privacy policy and refund policy</span>
+      </label>
+      <button onclick="acceptTerms()" style="width:100%;background:var(--accent);color:#000;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;">✓ Accept & Enter Portal</button>
+      <div id="termsMsg" style="margin-top:.6rem;font-size:12px;color:var(--red);display:none;text-align:center;">Please check the box above before continuing.</div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
 <div class="dash" id="dash">
   <div class="topbar">
     <div class="tb-left">
@@ -239,6 +456,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       </div>
     </div>
   </div>
+
+  <!-- NOTIFICATIONS (fixed) -->
   <div class="npop" id="nPop">
     <div class="npop-h">
       <span>Notifications <span class="npop-count" id="nCount" style="display:none;">0</span></span>
@@ -247,124 +466,650 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
     <div class="npop-b" id="nBody"></div>
     <div class="npop-f"><button onclick="goChat()">View messages →</button></div>
   </div>
+
   <div class="main">
+    <!-- WELCOME -->
     <div class="welcome-bar">
       <h1 id="wTitle">Welcome back 👋</h1>
       <p>Here's an overview of your projects with Avision.</p>
     </div>
+    <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card"><div class="stat-n" id="sA">0</div><div class="stat-l">Active</div></div>
       <div class="stat-card"><div class="stat-n" id="sD">0</div><div class="stat-l">Completed</div></div>
       <div class="stat-card"><div class="stat-n" id="sR">0</div><div class="stat-l">In review</div></div>
     </div>
+    <!-- PROJECTS -->
     <div class="sect">
       <div class="sect-h"><span class="sect-title">Projects</span></div>
       <div id="pList"><div class="empty-card">No projects yet — Amir will add them here.</div></div>
+    </div>
+    <!-- FILES -->
+    <div class="sect">
+      <div class="sect-h"><span class="sect-title">Send Files</span></div>
+      <div class="tab-row"><div class="utab on" onclick="swUp('d')">Direct upload</div><div class="utab" onclick="swUp('g')">Google Drive link</div></div>
+      <div class="upload-card">
+        <div id="dUp">
+          <div class="dz" onclick="document.getElementById('fi').click()" id="dz">
+            <div class="dz-ico">↑</div>
+            <h3>Drop files here or click to browse</h3>
+            <p>Videos, images, documents — any format</p>
+            <button class="btn-outline">Choose files</button>
+            <input type="file" id="fi" multiple style="display:none;" onchange="doUp(this.files)">
+          </div>
+          <div class="prog-area" id="pA"><div class="prog-bar-track"><div class="prog-bar-fill" id="pF"></div></div><div class="prog-txt" id="pL">Uploading...</div></div>
+          <div class="files-list" id="fList"></div>
+        </div>
+        <div id="gUp" style="display:none;">
+          <div class="drive-inner">
+            <p>Upload your file to Google Drive and share the link below.</p>
+            <div class="steps">
+              <div class="step"><div class="step-n">1</div><div class="step-t">Upload to <strong>Google Drive</strong></div></div>
+              <div class="step"><div class="step-n">2</div><div class="step-t">Right-click → Share → "Anyone with the link"</div></div>
+              <div class="step"><div class="step-n">3</div><div class="step-t">Paste the link below</div></div>
+            </div>
+            <div class="drive-row">
+              <input type="url" class="drive-in" id="dL" placeholder="https://drive.google.com/file/d/...">
+              <button class="btn-accent" onclick="sendLink()">Share</button>
+            </div>
+            <div class="ln" id="lN"></div>
+            <div class="links-sent" id="lSent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- INVOICES -->
+    <div class="sect">
+      <div class="sect-h"><span class="sect-title">Invoices</span></div>
+      <div id="invSec"><div class="empty-card">No invoices yet.</div></div>
+    </div>
+    <!-- MESSAGES -->
+    <div class="sect" id="msgSect">
+      <div class="sect-h"><span class="sect-title">Messages</span></div>
+      <div class="chat-wrap">
+        <div class="chat-hdr">
+          <div class="chat-hdr-left">
+            <div class="chat-av">A</div>
+            <div>
+              <div class="chat-name">Amir — Avision</div>
+              <div class="chat-status">
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--text3);display:inline-block;" id="onlineDot"></span>
+                <span style="font-size:11px;color:var(--text3);" id="onlineTxt">Offline</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-msgs" id="cMsgs"><div class="chat-empty">No messages yet — start a conversation.</div></div>
+        <div class="typing-bar" id="typingBar">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+            <span style="font-size:11px;color:var(--text3);margin-left:4px;">Amir is typing...</span>
+          </div>
+        </div>
+        <div class="qr-section">
+          <div class="qr-lbl">Quick replies</div>
+          <div class="qr-btns">
+            <button class="qr-btn" onclick="qr('When is the delivery date?')">📅 Delivery date?</button>
+            <button class="qr-btn" onclick="qr('I approve this version ✓')">✅ Approve</button>
+            <button class="qr-btn" onclick="qr('I need a revision on this')">🔄 Need revision</button>
+            <button class="qr-btn" onclick="qr('Please send me the final file')">📁 Final file</button>
+            <button class="qr-btn" onclick="qr('How is the project going?')">💬 Status update?</button>
+          </div>
+        </div>
+        <div class="chat-input">
+          <label for="chatFile" class="chat-action-btn" title="Attach file">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd"/></svg>
+            <input type="file" id="chatFile" style="display:none;" onchange="sendChatFile(this.files[0])">
+          </label>
+          <button class="chat-action-btn" onclick="togEmoji()" style="font-size:18px;">😊</button>
+          <input type="text" class="cin" id="cIn" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="csend" onclick="sendMsg()">Send</button>
+          <div id="emojiPicker" style="display:none;position:absolute;bottom:52px;left:0;right:0;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:.75rem;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.5);max-height:200px;overflow-y:auto;">
+            <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">Emoji</div>
+            <div id="emojiGrid" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
 var SBU='https://pwrukagppviyyxdlurxs.supabase.co',SBK='sb_publishable_0qAX6jXA8bacc2VB0H81Ag_jRVWtpGV';
+var FN=SBU+'/functions/v1/notify-admin',SF=SBU+'/functions/v1/stripe-checkout';
 var me=null,notifs=[],poll=null;
 var sb=supabase.createClient(SBU,SBK,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'avision-auth'}});
 
-function togPw(id,btn){var i=document.getElementById(id);i.type=i.type==='password'?'text':'password';}
-function swTab(v){document.querySelectorAll('.auth-tab').forEach(function(el,i){el.classList.toggle('on',v==='l'?i===0:i===1);});document.getElementById('lForm').style.display=v==='l'?'block':'none';document.getElementById('sForm').style.display=v==='s'?'block':'none';}
+function toast(msg,type){
+  var t=document.getElementById('toast'),d=document.createElement('div');d.className='ti';
+  var c=type==='ok'?'#22c55e':type==='err'?'#ef4444':'#c9a84c';
+  d.style.borderLeft='2px solid '+c;
+  d.innerHTML='<span class="tdot" style="background:'+c+'"></span><span>'+msg+'</span>';
+  t.appendChild(d);requestAnimationFrame(function(){d.classList.add('show');});
+  setTimeout(function(){d.classList.remove('show');setTimeout(function(){d.remove();},400);},3000);
+}
+function sm(id,txt,type){var e=document.getElementById(id);if(!e)return;e.textContent=txt;e.className='amsg '+(type||'');}
+function togPw(id,btn){var i=document.getElementById(id);var s=i.type==='password';i.type=s?'text':'password';btn.style.opacity=s?'1':'.5';}
+function swTab(v){
+  document.querySelectorAll('.auth-tab').forEach(function(el,i){el.classList.toggle('on',v==='l'?i===0:i===1);});
+  document.getElementById('lForm').style.display=v==='l'?'block':'none';
+  document.getElementById('sForm').style.display=v==='s'?'block':'none';
+}
+function swUp(v){
+  document.querySelectorAll('.utab').forEach(function(el,i){el.classList.toggle('on',v==='d'?i===0:i===1);});
+  document.getElementById('dUp').style.display=v==='d'?'block':'none';
+  document.getElementById('gUp').style.display=v==='g'?'block':'none';
+}
 function showReset(){document.getElementById('resetForm').style.display='block';}
 function hideReset(){document.getElementById('resetForm').style.display='none';}
-function sm(id,txt,type){var e=document.getElementById(id);if(!e)return;e.textContent=txt;e.className='amsg '+(type||'');}
-async function doReset(){var e=document.getElementById('rE').value;if(!e)return sm('rM','Please enter your email.','err');sm('rM','Sending...','');const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:'https://www.amiravision.com/portal.html'});if(error)return sm('rM',error.message,'err');sm('rM','✓ Reset link sent! Check your email.','ok');}
-function doLogin(){var e=document.getElementById('lE').value.trim(),p=document.getElementById('lP').value;if(!e||!p)return sm('lM','Please fill all fields.','err');sm('lM','Signing in...','');sb.auth.signInWithPassword({email:e,password:p}).then(function(r){if(r.error)return sm('lM',r.error.message,'err');sm('lM','','');}).catch(function(err){sm('lM',err.message||'Something went wrong.','err');});}
-function doSignup(){var n=document.getElementById('sN').value.trim(),e=document.getElementById('sE').value.trim();var p=document.getElementById('sP').value,p2=document.getElementById('sP2').value;if(!n||!e||!p||!p2)return sm('sM','Please fill all fields.','err');if(p.length<8)return sm('sM','Password min. 8 characters.','err');if(!/[A-Z]/.test(p))return sm('sM','Password must contain at least 1 capital letter.','err');if(!/[!@#$%^&*()_+\-=\[\]{}|,.<>?]/.test(p))return sm('sM','Password must contain at least 1 special character.','err');if(p!==p2)return sm('sM','Passwords do not match.','err');if(!document.getElementById('agr').checked)return sm('sM','Please accept the terms.','err');sm('sM','Creating account...','');sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}}).then(function(r){if(r.error)return sm('sM',r.error.message,'err');sm('sM','✓ Account created!','ok');}).catch(function(err){sm('sM',err.message||'Error','err');});}
-function doLogout(){sb.auth.signOut().then(function(){document.getElementById('dash').style.display='none';document.getElementById('authPage').style.display='flex';me=null;});}
-function openCp(){document.getElementById('cpModal').classList.add('show');}
-function closeCp(){document.getElementById('cpModal').classList.remove('show');}
-async function doChangePw(){var p1=document.getElementById('np1').value,p2=document.getElementById('np2').value;if(!p1||!p2)return sm('cpMsg','Please fill both fields.','err');if(p1.length<6)return sm('cpMsg','Min. 6 characters.','err');if(p1!==p2)return sm('cpMsg','Passwords do not match.','err');sm('cpMsg','Updating...','');const{error}=await sb.auth.updateUser({password:p1});if(error)return sm('cpMsg',error.message,'err');sm('cpMsg','✓ Password updated!','ok');setTimeout(closeCp,2000);}
-function togProf(){var p=document.getElementById('profPop');p.style.display=p.style.display==='block'?'none':'block';}
-function togNotif(){var p=document.getElementById('nPop');p.style.display=p.style.display==='block'?'none':'block';}
-
+async function doReset(){
+  var e=document.getElementById('rE').value;
+  if(!e)return sm('rM','Please enter your email.','err');
+  sm('rM','Sending...','');
+  const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:'https://www.amiravision.com/portal.html'});
+  if(error)return sm('rM',error.message,'err');
+  sm('rM','✓ Reset link sent! Check your email.','ok');
+}
+function acceptTerms(){
+  if(!document.getElementById('termsCheck').checked){document.getElementById('termsMsg').style.display='block';return;}
+  document.getElementById('termsMsg').style.display='none';
+  document.getElementById('termsPopup').style.display='none';
+  if(me){localStorage.setItem('terms_accepted_'+me.id,'true');sb.from('clients').update({terms_accepted:true}).eq('email',me.email).catch(function(){});}
+  toast('Welcome to Avision Portal! 🎉','ok');
+}
+function checkTermsAccepted(user){
+  if(!localStorage.getItem('terms_accepted_'+user.id))document.getElementById('termsPopup').style.display='flex';
+}
+// OTP
+var otpEmail='',otpTimerInterval=null,pendingSession=null;
+function showOTPScreen(email,isSignup){
+  otpEmail=email;
+  document.getElementById('otpEmailDisp').textContent=email;
+  document.getElementById('otpScreen').querySelector('.otp-title').textContent=isSignup?'Verify your email':'Verify your identity';
+  document.getElementById('otpScreen').querySelector('.otp-sub').innerHTML=(isSignup?'Your account is ready! Enter the code sent to<br>':'We sent a 6-digit code to<br>')+'<span>'+email+'</span>';
+  document.querySelectorAll('.auth-tabs,.auth-tab').forEach(function(el){el.style.display='none';});
+  document.getElementById('lForm').style.display='none';
+  document.getElementById('sForm').style.display='none';
+  document.getElementById('otpScreen').style.display='block';
+  ['o1','o2','o3','o4','o5','o6'].forEach(function(id){document.getElementById(id).value='';document.getElementById(id).classList.remove('filled');});
+  setTimeout(function(){document.getElementById('o1').focus();},100);
+  startOTPTimer();
+}
+function backToLogin(){
+  document.getElementById('otpScreen').style.display='none';
+  document.querySelectorAll('.auth-tabs,.auth-tab').forEach(function(el){el.style.display='';});
+  document.getElementById('lForm').style.display='block';
+  if(otpTimerInterval)clearInterval(otpTimerInterval);
+  if(pendingSession){sb.auth.signOut();pendingSession=null;}
+}
+function otpMove(inp,nextId){
+  inp.value=inp.value.replace(/[^0-9]/g,'');
+  if(inp.value)inp.classList.add('filled');else inp.classList.remove('filled');
+  if(inp.value&&nextId)document.getElementById(nextId).focus();
+  var code=['o1','o2','o3','o4','o5','o6'].map(function(id){return document.getElementById(id).value;}).join('');
+  if(code.length===6)setTimeout(verifyOTP,150);
+}
+function otpKey(e,inp,prevId){
+  if(e.key==='Backspace'&&!inp.value&&prevId)document.getElementById(prevId).focus();
+  if(e.key==='Enter')verifyOTP();
+}
+function otpPaste(e){
+  e.preventDefault();
+  var text=(e.clipboardData||window.clipboardData).getData('text').replace(/[^0-9]/g,'').substring(0,6);
+  var ids=['o1','o2','o3','o4','o5','o6'];
+  for(var i=0;i<text.length;i++){var el=document.getElementById(ids[i]);el.value=text[i];el.classList.add('filled');}
+  if(text.length>0){var last=document.getElementById(ids[Math.min(text.length,5)]);if(last)last.focus();}
+  if(text.length===6)setTimeout(verifyOTP,150);
+}
+function startOTPTimer(){
+  if(otpTimerInterval)clearInterval(otpTimerInterval);
+  var secs=300;
+  function update(){
+    var m=Math.floor(secs/60),s=secs%60;
+    var el=document.getElementById('otpTimer');
+    if(el)el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    if(secs<=0){clearInterval(otpTimerInterval);if(el)el.textContent='Expired';}
+    secs--;
+  }
+  update();otpTimerInterval=setInterval(update,1000);
+}
+async function sendOTPCode(email){
+  var code=Math.floor(100000+Math.random()*900000).toString();
+  var expires=new Date(Date.now()+5*60*1000).toISOString();
+  await sb.from('otp_codes').insert({email:email,code:code,expires_at:expires,used:false});
+  await fetch(SBU+'/functions/v1/send-otp',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SBK},body:JSON.stringify({email:email,code:code})}).catch(function(){});
+  return code;
+}
+async function verifyOTP(){
+  var code=['o1','o2','o3','o4','o5','o6'].map(function(id){return document.getElementById(id).value.trim();}).join('');
+  if(code.length<6)return sm('otpMsg','Please enter all 6 digits.','err');
+  var btn=document.getElementById('otpVerifyBtn');
+  if(btn){btn.textContent='Verifying...';btn.disabled=true;}
+  sm('otpMsg','','');
+  try{
+    var{data,error}=await sb.from('otp_codes').select('*').eq('email',otpEmail).eq('used',false).order('created_at',{ascending:false}).limit(10);
+    if(error)throw new Error(error.message);
+    if(!data||!data.length){if(btn){btn.textContent='Verify →';btn.disabled=false;}return sm('otpMsg','No code found. Request a new one.','err');}
+    var now=new Date();
+    var match=data.find(function(r){return r.code===code&&new Date(r.expires_at)>now;});
+    if(!match){
+      if(btn){btn.textContent='Verify →';btn.disabled=false;}
+      var expired=data.find(function(r){return r.code===code;});
+      if(expired)return sm('otpMsg','Code expired. Request a new one.','err');
+      return sm('otpMsg','Wrong code. Try again.','err');
+    }
+    await sb.from('otp_codes').update({used:true}).eq('id',match.id);
+    if(otpTimerInterval)clearInterval(otpTimerInterval);
+    sessionStorage.setItem('otp_verified','true');
+    sm('otpMsg','✓ Verified!','ok');
+    setTimeout(function(){
+      document.getElementById('otpScreen').style.display='none';
+      if(pendingSession&&pendingSession.user){startDash(pendingSession.user);}
+      else{sb.auth.getSession().then(function(r){if(r.data&&r.data.session)startDash(r.data.session.user);else sm('otpMsg','Session error — please sign in again.','err');});}
+    },600);
+  }catch(err){if(btn){btn.textContent='Verify →';btn.disabled=false;}sm('otpMsg','Error: '+err.message,'err');}
+}
+async function resendOTP(){
+  sm('otpMsg','Sending new code...','');
+  ['o1','o2','o3','o4','o5','o6'].forEach(function(id){document.getElementById(id).value='';document.getElementById(id).classList.remove('filled');});
+  await sendOTPCode(otpEmail);startOTPTimer();
+  sm('otpMsg','New code sent!','ok');setTimeout(function(){sm('otpMsg','','');},3000);
+}
+function doLogin(){
+  var e=document.getElementById('lE').value.trim(),p=document.getElementById('lP').value;
+  if(!e||!p)return sm('lM','Please fill all fields.','err');
+  sm('lM','Signing in...','');
+  sb.auth.signInWithPassword({email:e,password:p}).then(function(r){
+    if(r.error)return sm('lM',r.error.message,'err');
+    pendingSession=r.data;sm('lM','','');
+    showOTPScreen(e,false);sm('otpMsg','Sending code...','');
+    sendOTPCode(e).then(function(){sm('otpMsg','','');}).catch(function(){sm('otpMsg','Code sent — check your email.','ok');});
+  }).catch(function(err){sm('lM',err.message||'Something went wrong.','err');});
+}
+function doSignup(){
+  var n=document.getElementById('sN').value.trim(),e=document.getElementById('sE').value.trim();
+  var p=document.getElementById('sP').value,p2=document.getElementById('sP2').value;
+  if(!n||!e||!p||!p2)return sm('sM','Please fill all fields.','err');
+  if(p.length<8)return sm('sM','Password min. 8 characters.','err'); if(!/[A-Z]/.test(p))return sm('sM','Password must contain at least 1 capital letter.','err'); if(!/[!@#$%^&*()_+\-=\[\]{}|,.<>?]/.test(p))return sm('sM','Password must contain at least 1 special character (@ ! # ...).','err');
+  if(p!==p2)return sm('sM','Passwords do not match.','err');
+  if(!document.getElementById('agr').checked)return sm('sM','Please accept the terms.','err');
+  sm('sM','Creating account...','');
+  sb.auth.signUp({email:e,password:p,options:{data:{full_name:n}}}).then(function(r){
+    if(r.error){
+      if(r.error.message.toLowerCase().includes('already'))
+        return sm('sM','This email is already registered. Please sign in.','err');
+      return sm('sM',r.error.message,'err');
+    }
+    // Supabase returns user with empty identities if email already exists
+    if(r.data&&r.data.user&&r.data.user.identities&&r.data.user.identities.length===0){
+      return sm('sM','This email is already registered. Please sign in.','err');
+    }
+    sb.from('clients').upsert({email:e,full_name:n},{onConflict:'email'}).then(function(){}).catch(function(){});
+    pendingSession=r.data;otpEmail=e;
+    showOTPScreen(e,true);sm('otpMsg','Sending code...','');
+    sendOTPCode(e).then(function(){sm('otpMsg','','');}).catch(function(){sm('otpMsg','Code sent — check your email.','ok');});
+  }).catch(function(err){sm('sM',err.message||'Something went wrong. Try again.','err');});
+}
+function doLogout(){
+  if(poll){poll.unsubscribe();poll=null;}
+  if(window._presencePoll)clearInterval(window._presencePoll);
+  sessionStorage.removeItem('otp_verified');
+  sb.auth.signOut().then(function(){
+    document.getElementById('dash').style.display='none';
+    document.getElementById('authPage').style.display='flex';
+    me=null;
+  });
+}
+function openCp(){document.getElementById('profPop').style.display='none';document.getElementById('cpModal').classList.add('show');}
+function closeCp(){document.getElementById('cpModal').classList.remove('show');document.getElementById('np1').value='';document.getElementById('np2').value='';sm('cpMsg','');}
+async function doChangePw(){
+  var p1=document.getElementById('np1').value,p2=document.getElementById('np2').value;
+  if(!p1||!p2)return sm('cpMsg','Please fill both fields.','err');
+  if(p1.length<6)return sm('cpMsg','Min. 6 characters.','err');
+  if(p1!==p2)return sm('cpMsg','Passwords do not match.','err');
+  sm('cpMsg','Updating...','');
+  const{error}=await sb.auth.updateUser({password:p1});
+  if(error)return sm('cpMsg',error.message,'err');
+  sm('cpMsg','✓ Password updated!','ok');toast('Password updated','ok');setTimeout(closeCp,2000);
+}
+document.getElementById('cpModal').addEventListener('click',function(e){if(e.target===this)closeCp();});
+function togProf(){
+  var p=document.getElementById('profPop');var o=p.style.display==='block';
+  document.getElementById('nPop').style.display='none';
+  p.style.display=o?'none':'block';
+}
+function togNotif(){
+  var p=document.getElementById('nPop');var o=p.style.display==='block';
+  document.getElementById('profPop').style.display='none';
+  p.style.display=o?'none':'block';
+  if(!o){renderNotifs();hideDot();if(me)sb.from('notifications').update({is_read:true}).eq('client_email',me.email).eq('is_read',false);}
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.bell-btn')&&!e.target.closest('#nPop'))document.getElementById('nPop').style.display='none';
+  if(!e.target.closest('#profWrap'))document.getElementById('profPop').style.display='none';
+});
+function goChat(){
+  document.getElementById('nPop').style.display='none';
+  document.getElementById('msgSect').scrollIntoView({behavior:'smooth'});
+}
+function notifyAdmin(type,content){
+  fetch(FN,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SBK},body:JSON.stringify({client_email:me?me.email:'',type:type,content:content})}).catch(function(){});
+}
+function statusPct(s){return{pending:0,inprogress:55,review:85,done:100}[s]||0;}
+function tlSteps(s){
+  var steps=['Brief','Production','Review','Delivered'];
+  var idx={pending:0,inprogress:1,review:2,done:3}[s]||0;
+  return '<div class="proj-tl">'+steps.map(function(l,i){
+    var cls=i<idx?'done':i===idx?'active':'';
+    var line=i<steps.length-1?'<div class="tl-line '+(i<idx?'done':'')+'"></div>':'';
+    return '<div class="tl-step"><div class="tl-dot '+cls+'"></div>'+line+'<div class="tl-lbl '+cls+'">'+l+'</div></div>';
+  }).join('')+'</div>';
+}
+function spBadge(s){
+  var m={inprogress:['sp-ip','In progress'],review:['sp-rv','In review'],done:['sp-dn','Done'],pending:['sp-pd','Pending']};
+  var d=m[s]||['sp-pd',s];return '<span class="sp-badge '+d[0]+'">'+d[1]+'</span>';
+}
+function loadProjects(user){
+  sb.from('projects').select('*').eq('client_email',user.email).order('created_at',{ascending:false}).then(function(r){
+    var data=r.data||[],el=document.getElementById('pList');
+    document.getElementById('sA').textContent=data.filter(function(p){return p.status==='inprogress';}).length;
+    document.getElementById('sD').textContent=data.filter(function(p){return p.status==='done';}).length;
+    document.getElementById('sR').textContent=data.filter(function(p){return p.status==='review';}).length;
+    if(!data.length){el.innerHTML='<div class="empty-card">No projects yet — Amir will add them here.</div>';return;}
+    el.innerHTML=data.map(function(p){
+      var pct=statusPct(p.status);
+      var dl=p.delivery_url?'<a href="'+p.delivery_url+'" target="_blank" class="dl-btn">Download</a>':'';
+      return '<div class="proj-card"><div class="proj-top"><div><div class="proj-title">'+p.title+'</div><div class="proj-meta">'+(p.description||'')+'</div></div><div class="proj-right">'+(p.delivery_date?'<div class="proj-date">Due '+p.delivery_date+'</div>':'')+'<div class="proj-acts">'+dl+spBadge(p.status)+'</div></div></div><div class="proj-prog"><div class="prog-row"><span class="prog-lbl">Progress</span><span class="prog-pct">'+pct+'%</span></div><div class="prog-track"><div class="prog-fill" style="width:'+pct+'%"></div></div></div>'+tlSteps(p.status)+'</div>';
+    }).join('');
+  });
+}
+function loadFiles(){
+  if(!me)return;
+  sb.storage.from('project-files').list(me.email,{sortBy:{column:'created_at',order:'desc'}}).then(function(r){
+    var data=r.data||[],el=document.getElementById('fList');
+    if(!data.length){el.innerHTML='';return;}
+    el.innerHTML=data.map(function(f){
+      var ext=f.name.split('.').pop().toLowerCase();
+      var ico=['mp4','mov','avi'].includes(ext)?'🎬':['jpg','png','gif'].includes(ext)?'🖼️':'📎';
+      var sz=f.metadata?(f.metadata.size<1048576?(f.metadata.size/1024).toFixed(1)+' KB':(f.metadata.size/1048576).toFixed(1)+' MB'):'';
+      return '<div class="file-row"><div class="file-l"><span>'+ico+'</span><div><div class="file-name">'+f.name.replace(/^\d+_/,'')+'</div><div class="file-size">'+sz+'</div></div></div><div class="file-date">'+new Date(f.created_at).toLocaleDateString()+'</div></div>';
+    }).join('');
+  });
+}
+function doUp(files){
+  if(!files.length||!me)return;
+  var pa=document.getElementById('pA'),pf=document.getElementById('pF'),pl=document.getElementById('pL');
+  pa.style.display='block';var i=0;
+  function next(){
+    if(i>=files.length){pf.style.width='100%';pl.textContent='Uploaded!';pl.className='prog-txt ok';toast('Files uploaded','ok');notifyAdmin('File Upload',Array.from(files).map(function(f){return f.name;}).join(', '));setTimeout(function(){pa.style.display='none';pf.style.width='0';},3000);loadFiles();return;}
+    pf.style.width=Math.round((i/files.length)*100)+'%';pl.textContent='Uploading '+files[i].name+'...';
+    sb.storage.from('project-files').upload(me.email+'/'+Date.now()+'_'+files[i].name,files[i]).then(function(r){if(r.error){pl.textContent='Error: '+r.error.message;pl.className='prog-txt err';return;}i++;next();});
+  }next();
+}
+function sendLink(){
+  var link=document.getElementById('dL').value.trim(),n=document.getElementById('lN');
+  if(!link){n.textContent='Please paste a link.';n.className='ln err';return;}
+  n.textContent='Sending...';n.className='ln';
+  sb.from('shared_links').insert({client_email:me.email,link:link}).then(function(){
+    notifyAdmin('Drive Link',link);n.textContent='Link shared with Amir';n.className='ln ok';toast('Link shared','ok');document.getElementById('dL').value='';
+    var li=document.createElement('div');li.className='ls-item';li.innerHTML='<a href="'+link+'" target="_blank">'+link+'</a><span>Just now</span>';
+    document.getElementById('lSent').prepend(li);
+  });
+}
+function loadInvoices(){
+  if(!me)return;
+  var sym={USD:'$',SAR:'﷼',EUR:'€',GBP:'£'};
+  sb.from('invoices').select('*').eq('client_email',me.email).order('created_at',{ascending:false}).then(function(r){
+    var data=r.data||[],sec=document.getElementById('invSec');
+    if(!data.length){sec.innerHTML='<div class="empty-card">No invoices yet.</div>';return;}
+    sec.innerHTML='<div class="inv-cards">'+data.map(function(inv){
+      var s=sym[inv.currency]||'$',ip=inv.status==='paid';
+      var bc=ip?'ib-paid':inv.status==='pending'?'ib-pending':'ib-unpaid';
+      var statusLabel=inv.status.charAt(0).toUpperCase()+inv.status.slice(1);
+      var pct=ip?100:inv.status==='pending'?50:0;
+      var barColor=ip?'var(--green)':inv.status==='pending'?'var(--accent)':'var(--red)';
+      var act=ip?'<span class="inv-badge ib-paid">✓ Paid</span>':'<button class="pay-btn" id="pb'+inv.id+'" onclick="payNow(\''+inv.id+'\',\''+inv.amount+'\',\''+(inv.currency||'USD')+'\',\''+inv.project_title.replace(/['"]/g,'')+'\')">Pay Now →</button>';
+      var pdfBtn='<button class="pdf-btn" onclick="downloadPDF(\''+inv.id+'\',\''+inv.project_title.replace(/['"]/g,'')+'\',\''+s+'\',\''+inv.amount+'\',\''+(inv.due_date||'—')+'\',\''+inv.status+'\',\''+(inv.notes||'').replace(/['"]/g,'')+'\',\''+(inv.currency||'USD')+'\')">↓ PDF</button>';
+      return '<div class="inv-card"><div class="inv-card-top"><div><div class="inv-card-title">'+inv.project_title+'</div><div class="inv-card-sub">'+(inv.notes||'Amir Avision LLC')+'</div></div><div class="inv-card-amount"><div class="inv-card-price">'+s+parseFloat(inv.amount).toLocaleString()+'</div><div class="inv-card-cur">'+inv.currency+'</div></div></div><div class="inv-card-bottom"><div class="inv-card-meta"><span class="inv-badge '+bc+'">'+statusLabel+'</span>'+(inv.due_date?'<span class="inv-card-due">Due '+inv.due_date+'</span>':'')+'</div><div class="inv-card-actions">'+pdfBtn+act+'</div></div><div class="inv-progress"><div class="inv-progress-label"><span>Payment status</span><span>'+pct+'%</span></div><div class="inv-progress-bar"><div class="inv-progress-fill" style="width:'+pct+'%;background:'+barColor+';"></div></div></div></div>';
+    }).join('')+'</div>';
+  });
+  var p=new URLSearchParams(window.location.search);
+  if(p.get('payment')==='success'){
+    var id=p.get('invoice');
+    if(id){
+      sb.from('invoices').select('*').eq('id',id).single().then(function(r){
+        if(!r.data)return;
+        var inv=r.data;var sym2={USD:'$',SAR:'﷼',EUR:'€',GBP:'£'}[inv.currency]||'$';
+        sb.from('invoices').update({status:'paid'}).eq('id',id).then(function(){
+          toast('Payment received! 🎉','ok');loadInvoices();
+          var html='<div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;background:#0a0a0a;color:#ededed;border-radius:16px;overflow:hidden;"><div style="background:#22c55e;padding:1.5rem 2rem;"><div style="font-size:1.4rem;font-weight:800;color:#000;">AVISION</div></div><div style="padding:2rem;"><p style="font-size:22px;font-weight:700;margin-bottom:.5rem;">✅ Payment Confirmed!</p><p style="color:#a1a1a1;font-size:13px;">Thank you! Amir will start working right away.</p></div></div>';
+          fetch(SBU+'/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SBK},body:JSON.stringify({to:inv.client_email,subject:'✅ Payment Confirmed — Avision',html:html})}).catch(function(){});
+          fetch(SBU+'/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SBK},body:JSON.stringify({to:'contact@amiravision.com',subject:'💰 Payment: '+sym2+parseFloat(inv.amount).toLocaleString()+' from '+inv.client_email,html:'<p>'+inv.client_email+' paid '+sym2+parseFloat(inv.amount).toLocaleString()+' for "'+inv.project_title+'"</p>'})}).catch(function(){});
+        });
+      });
+    }
+    window.history.replaceState({},'','/portal.html');
+  }
+}
+function downloadPDF(id,title,sym,amount,due,status,notes,currency){
+  var clientName=document.getElementById('profName')?document.getElementById('profName').textContent:'Client';
+  var clientEmail=me?me.email:'';
+  var date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  var statusColor=status==='paid'?'#22c55e':status==='pending'?'#c9a84c':'#ef4444';
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Inter,Helvetica,sans-serif;background:#fff;color:#111;margin:0;}.page{max-width:600px;margin:0 auto;padding:48px 40px;}.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:48px;}.logo{font-size:22px;font-weight:700;color:#111;}.logo span{color:#c9a84c;}.divider{height:1px;background:#e5e5e5;margin:24px 0;}.row{display:flex;justify-content:space-between;margin-bottom:32px;}.col h4{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}.col p{font-size:14px;color:#111;line-height:1.6;}.item-table{width:100%;border-collapse:collapse;margin-bottom:24px;}.item-table th{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;text-align:left;border-bottom:2px solid #e5e5e5;}.item-table td{padding:14px 12px;border-bottom:1px solid #f0f0f0;font-size:14px;}.total-row{display:flex;justify-content:space-between;padding:16px 12px;background:#f9f9f9;border-radius:8px;}.total-label{font-size:14px;color:#555;}.total-amount{font-size:20px;font-weight:700;color:#111;}.status-pill{display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;background:'+statusColor+'22;color:'+statusColor+';}.footer{margin-top:48px;padding-top:24px;border-top:1px solid #e5e5e5;font-size:12px;color:#888;text-align:center;}</style></head><body><div class="page"><div class="header"><div><div class="logo">A<span>vision</span></div><div style="font-size:12px;color:#888;margin-top:4px;">amiravision.com</div></div><div style="text-align:right;"><div style="background:#f5f5f5;border-radius:6px;padding:4px 12px;font-size:12px;color:#555;">Invoice #'+id+'</div><div style="font-size:12px;color:#888;margin-top:6px;">'+date+'</div></div></div><div class="row"><div class="col"><h4>From</h4><p><strong>Amir</strong><br>Amir Avision LLC<br>contact@amiravision.com</p></div><div class="col" style="text-align:right;"><h4>To</h4><p><strong>'+clientName+'</strong><br>'+clientEmail+'</p></div></div><div class="divider"></div><table class="item-table"><thead><tr><th>Description</th><th style="text-align:right;">Amount</th></tr></thead><tbody><tr><td><strong>'+title+'</strong>'+(notes?'<br><span style="color:#888;font-size:12px;">'+notes+'</span>':'')+'</td><td style="text-align:right;font-weight:600;">'+sym+parseFloat(amount).toLocaleString()+' '+currency+'</td></tr></tbody></table><div class="total-row"><span class="total-label">Total</span><span class="total-amount">'+sym+parseFloat(amount).toLocaleString()+' '+currency+'</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:0 12px;margin-top:12px;"><span style="font-size:13px;color:#888;">Due: <strong>'+due+'</strong></span><span class="status-pill">'+status.charAt(0).toUpperCase()+status.slice(1)+'</span></div><div class="footer">Amir Avision LLC · amiravision.com · contact@amiravision.com</div></div></body></html>';
+  var w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=function(){w.print();};
+  toast('Invoice PDF ready','ok');
+}
+function payNow(id,amount,cur,desc){
+  var btn=document.getElementById('pb'+id);if(btn){btn.textContent='Loading...';btn.disabled=true;}
+  fetch(SF,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:parseFloat(amount),currency:cur.toLowerCase(),invoice_id:id,client_email:me.email,description:desc})})
+    .then(function(r){return r.json();}).then(function(d){if(d.url)window.location.href=d.url;else{if(btn){btn.textContent='Pay Now →';btn.disabled=false;}toast('Payment error','err');}}).catch(function(){if(btn){btn.textContent='Pay Now →';btn.disabled=false;}});
+}
+function qr(msg){var i=document.getElementById('cIn');i.value=msg;sendMsg();}
+function sendMsg(){
+  var inp=document.getElementById('cIn'),m=inp.value.trim();if(!m||!me)return;inp.value='';
+  sb.from('messages').insert({client_email:me.email,sender:'client',message:m,is_read:false}).then(function(){notifyAdmin('Message',m);});
+}
+function sendChatFile(file){
+  if(!file||!me)return;
+  if(file.size>10*1024*1024){toast('File too large (max 10MB)','err');return;}
+  toast('Uploading...','');
+  sb.storage.from('project-files').upload(me.email+'/chat/'+Date.now()+'_'+file.name,file).then(function(r){
+    if(r.error){toast('Upload failed','err');return;}
+    var ext=file.name.split('.').pop().toLowerCase();
+    var ico=['mp4','mov','avi'].includes(ext)?'🎬':['jpg','jpeg','png','gif'].includes(ext)?'🖼️':'📎';
+    var msg=ico+' '+file.name+' ('+(file.size<1048576?(file.size/1024).toFixed(1)+' KB':(file.size/1048576).toFixed(1)+' MB')+')';
+    sb.from('messages').insert({client_email:me.email,sender:'client',message:msg,is_read:false}).then(function(){notifyAdmin('File in Chat',file.name);toast('File sent!','ok');});
+  });
+}
+function loadMsgs(){
+  if(!me)return;
+  sb.from('messages').select('*').eq('client_email',me.email).order('created_at',{ascending:true}).then(function(r){renderMsgs(r.data||[]);});
+}
+function renderMsgs(data){
+  var c=document.getElementById('cMsgs');if(!c)return;
+  if(!data.length){c.innerHTML='<div class="chat-empty">No messages yet — start a conversation.</div>';return;}
+  var unread=data.filter(function(m){return m.sender==='admin'&&!m.is_read;});
+  if(unread.length)unread.forEach(function(m){sb.from('messages').update({is_read:true}).eq('id',m.id);});
+  c.innerHTML=data.map(function(m){
+    var mine=m.sender==='client',t=new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    var tick=mine?'<span style="font-size:10px;margin-left:4px;color:'+(m.is_read?'#22c55e':'var(--text3)')+';">'+(m.is_read?'✓✓':'✓')+'</span>':'';
+    return '<div class="mrow '+(mine?'me':'them')+'">'+(mine?'':'<div class="msnd">Amir</div>')+'<div class="mbub">'+m.message+'</div><div class="mtime">'+t+tick+'</div></div>';
+  }).join('');
+  requestAnimationFrame(function(){c.scrollTop=c.scrollHeight;});
+}
+function checkPresence(){
+  if(!me)return;
+  sb.from('admin_presence').select('*').limit(1).then(function(r){
+    if(!r.data||!r.data.length)return;
+    var p=r.data[0];
+    var isOnline=(Date.now()-new Date(p.last_seen).getTime())<3*60*1000;
+    var dot=document.getElementById('onlineDot'),txt=document.getElementById('onlineTxt');
+    if(dot){dot.style.background=isOnline?'#22c55e':'var(--text3)';dot.style.boxShadow=isOnline?'0 0 6px #22c55e':'';}
+    if(txt){txt.textContent=isOnline?'Online':'Offline';txt.style.color=isOnline?'#22c55e':'var(--text3)';}
+    var tb=document.getElementById('typingBar');
+    if(tb)tb.style.display=(p.is_typing&&p.typing_for===me.email&&isOnline)?'block':'none';
+  });
+}
+// EMOJI
+var EMOJIS=['😊','😂','🔥','❤️','👍','🙏','😍','🎉','✅','💯','😎','🤩','🚀','⚡','💪','👏','🎬','📹','✨','💫','😅','🤔','👀','💡','🎯','💎','🌟','😁','🙌','👌','💬','📱','🎥','🏆','⭐','💰','📅','🔄','📁','🎊','🤝','👋','🥳'];
+(function(){
+  var grid=document.getElementById('emojiGrid');if(!grid)return;
+  EMOJIS.forEach(function(e){
+    var btn=document.createElement('button');btn.textContent=e;
+    btn.style.cssText='background:none;border:none;font-size:20px;cursor:pointer;padding:4px;border-radius:4px;transition:background .15s;';
+    btn.onmouseover=function(){this.style.background='var(--surface2)';};btn.onmouseout=function(){this.style.background='none';};
+    btn.onclick=function(){var inp=document.getElementById('cIn');if(inp){inp.value+=e;inp.focus();}togEmoji();};
+    grid.appendChild(btn);
+  });
+})();
+function togEmoji(){var p=document.getElementById('emojiPicker');p.style.display=p.style.display==='block'?'none':'block';}
+document.addEventListener('click',function(e){
+  var ep=document.getElementById('emojiPicker');
+  if(ep&&ep.style.display==='block'&&!e.target.closest('.chat-input'))ep.style.display='none';
+});
+// NOTIFICATIONS
+function markAll(e){
+  e.stopPropagation();
+  if(me)sb.from('notifications').update({is_read:true}).eq('client_email',me.email).eq('is_read',false).then(function(){
+    notifs=notifs.map(function(n){return Object.assign({},n,{is_read:true});});renderNotifs();hideDot();
+  });
+}
+function renderNotifs(){
+  var b=document.getElementById('nBody');
+  var unread=notifs.filter(function(n){return !n.is_read;});
+  var nc=document.getElementById('nCount');
+  if(nc){nc.style.display=unread.length?'inline':'none';nc.textContent=unread.length;}
+  if(!notifs.length){b.innerHTML='<div class="npop-empty"><div class="npop-empty-ico">🔔</div><div>You\'re all caught up</div></div>';return;}
+  b.innerHTML=notifs.slice(0,10).map(function(n){
+    var t=new Date(n.created_at),diff=Math.floor((new Date()-t)/60000);
+    var ts=diff<1?'Just now':diff<60?diff+'m ago':diff<1440?Math.floor(diff/60)+'h ago':t.toLocaleDateString();
+    var tp=(n.type||'').toLowerCase();
+    var ic=tp.includes('invoice')||tp.includes('payment')?'💳':tp.includes('project')?'📁':'💬';
+    var hint=tp.includes('invoice')||tp.includes('payment')?'→ Invoices':'→ Messages';
+    return '<div class="nitem'+(n.is_read?'':' unread')+'" onclick="nItemClick(\''+n.type+'\','+n.id+')">'+
+      '<div class="nitem-ico">'+ic+'</div>'+
+      '<div class="nitem-body">'+
+        '<div class="nitem-t">'+n.title+'</div>'+
+        '<div class="nitem-m">'+n.message+'</div>'+
+        '<div class="nitem-time"><span>'+ts+'</span><span style="color:var(--accent);font-size:10px;">'+hint+'</span></div>'+
+      '</div></div>';
+  }).join('');
+}
+function nItemClick(type,id){
+  sb.from('notifications').update({is_read:true}).eq('id',id).then(function(){
+    notifs=notifs.map(function(n){return n.id===id?Object.assign({},n,{is_read:true}):n;});
+    if(!notifs.filter(function(n){return !n.is_read;}).length)hideDot();renderNotifs();
+  });
+  document.getElementById('nPop').style.display='none';
+  var tp=(type||'').toLowerCase();
+  if(tp.includes('invoice')||tp.includes('payment')){document.getElementById('invSec').closest('.sect').scrollIntoView({behavior:'smooth'});}
+  else{document.getElementById('msgSect').scrollIntoView({behavior:'smooth'});}
+}
+function showDot(){
+  if(!notifs.filter(function(n){return !n.is_read;}).length)return;
+  document.getElementById('bDot').style.display='block';
+}
+function hideDot(){document.getElementById('bDot').style.display='none';}
+// DRAG DROP
+var dz=document.getElementById('dz');
+dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('ov');});
+dz.addEventListener('dragleave',function(){dz.classList.remove('ov');});
+dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('ov');doUp(e.dataTransfer.files);});
+// START DASH
+function startDash(user){
+  if(me&&me.id===user.id)return;
+  me=user;
+  document.getElementById('authPage').style.display='none';
+  document.getElementById('dash').style.display='block';
+  var name=user.user_metadata&&user.user_metadata.full_name;
+  var initial=(name?name.charAt(0):user.email.charAt(0)).toUpperCase();
+  if(name)document.getElementById('wTitle').textContent='Welcome back, '+name.split(' ')[0]+' 👋';
+  document.getElementById('profName').textContent=name||user.email;
+  document.getElementById('profEmailTxt').textContent=user.email;
+  document.getElementById('profAv').textContent=initial;
+  document.getElementById('profIcon').textContent=initial;
+  loadProjects(user);loadFiles();loadMsgs();loadInvoices();
+  checkTermsAccepted(user);
+  sb.from('notifications').select('*').eq('client_email',user.email).order('created_at',{ascending:false}).then(function(r){
+    notifs=r.data||[];if(notifs.filter(function(n){return !n.is_read;}).length)showDot();
+  });
+  // REALTIME
+  if(poll){poll.unsubscribe();poll=null;}
+  poll=sb.channel('messages:'+user.email)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'client_email=eq.'+user.email},function(payload){
+      var m=payload.new;
+      if(m.sender==='admin'){sb.from('messages').update({is_read:true}).eq('id',m.id);toast('New message from Amir ⚡','');}
+      sb.from('messages').select('*').eq('client_email',user.email).order('created_at',{ascending:true}).then(function(r){renderMsgs(r.data||[]);});
+    })
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages',filter:'client_email=eq.'+user.email},function(){
+      sb.from('messages').select('*').eq('client_email',user.email).order('created_at',{ascending:true}).then(function(r){renderMsgs(r.data||[]);});
+    })
+    .subscribe();
+  if(window._presencePoll)clearInterval(window._presencePoll);
+  window._presencePoll=setInterval(function(){
+    if(!me)return;
+    checkPresence();
+    sb.from('notifications').select('*').eq('client_email',me.email).eq('is_read',false).then(function(r){
+      if(r.data&&r.data.length){notifs=r.data;showDot();}
+    });
+  },8000);
+  setTimeout(checkPresence,1000);
+}
 // PASSWORD RESET
-var _isRecovery=(function(){var pp=new URLSearchParams(window.location.hash.substring(1)||window.location.search.substring(1));return pp.get('type')==='recovery'&&(pp.get('token_hash')||pp.get('access_token'));})();
-var _recoveryTokens=null; // store tokens for re-use in doResetSave
-
 (function(){
   var h=window.location.hash.substring(1),s=window.location.search.substring(1);
   var p=new URLSearchParams(h||s);
   var at=p.get('access_token'),rt=p.get('refresh_token')||'',th=p.get('token_hash'),tp=p.get('type')||'signup';
-  
+  if(tp==='recovery'&&at){sb.auth.setSession({access_token:at,refresh_token:rt}).then(function(){window.history.replaceState({},'','/portal.html');var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;';o.innerHTML='<div style="background:#111;border:1px solid #222;border-radius:12px;padding:1.75rem;width:100%;max-width:360px;"><h2 style="font-size:16px;font-weight:600;margin-bottom:1.25rem;color:#ededed;font-family:Inter,sans-serif;">Set new password</h2><div style="margin-bottom:1rem;"><label style="display:block;font-size:12px;color:#a1a1a1;margin-bottom:6px;font-family:Inter,sans-serif;">New password</label><input type="password" id="rpw1" placeholder="Min. 6 characters" style="width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;color:#ededed;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:1rem;"><label style="display:block;font-size:12px;color:#a1a1a1;margin-bottom:6px;font-family:Inter,sans-serif;">Confirm password</label><input type="password" id="rpw2" placeholder="Repeat password" style="width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;color:#ededed;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;"></div><button onclick="doResetSave()" style="width:100%;background:#c9a84c;color:#000;border:none;border-radius:6px;padding:10px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">Update password</button><div id="rpwMsg" style="font-size:12px;margin-top:.75rem;text-align:center;font-family:Inter,sans-serif;"></div></div>';document.body.appendChild(o);});return;}
   if(th&&tp==='recovery'){
     sb.auth.verifyOtp({token_hash:th,type:'recovery'}).then(function(r){
       if(r.data&&r.data.session){
-        _recoveryTokens={access_token:r.data.session.access_token,refresh_token:r.data.session.refresh_token};
-        sb.auth.setSession(_recoveryTokens).then(function(){
+        window.history.replaceState({},'','/portal.html');
+        var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+        o.innerHTML='<div style="background:#111;border:1px solid #222;border-radius:12px;padding:1.75rem;width:100%;max-width:360px;"><h2 style="font-size:16px;font-weight:600;margin-bottom:1.25rem;color:#ededed;font-family:Inter,sans-serif;">Set new password</h2><div style="margin-bottom:1rem;"><label style="display:block;font-size:12px;color:#a1a1a1;margin-bottom:6px;font-family:Inter,sans-serif;">New password</label><input type="password" id="rpw1" placeholder="Min. 6 characters" style="width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;color:#ededed;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:1rem;"><label style="display:block;font-size:12px;color:#a1a1a1;margin-bottom:6px;font-family:Inter,sans-serif;">Confirm password</label><input type="password" id="rpw2" placeholder="Repeat password" style="width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;color:#ededed;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;"></div><button onclick="doResetSave()" style="width:100%;background:#c9a84c;color:#000;border:none;border-radius:6px;padding:10px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">Update password</button><div id="rpwMsg" style="font-size:12px;margin-top:.75rem;text-align:center;font-family:Inter,sans-serif;"></div></div>';
+        document.body.appendChild(o);
+      }
+    });return;
+  }
+  if(th&&tp==='recovery'){
+    sb.auth.verifyOtp({token_hash:th,type:'recovery'}).then(function(r){
+      if(r.data&&r.data.session){
+        sb.auth.setSession({access_token:r.data.session.access_token,refresh_token:r.data.session.refresh_token}).then(function(){
           window.history.replaceState({},'','/portal.html');
-          var o=document.createElement('div');o.innerHTML='<div style="position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;"><div style="background:#111;border:1px solid #222;border-radius:12px;padding:1.75rem;width:100%;max-width:360px;"><h2 style="font-size:16px;font-weight:600;margin-bottom:1.25rem;color:#ededed;font-family:Inter,sans-serif;">Set new password</h2><div style="margin-bottom:1rem;"><label style="display:block;font-size:12px;color:#a1a1a1;margin-bottom:6px;font-family:Inter,sans-serif;">New password</label><input type="password" id="rpw1" placeholder="Min. 8 characters" style="width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;color:#ededed;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:1rem;"><label style="display:block;font-size:12px;color:#a1a1a1;margin-bottom:6px;font-family:Inter,sans-serif;">Confirm password</label><input type="password" id="rpw2" placeholder="Repeat password" style="width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;color:#ededed;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;"></div><button onclick="doResetSave()" style="width:100%;background:#c9a84c;color:#000;border:none;border-radius:6px;padding:10px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">Update password</button><div id="rpwMsg" style="font-size:12px;margin-top:.75rem;text-align:center;font-family:Inter,sans-serif;"></div></div>';
+          var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+          o.innerHTML='<div style="background:#111;border:1px solid #222;border-radius:12px;padding:1.75rem;width:100%;max-width:360px;"><h2 style="font-size:16px;font-weight:600;margin-bottom:1.25rem;color:#ededed;font-family:Inter,sans-serif;">Set new password</h2><div style="margin-bottom:1rem;"><label style="display:block;font-size:12px;color:#a1a1a1;margin-bottom:6px;font-family:Inter,sans-serif;">New password</label><input type="password" id="rpw1" placeholder="Min. 6 characters" style="width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;color:#ededed;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:1rem;"><label style="display:block;font-size:12px;color:#a1a1a1;margin-bottom:6px;font-family:Inter,sans-serif;">Confirm password</label><input type="password" id="rpw2" placeholder="Repeat password" style="width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;color:#ededed;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;"></div><button onclick="doResetSave()" style="width:100%;background:#c9a84c;color:#000;border:none;border-radius:6px;padding:10px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">Update password</button><div id="rpwMsg" style="font-size:12px;margin-top:.75rem;text-align:center;font-family:Inter,sans-serif;"></div></div>';
           document.body.appendChild(o);
         });
       }
     });return;
   }
   if(th){sb.auth.verifyOtp({token_hash:th,type:tp}).then(function(r){if(r.data&&r.data.session)window.history.replaceState({},'','/portal.html');});}
+  else if(at){sb.auth.setSession({access_token:at,refresh_token:rt}).then(function(r){if(r.data&&r.data.session)window.history.replaceState({},'','/portal.html');});}
 })();
-
 async function doResetSave(){
   var p1=document.getElementById('rpw1').value,p2=document.getElementById('rpw2').value,msg=document.getElementById('rpwMsg');
   if(!p1||!p2){msg.textContent='Please fill both fields.';msg.style.color='#ef4444';return;}
-  if(p1.length<8){msg.textContent='Min. 8 characters.';msg.style.color='#ef4444';return;}
-  if(!/[A-Z]/.test(p1)){msg.textContent='Need 1 capital letter.';msg.style.color='#ef4444';return;}
-  if(!/[!@#$%^&*()_+\-=\[\]{}|,.<>?]/.test(p1)){msg.textContent='Need 1 special character.';msg.style.color='#ef4444';return;}
+  if(p1.length<6){msg.textContent='Min. 6 characters.';msg.style.color='#ef4444';return;}
   if(p1!==p2){msg.textContent='Passwords do not match.';msg.style.color='#ef4444';return;}
   msg.textContent='Updating...';msg.style.color='#a1a1a1';
-  
-  // Re-set session before updateUser to prevent "Auth session missing!" error
-  if(_recoveryTokens){
-    var sr=await sb.auth.setSession(_recoveryTokens);
-    if(sr.error){msg.textContent='Session expired. Please request a new reset link.';msg.style.color='#ef4444';return;}
-  }
-  
   const{error}=await sb.auth.updateUser({password:p1});
   if(error){msg.textContent=error.message;msg.style.color='#ef4444';return;}
   msg.textContent='✓ Password updated!';msg.style.color='#22c55e';
-  _recoveryTokens=null;
   setTimeout(function(){window.location.href='/portal.html';},2000);
 }
-
-// SESSION CHECK - FIX 4: _isRecovery guard protects recovery session
+// SESSION CHECK
 sb.auth.getSession().then(function(r){
   if(r.data&&r.data.session){
-    if(_isRecovery)return;
-    document.getElementById('dash').style.display='block';
-    document.getElementById('authPage').style.display='none';
-    me=r.data.session.user;
+    if(sessionStorage.getItem('otp_verified')==='true'){startDash(r.data.session.user);}
+    else{sb.auth.signOut();}
   }
 });
-function checkPasswordStrength(){
-  var pw=document.getElementById('sP').value;
-  var reqs=document.getElementById('pwReqs');
-  var req8=document.getElementById('req8');
-  var reqCap=document.getElementById('reqCap');
-  var reqSpec=document.getElementById('reqSpec');
-  
-  reqs.style.display=pw.length>0?'block':'none';
-  
-  var has8=pw.length>=8;
-  var hasCap=/[A-Z]/.test(pw);
-  var hasSpec=/[!@#$%^&*()_+\-=\[\]{}|,.<>?]/.test(pw);
-  
-  req8.textContent=has8?'✅':'❌';
-  req8.style.color=has8?'#22c55e':'#ef4444';
-  req8.parentElement.style.color=has8?'#22c55e':'#999';
-  
-  reqCap.textContent=hasCap?'✅':'❌';
-  reqCap.style.color=hasCap?'#22c55e':'#ef4444';
-  reqCap.parentElement.style.color=hasCap?'#22c55e':'#999';
-  
-  reqSpec.textContent=hasSpec?'✅':'❌';
-  reqSpec.style.color=hasSpec?'#22c55e':'#ef4444';
-  reqSpec.parentElement.style.color=hasSpec?'#22c55e':'#999';
-}
-
+sb.auth.onAuthStateChange(function(ev,session){
+  if(session&&ev==='TOKEN_REFRESHED'&&sessionStorage.getItem('otp_verified')==='true')startDash(session.user);
+  else if(session&&ev==='USER_UPDATED')startDash(session.user);
+  else if(!session){me=null;document.getElementById('dash').style.display='none';document.getElementById('authPage').style.display='flex';}
+});
 </script>
 </body>
 </html>
